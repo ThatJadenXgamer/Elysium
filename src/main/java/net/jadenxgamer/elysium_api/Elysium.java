@@ -3,6 +3,7 @@ package net.jadenxgamer.elysium_api;
 import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.api.biome.ElysiumBiomeRegistry;
 import net.jadenxgamer.elysium_api.impl.ElysiumRegistries;
+import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
 import net.jadenxgamer.elysium_api.impl.use_behavior.UseBehaviorImpl;
 import net.minecraft.core.Holder;
@@ -49,19 +50,21 @@ public class Elysium {
     public void onServerAboutToStart(ServerAboutToStartEvent event) {
         registryAccess = event.getServer().registryAccess();
 
-        ElysiumBiomeRegistry.registerNetherBiome(Biomes.BADLANDS, registryAccess);
+        //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.BADLANDS, Biomes.SOUL_SAND_VALLEY, 0.5, 16, registryAccess);
 
         Registry<LevelStem> levelStems = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
-        for (ResourceKey<LevelStem> levelStemKey : levelStems.registryKeySet()) {
-            Optional<Holder.Reference<LevelStem>> optionalLevelStem = levelStems.getHolder(levelStemKey);
+        for (ResourceKey<LevelStem> dimension : levelStems.registryKeySet()) {
+            Optional<Holder.Reference<LevelStem>> optionalLevelStem = levelStems.getHolder(dimension);
             if (optionalLevelStem.isPresent() && optionalLevelStem.get().value().generator().getBiomeSource() instanceof ElysiumBiomeSource biomeSource) {
-                if (levelStemKey.equals(LevelStem.OVERWORLD)) {
-                    // makes all overworld registered biomes locatable
-                    biomeSource.addPossibleBiomes(ElysiumBiomeRegistry.overworldPossibleBiomes);
+                if (dimension.equals(LevelStem.OVERWORLD)) {
+                    // initializes BiomeReplacer for the Overworld
+                    biomeSource.setDimension(LevelStem.OVERWORLD);
+                    biomeSource.addPossibleBiomes(ElysiumBiomeHelper.overworldPossibleBiomes);
                 }
-                else if (levelStemKey.equals(LevelStem.NETHER)) {
-                    // makes all nether registered biomes locatable
-                    biomeSource.addPossibleBiomes(ElysiumBiomeRegistry.netherPossibleBiomes);
+                else if (dimension.equals(LevelStem.NETHER)) {
+                    // initializes BiomeReplacer for the Nether
+                    biomeSource.setDimension(LevelStem.NETHER);
+                    biomeSource.addPossibleBiomes(ElysiumBiomeHelper.netherPossibleBiomes);
                 }
                 //TODO: End Biomes
             }

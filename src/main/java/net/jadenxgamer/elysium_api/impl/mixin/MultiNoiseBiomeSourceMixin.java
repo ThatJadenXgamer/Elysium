@@ -1,12 +1,13 @@
 package net.jadenxgamer.elysium_api.impl.mixin;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeHelper;
+import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.dimension.LevelStem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
 import java.util.Random;
 
 @Mixin(value = MultiNoiseBiomeSource.class, priority = 800)
@@ -28,27 +30,26 @@ public abstract class MultiNoiseBiomeSourceMixin {
             cancellable = true
     )
     private void elysium$getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir) {
-        int eX = x / 16;
-        int eZ = z / 16;
+        Holder<Biome> currentBiome = this.parameters().findValue(sampler.sample(x, y, z));
 
-        long seed = makeCoordinatesIntoSeed(eX, eZ);
-        Random random = new Random(seed);
+        if (this instanceof ElysiumBiomeSource biomeSource && isReplaceableDimension(biomeSource.getDimension())) {
+            List<ElysiumBiomeHelper.BiomeReplacer> matchingReplaces = ElysiumBiomeHelper.biomesForDimension(biomeSource.getDimension()).stream().filter(p -> p.canReplace().is(currentBiome.unwrapKey().get())).toList();
+            if (matchingReplaces.isEmpty()) {
+                return;
+            }
 
-        if (random.nextDouble() < 0.5) {
-            Holder<Biome> currentBiome = this.parameters().findValueBruteForce(sampler.sample(x, y, z));
-            if (currentBiome.is(Biomes.SOUL_SAND_VALLEY)) {
-                cir.setReturnValue(Elysium.registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.BADLANDS));
+            for (ElysiumBiomeHelper.BiomeReplacer replacer : matchingReplaces) {
+                int scaledX = x / replacer.size();
+                int scaledZ = z / replacer.size();
+                Random random = new Random(makeCoordinatesIntoSeed(scaledX, scaledZ));
+
+                if (random.nextDouble() < replacer.rarity()) {
+                    cir.setReturnValue(replacer.biome());
+                    return;
+                }
             }
         }
     }
-
-//    @Unique
-//    private static Holder<Biome> replaceBiome(Holder<Biome> original, int x, int y, int z, Climate.Sampler sampler) {
-//        if (original.is(Biomes.SOUL_SAND_VALLEY)) {
-//            return cir.setReturnValue(Elysium.registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.BADLANDS));;
-//        }
-//        return original;
-//    }
 
     @Unique
     private long makeCoordinatesIntoSeed(int regionX, int regionZ) {
@@ -56,5 +57,10 @@ public abstract class MultiNoiseBiomeSourceMixin {
         long x = 31L * regionX + 17;
         long z = 37L * regionZ + 23;
         return (x ^ z) * 0x5DEECE66DL;
+    }
+
+    @Unique
+    private boolean isReplaceableDimension(ResourceKey<LevelStem> dimension) {
+        return dimension.equals(LevelStem.OVERWORLD) || dimension.equals(LevelStem.NETHER);
     }
 }

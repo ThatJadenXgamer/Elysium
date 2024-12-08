@@ -5,8 +5,10 @@ import com.google.common.collect.ImmutableSet;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.dimension.LevelStem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,6 +26,9 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
     @Unique
     private boolean elysium$hasMergedPossibleBiomes = false;
 
+    @Unique
+    private ResourceKey<LevelStem> elysium$currentDimension = null;
+
     @Override
     public void addPossibleBiomes(Set<Holder<Biome>> biomes) {
         if(elysium$hasMergedPossibleBiomes) {
@@ -35,5 +40,16 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
         builder.addAll(biomes);
         this.possibleBiomes = Suppliers.memoize(builder::build);
         this.elysium$hasMergedPossibleBiomes = true;
+        Elysium.LOGGER.info("ElysiumBiomeSource successfully initialized for " + elysium$currentDimension);
+    }
+
+    @Override
+    public void setDimension(ResourceKey<LevelStem> dimension) {
+        this.elysium$currentDimension = dimension;
+    }
+
+    @Override
+    public ResourceKey<LevelStem> getDimension() {
+        return this.elysium$currentDimension;
     }
 }
