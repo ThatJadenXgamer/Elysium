@@ -1,8 +1,0 @@
-{
-  "dimension": "minecraft:the_nether",
-  "biomes": "minecraft:soul_sand_valley",
-  "logic": {
-    "replacement_biome": "netherexp:sorrowsquash_pastures",
-    "rarity": 0.5
-  }
-}

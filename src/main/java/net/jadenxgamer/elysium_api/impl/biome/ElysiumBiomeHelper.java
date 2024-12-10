@@ -21,10 +21,7 @@ public class ElysiumBiomeHelper {
         if (dimension.equals(LevelStem.OVERWORLD)) {
             return overworldBiomes;
         }
-        else if (dimension.equals(LevelStem.NETHER)) {
-            return netherBiomes;
-        }
-        else return null;
+        else return netherBiomes;
     }
 
     public record BiomeReplacer(ResourceKey<LevelStem> dimension, Holder<Biome> biome, Holder<Biome> canReplace, double rarity, int size) {

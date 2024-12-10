@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api;
 
 import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.api.biome.ElysiumBiomeRegistry;
+import net.jadenxgamer.elysium_api.api.surface_rules.SurfaceRulesRegistry;
 import net.jadenxgamer.elysium_api.impl.ElysiumRegistries;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
@@ -50,7 +51,8 @@ public class Elysium {
     public void onServerAboutToStart(ServerAboutToStartEvent event) {
         registryAccess = event.getServer().registryAccess();
 
-        //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.BADLANDS, Biomes.SOUL_SAND_VALLEY, 0.5, 16, registryAccess);
+//        ElysiumBiomeRegistry.replaceNetherBiome(Biomes.BADLANDS, Biomes.SOUL_SAND_VALLEY, 0.5, 16, registryAccess); // example of how you use BiomeReplacer
+//        ElysiumBiomeRegistry.replaceNetherBiome(Biomes.DESERT, Biomes.BADLANDS, 0.5, 24, registryAccess); // and yes, you can replace already replaced biomes lmfao
 
         Registry<LevelStem> levelStems = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
         for (ResourceKey<LevelStem> dimension : levelStems.registryKeySet()) {

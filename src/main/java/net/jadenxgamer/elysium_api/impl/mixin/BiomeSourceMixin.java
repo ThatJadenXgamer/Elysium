@@ -40,7 +40,7 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
         builder.addAll(biomes);
         this.possibleBiomes = Suppliers.memoize(builder::build);
         this.elysium$hasMergedPossibleBiomes = true;
-        Elysium.LOGGER.info("ElysiumBiomeSource successfully initialized for " + elysium$currentDimension);
+        Elysium.LOGGER.info("ElysiumBiomeSource successfully initialized for " + elysium$currentDimension.location());
     }
 
     @Override
