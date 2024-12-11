@@ -1,6 +1,5 @@
 package net.jadenxgamer.elysium_api.impl.biome;
 
-import net.jadenxgamer.elysium_api.api.biome.ElysiumBiomeRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
