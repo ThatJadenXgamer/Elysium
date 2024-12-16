@@ -1,10 +1,12 @@
 package net.jadenxgamer.elysium_api.impl.mixin;
 
 import com.mojang.datafixers.util.Either;
+import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
 import net.jadenxgamer.elysium_api.impl.compat.ElysiumTerrablenderHelper;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
@@ -50,15 +52,15 @@ public abstract class MultiNoiseBiomeSourceMixin {
             do {
                 biomeReplacedInThisIteration = false;
                 for (ElysiumBiomeHelper.BiomeReplacer replacer : biomeReplacers) {
-                    if (replacer.canReplace().is(currentBiome.unwrapKey().get())) {
+                    if (currentBiome.is(replacer.canReplace())) {
                         // scales x and z coordinates based on the replacer size
                         int scaledX = x / replacer.size();
                         int scaledZ = z / replacer.size();
-                        long uniqueSeed = makeCoordinatesIntoSeed(scaledX, scaledZ) ^ replacer.hashCode();
+                        long uniqueSeed = makeCoordinatesIntoSeed(scaledX, scaledZ) ^ replacer.id().hashCode();
                         double random = new Random(uniqueSeed).nextDouble();
 
                         if (random < replacer.rarity()) {
-                            currentBiome = replacer.biome();
+                            currentBiome = Elysium.registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.biome());
                             biomeReplacedInThisIteration = true;
                             biomeReplaced = true;
                             break;
@@ -80,4 +82,13 @@ public abstract class MultiNoiseBiomeSourceMixin {
         long z = 37L * scaledZ + 23;
         return (x ^ z) * 0x5DEECE66DL;
     }
+
+//    Something for future me to mess around with
+//    @Unique
+//    private boolean shouldReplaceBiome(int x, int z, double threshold) {
+//        double scale = 0.01;
+//        double noiseValue = elysium$noise.getValue(x * scale, z * scale);
+//
+//        return (noiseValue + 1) / 2.0 < threshold;
+//    }
 }

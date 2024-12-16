@@ -6,6 +6,7 @@ import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -22,7 +23,6 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
     @Shadow
     @Mutable
     public Supplier<Set<Holder<Biome>>> possibleBiomes;
-
     @Unique
     private boolean elysium$hasMergedPossibleBiomes = false;
 

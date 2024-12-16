@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api.impl.biome;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 
@@ -23,7 +24,7 @@ public class ElysiumBiomeHelper {
         else return netherBiomes;
     }
 
-    public record BiomeReplacer(ResourceKey<LevelStem> dimension, Holder<Biome> biome, Holder<Biome> canReplace, double rarity, int size) {
+    public record BiomeReplacer(ResourceKey<LevelStem> dimension, ResourceKey<Biome> biome, ResourceKey<Biome> canReplace, double rarity, int size, ResourceLocation id) {
 
     }
 }
