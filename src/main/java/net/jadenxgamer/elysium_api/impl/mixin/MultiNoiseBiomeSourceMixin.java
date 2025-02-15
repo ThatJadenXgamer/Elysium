@@ -20,8 +20,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Mixin(value = MultiNoiseBiomeSource.class, priority = -800)
 public abstract class MultiNoiseBiomeSourceMixin {
@@ -36,51 +38,57 @@ public abstract class MultiNoiseBiomeSourceMixin {
             cancellable = true
     )
     private void elysium$getNoiseBiome(int x, int y, int z, Climate.Sampler sampler, CallbackInfoReturnable<Holder<Biome>> cir) {
-        Holder<Biome> currentBiome;
-        if (FMLLoader.getLoadingModList().getModFileById("terrablender") != null) {
-            // if Terrablender is present then obtain its climate parameters for more accurate replacements
-            currentBiome = ElysiumTerrablenderHelper.getCurrentBiome(((MultiNoiseBiomeSource) (Object) this), x, y, z, sampler);
-        } else {
-            currentBiome = this.parameters().findValue(sampler.sample(x, y, z));
-        }
+        Holder<Biome> currentBiome = getCurrentBiome(x, y, z, sampler);
 
         if (this instanceof ElysiumBiomeSource sourceElysium && sourceElysium.getDimension() != null) {
             List<ElysiumBiomeHelper.BiomeReplacer> biomeReplacers = ElysiumBiomeHelper.biomesForDimension(sourceElysium.getDimension());
 
-            boolean biomeReplaced = false;
-            boolean biomeReplacedInThisIteration;
-            do {
-                biomeReplacedInThisIteration = false;
-                for (ElysiumBiomeHelper.BiomeReplacer replacer : biomeReplacers) {
-                    if (currentBiome.is(replacer.canReplace())) {
-                        // scales x and z coordinates based on the replacer size
-                        int scaledX = x / replacer.size();
-                        int scaledZ = z / replacer.size();
-                        long uniqueSeed = makeCoordinatesIntoSeed(scaledX, scaledZ) ^ replacer.id().hashCode();
-                        double random = new Random(uniqueSeed).nextDouble();
+            Holder<Biome> replacedBiome = replaceBiomeIfNeeded(x, z, currentBiome, biomeReplacers, sourceElysium.getWorldSeed());
 
-                        if (random < replacer.rarity()) {
-                            currentBiome = Elysium.registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.biome());
-                            biomeReplacedInThisIteration = true;
-                            biomeReplaced = true;
-                            break;
-                        }
-                    }
-                }
-            } while (biomeReplacedInThisIteration); // we do this to allow other BiomeReplacers to replace already biomeReplaced biomes
-
-            if (biomeReplaced) {
-                cir.setReturnValue(currentBiome);
+            if (replacedBiome != null && !replacedBiome.equals(currentBiome)) {
+                cir.setReturnValue(replacedBiome);
             }
         }
     }
 
     @Unique
-    private long makeCoordinatesIntoSeed(int scaledX, int scaledZ) {
-        // Generates a seed depending on the scaled coordinates for consistent randomness
+    private Holder<Biome> getCurrentBiome(int x, int y, int z, Climate.Sampler sampler) {
+        if (FMLLoader.getLoadingModList().getModFileById("terrablender") != null) {
+            // if Terrablender is present then get it's regional parameters for more accurate replacements
+            return ElysiumTerrablenderHelper.getCurrentBiome(((MultiNoiseBiomeSource) (Object) this), x, y, z, sampler);
+        } else {
+            return this.parameters().findValue(sampler.sample(x, y, z));
+        }
+    }
+
+    @Unique
+    private Holder<Biome> replaceBiomeIfNeeded(int x, int z, Holder<Biome> currentBiome, List<ElysiumBiomeHelper.BiomeReplacer> biomeReplacers, long worldSeed) {
+        Set<Holder<Biome>> processedBiomes = new HashSet<>();
+
+        while (currentBiome != null && processedBiomes.add(currentBiome)) {
+            for (ElysiumBiomeHelper.BiomeReplacer replacer : biomeReplacers) {
+                if (currentBiome.is(replacer.canReplace())) {
+                    int scaledX = x / replacer.size();
+                    int scaledZ = z / replacer.size();
+                    long uniqueSeed = makeCoordinatesIntoSeed(scaledX, scaledZ, worldSeed) ^ replacer.id().hashCode();
+
+                    if (new Random(uniqueSeed).nextDouble() < replacer.rarity()) {
+                        currentBiome = Elysium.registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.biome());
+                        break;
+                    }
+                }
+            }
+        }
+        return currentBiome;
+    }
+
+    @Unique
+    private long makeCoordinatesIntoSeed(int scaledX, int scaledZ, long worldSeed) {
+        // Generates a seed depending on the scaled coordinates and world seed for consistent randomness
         long x = 31L * scaledX + 17;
         long z = 37L * scaledZ + 23;
-        return (x ^ z) * 0x5DEECE66DL;
+        long coordinatedSeed = (x ^ z) ^ worldSeed;
+        return coordinatedSeed * 0x5DEECE66DL;
     }
 
 //    Something for future me to mess around with

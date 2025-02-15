@@ -23,11 +23,15 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
     @Shadow
     @Mutable
     public Supplier<Set<Holder<Biome>>> possibleBiomes;
+
     @Unique
     private boolean elysium$hasMergedPossibleBiomes = false;
 
     @Unique
     private ResourceKey<LevelStem> elysium$currentDimension = null;
+
+    @Unique
+    private long elysium$worldSeed = 0L;
 
     @Override
     public void addPossibleBiomes(Set<Holder<Biome>> biomes) {
@@ -51,5 +55,15 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
     @Override
     public ResourceKey<LevelStem> getDimension() {
         return this.elysium$currentDimension;
+    }
+
+    @Override
+    public void setWorldSeed(long seed) {
+        this.elysium$worldSeed = seed;
+    }
+
+    @Override
+    public long getWorldSeed() {
+        return this.elysium$worldSeed;
     }
 }

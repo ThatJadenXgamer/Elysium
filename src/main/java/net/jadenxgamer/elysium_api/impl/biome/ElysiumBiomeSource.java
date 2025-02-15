@@ -14,4 +14,8 @@ public interface ElysiumBiomeSource {
     void setDimension(ResourceKey<LevelStem> dimension);
 
     ResourceKey<LevelStem> getDimension();
+
+    void setWorldSeed(long seed);
+
+    long getWorldSeed();
 }

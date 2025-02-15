@@ -17,9 +17,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Optional;
 
-public record UseBehavior(HolderSet<Block> blocks, HolderSet<Item> itemCondition, int chanceToFail, Behavior behavior) {
+public record UseBehavior(HolderSet<Block> blocks, Optional<BlockState> blockstateCondition, HolderSet<Item> itemCondition, int chanceToFail, Behavior behavior) {
     public static final Codec<UseBehavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.BLOCK).fieldOf("blocks").forGetter(UseBehavior::blocks),
+            BlockState.CODEC.optionalFieldOf("blockstate_condition").forGetter(UseBehavior::blockstateCondition),
             RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("item_condition").forGetter(UseBehavior::itemCondition),
             Codec.INT.optionalFieldOf("chance_to_fail", 0).forGetter(UseBehavior::chanceToFail),
             Behavior.CODEC.fieldOf("behaviors").forGetter(UseBehavior::behavior)
@@ -27,7 +28,7 @@ public record UseBehavior(HolderSet<Block> blocks, HolderSet<Item> itemCondition
 
     public record Behavior(UseBehaviorTypeEnum type, Optional<BlockState> block,
                            Optional<ResourceLocation> item, int itemCount, Optional<ResourceLocation> feature,
-                           PosEnum pos, int posOffset, AfterUseItemEnum afterUseItem, boolean canReplace,
+                           PosEnum pos, int posOffset, AfterUseItemEnum afterUseItem, boolean canReplace, boolean breakParticles,
                            Optional<Sounds> sounds, Optional<Particles> particles) {
         public static final Codec<Behavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 UseBehaviorTypeEnum.CODEC.optionalFieldOf("type", UseBehaviorTypeEnum.PLACE).forGetter(Behavior::type),
@@ -36,9 +37,10 @@ public record UseBehavior(HolderSet<Block> blocks, HolderSet<Item> itemCondition
                 Codec.INT.optionalFieldOf("item_count", 1).forGetter(Behavior::itemCount),
                 ResourceLocation.CODEC.optionalFieldOf("feature").forGetter(Behavior::feature),
                 PosEnum.CODEC.optionalFieldOf("pos", PosEnum.NOOP).forGetter(Behavior::pos),
-                Codec.INT.optionalFieldOf("pos_offset", 0).forGetter(Behavior::posOffset),
+                Codec.INT.optionalFieldOf("pos_offset", 1).forGetter(Behavior::posOffset),
                 AfterUseItemEnum.CODEC.optionalFieldOf("after_use_item", AfterUseItemEnum.NOTHING).forGetter(Behavior::afterUseItem),
                 Codec.BOOL.optionalFieldOf("can_replace_solids", false).forGetter(Behavior::canReplace),
+                Codec.BOOL.optionalFieldOf("break_particles", false).forGetter(Behavior::breakParticles),
                 Sounds.CODEC.optionalFieldOf("sounds").forGetter(Behavior::sounds),
                 Particles.CODEC.optionalFieldOf("particles").forGetter(Behavior::particles)
         ).apply(instance, Behavior::new));
@@ -53,12 +55,14 @@ public record UseBehavior(HolderSet<Block> blocks, HolderSet<Item> itemCondition
         ).apply(instance, Sounds::new));
     }
 
-    public record Particles(ResourceLocation particleType, double xv, double yv, double zv) {
+    public record Particles(ResourceLocation particleType, int count, double speed, double xOffset, double yOffset, double zOffset) {
         public static final Codec<Particles> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 ResourceLocation.CODEC.fieldOf("particle_type").forGetter(Particles::particleType),
-                Codec.DOUBLE.optionalFieldOf("x_velocity", 0.0).forGetter(Particles::xv),
-                Codec.DOUBLE.optionalFieldOf("y_velocity", 0.0).forGetter(Particles::yv),
-                Codec.DOUBLE.optionalFieldOf("z_velocity", 0.0).forGetter(Particles::zv)
+                Codec.INT.optionalFieldOf("count", 1).forGetter(Particles::count),
+                Codec.DOUBLE.optionalFieldOf("speed", 0.0).forGetter(Particles::speed),
+                Codec.DOUBLE.optionalFieldOf("x_offset", 0.0).forGetter(Particles::xOffset),
+                Codec.DOUBLE.optionalFieldOf("y_offset", 0.0).forGetter(Particles::yOffset),
+                Codec.DOUBLE.optionalFieldOf("z_offset", 0.0).forGetter(Particles::zOffset)
         ).apply(instance, Particles::new));
     }
 }

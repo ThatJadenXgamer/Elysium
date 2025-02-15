@@ -30,9 +30,7 @@ import java.util.Optional;
 public class UseBehaviorImpl {
 
     public static void init(PlayerInteractEvent.RightClickBlock event) {
-        if (Elysium.registryAccess == null) {
-            return;
-        }
+        if (Elysium.registryAccess == null) return;
         Level level = event.getLevel();
         BlockState state = level.getBlockState(event.getPos());
         Player player = event.getEntity();
@@ -41,20 +39,18 @@ public class UseBehaviorImpl {
         Optional<UseBehavior> useBehavior = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BLOCK_USE_BEHAVIORS).stream()
                 .filter(s -> s.blocks().contains(state.getBlockHolder()) && s.itemCondition().contains(stack.getItemHolder())).findFirst();
 
-        if (level.isClientSide()) {
-            return;
-        }
+        if (level.isClientSide()) return;
 
-        if (useBehavior.isEmpty()) {
-            // returns if no registry was found
-            return;
-        }
+        // returns if no registry was found
+        if (useBehavior.isEmpty()) return;
 
         UseBehavior registry = useBehavior.get();
         BlockPos pos = getPosFromCodec(registry.behavior().pos(), registry.behavior().posOffset(), event);
-        if (!registry.behavior().canReplace() && !level.getBlockState(pos).canBeReplaced()) {
-            // returns if the current block in pos cannot be replaced
-            return;
+        // returns if the current block in pos cannot be replaced
+        if (placeRelated(registry) && !registry.behavior().canReplace() && !level.getBlockState(pos).canBeReplaced()) return;
+
+        if (registry.blockstateCondition().isPresent()) {
+            if (!registry.blockstateCondition().get().equals(state)) return;
         }
 
         if (!player.getAbilities().instabuild) {
@@ -65,7 +61,7 @@ public class UseBehaviorImpl {
             level.playSound(null, event.getPos(), registry.behavior().sounds().get().soundEvent(), SoundSource.BLOCKS, registry.behavior().sounds().get().volume(), registry.behavior().sounds().get().pitch());
         }
         if (registry.behavior().particles().isPresent()) {
-            spawnParticles(level, pos, registry.behavior().particles().get().particleType(), registry.behavior().particles().get().xv(), registry.behavior().particles().get().yv(), registry.behavior().particles().get().zv());
+            spawnParticles((ServerLevel) level, pos, registry.behavior().particles().get().particleType(), registry.behavior().particles().get().count(), registry.behavior().particles().get().speed(), registry.behavior().particles().get().xOffset(), registry.behavior().particles().get().yOffset(), registry.behavior().particles().get().zOffset());
         }
 
         int chanceToFail = registry.chanceToFail();
@@ -80,10 +76,14 @@ public class UseBehaviorImpl {
         switch (registry.behavior().type()) {
             case PLACE -> placeBlock(level, pos, registry.behavior().block().get(), event);
             case PLACE_ITSELF -> placeBlock(level, pos, state, event);
-            case DROP -> dropStack(level, pos, event.getFace(), state.getBlock(), registry.behavior().item().get(), registry.behavior().itemCount());
-            case DROP_ITSELF -> dropStack(level, pos, event.getFace(), state.getBlock(), ForgeRegistries.BLOCKS.getKey(state.getBlock()), registry.behavior().itemCount());
+            case DROP -> dropStack(level, pos, event.getFace(), registry.behavior().item().get(), registry.behavior().itemCount());
+            case DROP_ITSELF -> dropStack(level, pos, event.getFace(), ForgeRegistries.BLOCKS.getKey(state.getBlock()), registry.behavior().itemCount());
             case FEATURE -> placeFeature(level, pos, registry.behavior().feature().get());
             case INSERT_STACK -> insertStack(player, registry.behavior().item().get(), registry.behavior().itemCount());
+        }
+
+        if (registry.behavior().breakParticles()) {
+            level.levelEvent(2001, pos, Block.getId(state));
         }
 
         event.setCancellationResult(InteractionResult.SUCCESS);
@@ -96,22 +96,21 @@ public class UseBehaviorImpl {
         }
     }
 
-    private static void dropStack(Level level, BlockPos pos, Direction direction, Block block, ResourceLocation location, int count) {
+    private static void dropStack(Level level, BlockPos pos, Direction direction, ResourceLocation location, int count) {
         Item item = ResourceKeyRegistryHelper.getItem(location);
-        block.popResourceFromFace(level, pos, direction, new ItemStack(item, count));
+        Block.popResourceFromFace(level, pos, direction, new ItemStack(item, count));
     }
 
     private static void insertStack(Player player, ResourceLocation location, int count) {
         Item item = ResourceKeyRegistryHelper.getItem(location);
-        player.addItem(new ItemStack(item, count));
+        player.getInventory().add(new ItemStack(item, count));
     }
 
     private static void placeFeature(Level level, BlockPos pos, ResourceLocation location) {
         if (level instanceof ServerLevel serverLevel) {
             ResourceKey<ConfiguredFeature<?, ?>> featureKey = ResourceKey.create(Registries.CONFIGURED_FEATURE, location);
-            serverLevel.registryAccess()
-                    .registry(Registries.CONFIGURED_FEATURE).flatMap(registry -> registry.getHolder(featureKey)).ifPresent(holder -> holder.value()
-                            .place(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.random, pos));
+            serverLevel.registryAccess().registry(Registries.CONFIGURED_FEATURE).flatMap(registry -> registry.getHolder(featureKey)).ifPresent(holder -> holder.value()
+                    .place(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.random, pos));
         }
     }
 
@@ -139,20 +138,15 @@ public class UseBehaviorImpl {
         };
     }
 
-    private static void spawnParticles(Level level, BlockPos pos, ResourceLocation location, double xVelocity, double yVelcoity, double zVelocity) {
+    private static void spawnParticles(ServerLevel level, BlockPos pos, ResourceLocation location, int count, double speed, double xOffset, double yOffset, double zOffset) {
         ParticleType<?> particleType = ResourceKeyRegistryHelper.getParticleType(location);
         if (particleType instanceof SimpleParticleType simple) {
-            RandomSource random = level.random;
-            for (Direction direction : Direction.values()) {
-                BlockPos blockPos = pos.relative(direction);
-                if (!level.getBlockState(blockPos).isCollisionShapeFullBlock(level, blockPos) && random.nextInt(120) == 0) {
-                    Direction.Axis axis = direction.getAxis();
-                    double e = axis == Direction.Axis.X ? 0.5 + 0.5625 * (double) direction.getStepX() : (double) random.nextFloat();
-                    double f = axis == Direction.Axis.Y ? 0.5 + 0.5625 * (double) direction.getStepY() : (double) random.nextFloat();
-                    double g = axis == Direction.Axis.Z ? 0.5 + 0.5625 * (double) direction.getStepZ() : (double) random.nextFloat();
-                    level.addParticle(simple, (double) pos.getX() + e, (double) pos.getY() + f, (double) pos.getZ() + g, xVelocity, yVelcoity, zVelocity);
-                }
-            }
+            level.sendParticles(simple, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, count, xOffset, yOffset, zOffset, speed);
         }
+    }
+
+    private static boolean placeRelated(UseBehavior registry) {
+        UseBehaviorTypeEnum type = registry.behavior().type();
+        return type == UseBehaviorTypeEnum.PLACE || type == UseBehaviorTypeEnum.PLACE_ITSELF || type == UseBehaviorTypeEnum.FEATURE;
     }
 }
