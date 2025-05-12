@@ -1,7 +1,7 @@
-package net.jadenxgamer.elysium_api.impl.mixin;
+package net.jadenxgamer.elysium_api.impl.mixin.block;
 
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.ElysiumRegistries;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.jadenxgamer.elysium_api.impl.properties_transformer.BlockProperties;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;

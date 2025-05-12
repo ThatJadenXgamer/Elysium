@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.mixin;
+package net.jadenxgamer.elysium_api.impl.mixin.entity;
 
 import net.jadenxgamer.elysium_api.Elysium;
 import net.minecraft.client.multiplayer.PlayerInfo;

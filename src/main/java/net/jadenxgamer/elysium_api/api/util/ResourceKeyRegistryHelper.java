@@ -20,7 +20,7 @@ public class ResourceKeyRegistryHelper {
 
     /**
      * Lets you easily retrieve Registries with ResourceLocation
-     * @param id - the namespaced id of the registry
+     * @param id - the namespaced uniqueId of the registry
      * @return - returns the Registry if it exists. but might return null if it doesn't
      */
 

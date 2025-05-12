@@ -4,6 +4,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.levelgen.SurfaceRules;
+import terrablender.api.SurfaceRuleManager;
 import terrablender.worldgen.IExtendedParameterList;
 
 public class ElysiumTerrablenderHelper {

@@ -1,18 +1,35 @@
 package net.jadenxgamer.elysium_api.api.surface_rules;
 
+import net.jadenxgamer.elysium_api.impl.surface_rules.SurfaceRulesManager;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SurfaceRulesRegistry {
-    public static final List<SurfaceRules.RuleSource> RULES = new ArrayList<>();
 
     /**
-     * Elysium allows you to add your own custom {@link SurfaceRules} that gets applied globally to all dimensions
-     * @param rule - SurfaceRules specified here get added to the list
+     * Add your own custom {@link SurfaceRules} that gets applied globally to All Dimensions
      */
     public static void registerSurfaceRule(SurfaceRules.RuleSource rule) {
-        RULES.add(rule);
+        SurfaceRulesManager.GLOBAL_SURFACE_RULES.add(rule);
+    }
+
+    /**
+     * Add your own custom {@link SurfaceRules} that gets applied to The Overworld
+     */
+    public static void registerOverworldSurfaceRule(SurfaceRules.RuleSource rule) {
+        SurfaceRulesManager.OVERWORLD_SURFACE_RULES.add(rule);
+    }
+
+    /**
+     * Add your own custom {@link SurfaceRules} that gets applied to The Nether
+     */
+    public static void registerNetherSurfaceRule(SurfaceRules.RuleSource rule) {
+        SurfaceRulesManager.NETHER_SURFACE_RULES.add(rule);
+    }
+
+    /**
+     * Add your own custom {@link SurfaceRules} that gets applied to The End
+     */
+    public static void registerEndSurfaceRule(SurfaceRules.RuleSource rule) {
+        SurfaceRulesManager.END_SURFACE_RULES.add(rule);
     }
 }

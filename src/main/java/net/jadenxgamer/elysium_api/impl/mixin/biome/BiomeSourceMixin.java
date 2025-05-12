@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.mixin;
+package net.jadenxgamer.elysium_api.impl.mixin.biome;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;

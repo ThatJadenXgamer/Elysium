@@ -1,7 +1,7 @@
-package net.jadenxgamer.elysium_api.impl.mixin;
+package net.jadenxgamer.elysium_api.impl.mixin.block;
 
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.ElysiumRegistries;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.jadenxgamer.elysium_api.impl.sound_transformer.SoundTransformer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;

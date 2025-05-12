@@ -5,13 +5,19 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "AbstractClientPlayerMixin"
+    "entity.AbstractClientPlayerMixin"
   ],
   "mixins": [
-    "BiomeSourceMixin",
-    "BlockMixin",
-    "MultiNoiseBiomeSourceMixin",
-    "NoiseBasedChunkGeneratorMixin"
+    "biome.BiomeSourceMixin",
+    "biome.MultiNoiseBiomeSourceMixin",
+    "biome.NoiseGeneratorSettingsMixin",
+    "block.BlockMixin",
+    "block.NetherSproutsBlockMixin",
+    "block.NetherWartBlockMixin",
+    "block.RootsBlockMixin",
+    "block.SoulFireBlockMixin",
+    "entity.LivingEntityMixin",
+    "entity.PiglinAiMixin"
   ],
   "injectors": {
     "defaultRequire": 1
