@@ -10,7 +10,7 @@
   "mixins": [
     "biome.BiomeSourceMixin",
     "biome.MultiNoiseBiomeSourceMixin",
-    "biome.NoiseGeneratorSettingsMixin",
+    "biome.NoiseGeneratorSettingsAccessor",
     "block.BlockMixin",
     "block.NetherSproutsBlockMixin",
     "block.NetherWartBlockMixin",
