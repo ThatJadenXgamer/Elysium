@@ -11,27 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ElysiumSurfaceRulesManager {
-    public static final List<SurfaceRules.RuleSource> GLOBAL_SURFACE_RULES = new ArrayList<>();
     public static final List<SurfaceRules.RuleSource> OVERWORLD_SURFACE_RULES = new ArrayList<>();
     public static final List<SurfaceRules.RuleSource> NETHER_SURFACE_RULES = new ArrayList<>();
     public static final List<SurfaceRules.RuleSource> END_SURFACE_RULES = new ArrayList<>();
 
     public static SurfaceRules.RuleSource getForMergingRules(List<SurfaceRules.RuleSource> dimensionRules, SurfaceRules.RuleSource originalRules) {
-        if (dimensionRules.isEmpty() && GLOBAL_SURFACE_RULES.isEmpty()) return null;
+        if (dimensionRules.isEmpty()) return null;
 
-        List<SurfaceRules.RuleSource> combinedRules = new ArrayList<>();
-        combinedRules.addAll(dimensionRules);
-        combinedRules.addAll(GLOBAL_SURFACE_RULES);
+        List<SurfaceRules.RuleSource> combinedRules = new ArrayList<>(dimensionRules);
         combinedRules.add(originalRules);
-        return SurfaceRules.sequence(combinedRules.toArray(SurfaceRules.RuleSource[]::new));
-    }
-
-    public static SurfaceRules.RuleSource getForTerrablenderRules(List<SurfaceRules.RuleSource> dimensionRules) {
-        if (dimensionRules.isEmpty() && GLOBAL_SURFACE_RULES.isEmpty()) return null;
-
-        List<SurfaceRules.RuleSource> combinedRules = new ArrayList<>();
-        combinedRules.addAll(dimensionRules);
-        combinedRules.addAll(GLOBAL_SURFACE_RULES);
         return SurfaceRules.sequence(combinedRules.toArray(SurfaceRules.RuleSource[]::new));
     }
 

@@ -5,6 +5,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.SurfaceRuleManager;
 import terrablender.worldgen.IExtendedParameterList;
 
@@ -20,12 +21,11 @@ public class ElysiumTerrablenderHelper {
         return source.parameters().findValue(sampler.sample(x, y, z));
     }
 
-    public static void addSurfaceRules() {
-        // I have no idea why calling "netherexp" causes the surface rule registry to work while "elysium_api" doesn't.
-        // does it work? ofcourse! is this cursed? very. do I care? fuck no lmao
-        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, "netherexp",
-                ElysiumSurfaceRulesManager.getForTerrablenderRules(ElysiumSurfaceRulesManager.OVERWORLD_SURFACE_RULES));
-        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.NETHER, "netherexp",
-                ElysiumSurfaceRulesManager.getForTerrablenderRules(ElysiumSurfaceRulesManager.NETHER_SURFACE_RULES));
+    public static void addOverworldSurfaceRule(SurfaceRules.RuleSource rules, String namespace) {
+        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, namespace, rules);
+    }
+
+    public static void addNetherSurfaceRule(SurfaceRules.RuleSource rules, String namespace) {
+        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.NETHER, namespace, rules);
     }
 }

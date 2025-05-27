@@ -68,11 +68,7 @@ public class ElysiumEvents {
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void commonSetup(final FMLCommonSetupEvent event) {
-            event.enqueueWork(() -> {
-                if (FMLLoader.getLoadingModList().getModFileById("terrablender") != null) {
-                    ElysiumTerrablenderHelper.addSurfaceRules();
-                }
-            });
+
         }
     }
 }
