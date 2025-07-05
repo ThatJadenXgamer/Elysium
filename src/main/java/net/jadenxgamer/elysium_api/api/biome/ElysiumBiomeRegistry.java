@@ -10,18 +10,18 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 
-import static net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeHelper.*;
+import static net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper.*;
 
 public class ElysiumBiomeRegistry {
 
     /**
      * Registers a BiomeReplacer for The Overworld
-     * @param replaceBiome      - biome ResourceKey it can replace
-     * @param withBiome         - the withBiome to swap out with
-     * @param rarity            - rarity of this BiomeReplacer
-     * @param size              - replacement radius of this BiomeReplacer (values lower than 12 may produce micro-biomes)
-     * @param id                - unique named identifier for your BiomeReplacer
-     * @param registryAccess    - pass in a RegistryAccess, preferably from ServerAboutToStartEvent
+     * @param replaceBiome biome ResourceKey it can replace
+     * @param withBiome the withBiome to swap out with
+     * @param rarity rarity of this BiomeReplacer
+     * @param size replacement radius of this BiomeReplacer
+     * @param id unique named identifier for your BiomeReplacer
+     * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
     public static void replaceOverworldBiome(ResourceKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
@@ -32,12 +32,12 @@ public class ElysiumBiomeRegistry {
 
     /**
      * Registers a BiomeReplacer for The Nether
-     * @param replaceBiome      - biome ResourceKey it can replace
-     * @param withBiome         - the withBiome to swap out with
-     * @param rarity            - rarity of this BiomeReplacer
-     * @param size              - replacement radius of this BiomeReplacer (values lower than 12 may produce micro-biomes)
-     * @param id                - unique named identifier for your BiomeReplacer
-     * @param registryAccess    - pass in a RegistryAccess, preferably from ServerAboutToStartEvent
+     * @param replaceBiome biome ResourceKey it can replace
+     * @param withBiome the withBiome to swap out with
+     * @param rarity rarity of this BiomeReplacer
+     * @param size replacement radius of this BiomeReplacer
+     * @param id unique named identifier for your BiomeReplacer
+     * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
     public static void replaceNetherBiome(ResourceKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
@@ -48,12 +48,12 @@ public class ElysiumBiomeRegistry {
 
     /**
      * Registers a BiomeReplacer for The Overworld
-     * @param replaceBiome      - biome TagKey it can replace
-     * @param withBiome         - the withBiome to swap out with
-     * @param rarity            - rarity of this BiomeReplacer
-     * @param size              - replacement radius of this BiomeReplacer (values lower than 12 may produce micro-biomes)
-     * @param id                - unique named identifier for your BiomeReplacer
-     * @param registryAccess    - pass in a RegistryAccess, preferably from ServerAboutToStartEvent
+     * @param replaceBiome biome TagKey it can replace
+     * @param withBiome the withBiome to swap out with
+     * @param rarity rarity of this BiomeReplacer
+     * @param size replacement radius of this BiomeReplacer
+     * @param id unique named identifier for your BiomeReplacer
+     * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
     public static void replaceOverworldBiome(TagKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
@@ -64,12 +64,12 @@ public class ElysiumBiomeRegistry {
 
     /**
      * Registers a BiomeReplacer for The Nether
-     * @param replaceBiome      - biome TagKey it can replace
-     * @param withBiome         - the withBiome to swap out with
-     * @param rarity            - rarity of this BiomeReplacer
-     * @param size              - replacement radius of this BiomeReplacer (values lower than 12 may produce micro-biomes)
-     * @param id                - unique named identifier for your BiomeReplacer
-     * @param registryAccess    - pass in a RegistryAccess, preferably from ServerAboutToStartEvent
+     * @param replaceBiome biome TagKey it can replace
+     * @param withBiome the withBiome to swap out with
+     * @param rarity rarity of this BiomeReplacer
+     * @param size replacement radius of this BiomeReplacer
+     * @param id unique named identifier for your BiomeReplacer
+     * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
     public static void replaceNetherBiome(TagKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);

@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.entity;
 
-import net.jadenxgamer.elysium_api.impl.misc_registry.ElysiumTags;
+import net.jadenxgamer.elysium_api.api.tags.ElysiumTags;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin {
+public abstract class LivingEntityMixin {
     @Inject(
             method = "getDamageAfterArmorAbsorb",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurtArmor(Lnet/minecraft/world/damagesource/DamageSource;F)V"),
@@ -20,7 +20,7 @@ public class LivingEntityMixin {
     private void elysium$preventArmorDamage(DamageSource pDamageSource, float pDamageAmount, CallbackInfoReturnable<Float> cir) {
         // makes it so some damage types do not take away armor durability
         if (pDamageSource.is(ElysiumTags.DamageTypes.CANT_DAMAGE_ARMOR)) {
-            pDamageAmount = CombatRules.getDamageAfterAbsorb(pDamageAmount, ((LivingEntity) (Object) this).getArmorValue(), (float) ((LivingEntity) (Object) this).getAttributeValue(Attributes.ARMOR_TOUGHNESS));
+            pDamageAmount = CombatRules.getDamageAfterAbsorb(((LivingEntity) (Object) this), pDamageAmount, pDamageSource, ((LivingEntity) (Object) this).getArmorValue(), (float) ((LivingEntity) (Object) this).getAttributeValue(Attributes.ARMOR_TOUGHNESS));
             cir.setReturnValue(pDamageAmount);
         }
     }

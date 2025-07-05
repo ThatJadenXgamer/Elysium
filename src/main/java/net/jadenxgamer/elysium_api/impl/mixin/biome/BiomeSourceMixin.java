@@ -3,10 +3,9 @@ package net.jadenxgamer.elysium_api.impl.mixin.biome;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.biome.ElysiumBiomeSource;
+import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -19,23 +18,23 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 @Mixin(BiomeSource.class)
-public class BiomeSourceMixin implements ElysiumBiomeSource {
+public abstract class BiomeSourceMixin implements ElysiumBiomeSource {
     @Shadow
     @Mutable
     public Supplier<Set<Holder<Biome>>> possibleBiomes;
 
     @Unique
-    private boolean elysium$hasMergedPossibleBiomes = false;
+    private boolean hasMergedPossibleBiomes = false;
 
     @Unique
-    private ResourceKey<LevelStem> elysium$currentDimension = null;
+    private ResourceKey<LevelStem> currentDimension = null;
 
     @Unique
     private long elysium$worldSeed = 0L;
 
     @Override
     public void addPossibleBiomes(Set<Holder<Biome>> biomes) {
-        if(elysium$hasMergedPossibleBiomes) {
+        if(hasMergedPossibleBiomes) {
             return;
         }
 
@@ -43,18 +42,18 @@ public class BiomeSourceMixin implements ElysiumBiomeSource {
         builder.addAll(this.possibleBiomes.get());
         builder.addAll(biomes);
         this.possibleBiomes = Suppliers.memoize(builder::build);
-        this.elysium$hasMergedPossibleBiomes = true;
-        Elysium.LOGGER.info("ElysiumBiomeSource successfully initialized for " + elysium$currentDimension.location());
+        this.hasMergedPossibleBiomes = true;
+        Elysium.LOGGER.info("ElysiumBiomeSource successfully initialized for " + currentDimension.location());
     }
 
     @Override
     public void setDimension(ResourceKey<LevelStem> dimension) {
-        this.elysium$currentDimension = dimension;
+        this.currentDimension = dimension;
     }
 
     @Override
     public ResourceKey<LevelStem> getDimension() {
-        return this.elysium$currentDimension;
+        return this.currentDimension;
     }
 
     @Override

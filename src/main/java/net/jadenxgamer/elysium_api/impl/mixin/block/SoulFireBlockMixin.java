@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.block;
 
-import net.jadenxgamer.elysium_api.impl.misc_registry.ElysiumTags;
+import net.jadenxgamer.elysium_api.api.tags.ElysiumTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelReader;

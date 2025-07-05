@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "net.jadenxgamer.elysium_api.impl.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "entity.AbstractClientPlayerMixin",
+    "entity.PlayerSkinAccessor"
+  ],
+  "mixins": [
+    "biome.BiomeSourceMixin",
+    "biome.MultiNoiseBiomeSourceMixin",
+    "biome.NoiseGeneratorSettingsAccessor",
+    "block.BlockBehaviorMixin",
+    "block.NetherSproutsBlockMixin",
+    "block.NetherWartBlockMixin",
+    "block.RootsBlockMixin",
+    "block.SoulFireBlockMixin",
+    "entity.LivingEntityMixin",
+    "entity.PiglinAiMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

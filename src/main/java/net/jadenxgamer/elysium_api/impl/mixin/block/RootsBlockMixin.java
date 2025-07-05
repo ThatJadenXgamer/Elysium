@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.block;
 
-import net.jadenxgamer.elysium_api.impl.misc_registry.ElysiumTags;
+import net.jadenxgamer.elysium_api.api.tags.ElysiumTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.RootsBlock;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RootsBlock.class)
-public class RootsBlockMixin {
+public abstract class RootsBlockMixin {
 
     @Inject(
             method = "mayPlaceOn",

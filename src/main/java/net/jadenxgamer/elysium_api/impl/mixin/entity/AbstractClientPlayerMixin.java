@@ -1,8 +1,10 @@
 package net.jadenxgamer.elysium_api.impl.mixin.entity;
 
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.impl.mixin.biome.NoiseGeneratorSettingsAccessor;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,20 +19,20 @@ import java.util.List;
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerMixin {
     @Unique
-    private static final List<String> DEV_CAPE_PLAYERS = List.of("JadenXgamer");
+    private static final List<String> DEV_CAPE_PLAYERS = List.of("JadenXgamer", "AlwaysMuddy");
 
     @Shadow @Nullable
     protected abstract PlayerInfo getPlayerInfo();
 
     @Inject(
-            method = "getCloakTextureLocation",
-            at = @At(value = "HEAD"),
-            cancellable = true
+            method = "getSkin",
+            at = @At(value = "TAIL")
     )
-    private void netherexp$getCustomCapeTexture(CallbackInfoReturnable<ResourceLocation> cir) {
-        PlayerInfo playerInfo = this.getPlayerInfo();
-        if (playerInfo != null && DEV_CAPE_PLAYERS.contains(playerInfo.getProfile().getName())) {
-            cir.setReturnValue(new ResourceLocation(Elysium.MOD_ID, "textures/entity/cape/jadenxgamer.png"));
+    private void elysium$getCustomCapeTexture(CallbackInfoReturnable<PlayerSkin> cir) {
+        PlayerInfo info = this.getPlayerInfo();
+        if (info != null && DEV_CAPE_PLAYERS.contains(info.getProfile().getName())) {
+            ResourceLocation capeTexture = Elysium.id("textures/entity/cape/jadenxgamer.png");
+            ((PlayerSkinAccessor) (Object) cir.getReturnValue()).elysium$setCapeTexture(capeTexture);
         }
     }
 }

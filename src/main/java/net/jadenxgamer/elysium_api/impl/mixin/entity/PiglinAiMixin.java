@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.entity;
 
-import net.jadenxgamer.elysium_api.impl.misc_registry.ElysiumTags;
+import net.jadenxgamer.elysium_api.api.tags.ElysiumTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PiglinAi.class)
 public class PiglinAiMixin {
+
     @Inject(
             method = "isZombified",
             at = @At(value = "TAIL"),
