@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api;
 
 import com.mojang.logging.LogUtils;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumFeature;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -16,7 +16,7 @@ public final class Elysium {
     public static RegistryAccess registryAccess;
 
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
-        ElysiumFeature.init(modEventBus);
+        ElysiumMiscRegistries.init(modEventBus);
     }
 
     public static ResourceLocation id(String path) {
