@@ -1,6 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.impl.client.fog.FogManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer.BiomeReplacerDataDriven;
@@ -83,7 +84,7 @@ public class ElysiumEvents {
 
         @SubscribeEvent
         public static void registerReloadListener(RegisterClientReloadListenersEvent event) {
-
+            event.registerReloadListener(new FogManager.FogSettingsReloadListener());
         }
 
         @SubscribeEvent
