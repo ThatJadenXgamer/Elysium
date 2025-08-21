@@ -1,6 +1,7 @@
 package net.jadenxgamer.elysium_api;
 
 import com.mojang.logging.LogUtils;
+import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 public final class Elysium {
     public static final String MOD_ID = "elysium_api";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
     public static RegistryAccess registryAccess;
 
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
