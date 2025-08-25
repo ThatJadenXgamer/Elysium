@@ -14,6 +14,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import org.apache.commons.lang3.tuple.Pair;
 
 @SuppressWarnings("unused")
@@ -32,7 +33,7 @@ public class ElysiumClientEvents {
 
     @SubscribeEvent
     public static void fogRender(ViewportEvent.RenderFog event) {
-        if (event.getCamera().getFluidInCamera() == FogType.NONE && event.getMode() == FogRenderer.FogMode.FOG_TERRAIN) {
+        if (event.getCamera().getFluidInCamera() == FogType.NONE && event.getMode() == FogRenderer.FogMode.FOG_TERRAIN && (event.getCamera().getEntity().getEyeInFluidType() == NeoForgeMod.EMPTY_TYPE.value())) {
             var settings = Elysium.FOG_SETTINGS.getSettings(Minecraft.getInstance().player, event.getNearPlaneDistance(), event.getFarPlaneDistance());
             if (settings != null) {
                 event.setCanceled(true);
