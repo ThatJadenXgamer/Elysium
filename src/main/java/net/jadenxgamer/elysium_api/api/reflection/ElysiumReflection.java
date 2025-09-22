@@ -1,5 +1,7 @@
 package net.jadenxgamer.elysium_api.api.reflection;
 
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.lang.invoke.MethodHandle;
@@ -11,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
-public final class BlockReflection {
+public final class ElysiumReflection {
     private static final Map<String, ConstructorInvoker> CACHE = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Constructor<?>[]> CONSTRUCTORS_CACHE = new ConcurrentHashMap<>();
 
@@ -23,7 +25,7 @@ public final class BlockReflection {
      *
      * <p><b>Usage Example:</b>
      * <pre>{@code
-     * Block lesionBlock = ReflectedBlock.create(
+     * Block lesionBlock = BlockReflection.createBlock(
      *     "net.jadenxgamer.netherexp.core.block.LesionBlock",
      *     () -> Items.ROTTEN_FLESH, BlockBehaviour.Properties.of().strength(2.0f)
      * );
@@ -34,13 +36,55 @@ public final class BlockReflection {
      * @return a new instance of the specified block class
      * @param <T> the type of block to create (must extend Block)
      */
-    public static <T extends Block> T create(String className, Object... args) {
+    public static <T extends Block> T createBlock(String className, Object... args) {
+        return createInstance(Block.class, className, args);
+    }
+
+    /**
+     * Creates an instance of an {@link Item} subclass using reflection
+     * <p>
+     * See {@link ElysiumReflection#createBlock} for usage example and explanation for reflection's use purpose
+     *
+     * @param className the fully qualified class name of the item to make a reflection out of
+     * @param args the constructor arguments to pass into the reflected item's constructor
+     * @return a new instance of the specified item class
+     * @param <T> the type of item to create (must extend Item)
+     */
+    public static <T extends Item> T createItem(String className, Object... args) {
+        return createInstance(Item.class, className, args);
+    }
+
+    /**
+     * Creates an instance of an {@link MobEffect} subclass using reflection
+     * <p>
+     * See {@link ElysiumReflection#createBlock} for usage example and explanation for reflection's use purpose
+     *
+     * @param className the fully qualified class name of the effect to make a reflection out of
+     * @param args the constructor arguments to pass into the reflected effect's constructor
+     * @return a new instance of the specified effect class
+     * @param <T> the type of item to create (must extend MobEffect)
+     */
+    public static <T extends MobEffect> T createMobEffect(String className, Object... args) {
+        return createInstance(MobEffect.class, className, args);
+    }
+
+    /**
+     * Generic method to create an instance of any class using reflection
+     *
+     * @param superType the super class type that the target class must extend/implement
+     * @param className the fully qualified class name of the class to instantiate
+     * @param args the constructor arguments to pass into the reflected class's constructor
+     * @return a new instance of the specified class
+     * @param <T> the type of object to create
+     * @param <S> the super type that T must extend/implement
+     */
+    private static <T, S> T createInstance(Class<S> superType, String className, Object... args) {
         Class<?>[] providedTypes = buildTypesArray(args);
         String cacheKey = buildCacheKey(className, providedTypes);
 
-        ConstructorInvoker invoker = CACHE.computeIfAbsent(cacheKey, key -> createInvoker(className, providedTypes));
+        ConstructorInvoker invoker = CACHE.computeIfAbsent(cacheKey, key -> createInvoker(superType, className, providedTypes));
 
-        return returnBlock(className, invoker, args);
+        return returnInstance(className, invoker, args);
     }
 
     private static Class<?>[] buildTypesArray(Object[] args) {
@@ -60,10 +104,10 @@ public final class BlockReflection {
         return keyBuilder.append(')').toString();
     }
 
-    private static ConstructorInvoker createInvoker(String className, Class<?>[] providedTypes) {
+    private static <S> ConstructorInvoker createInvoker(Class<S> superType, String className, Class<?>[] providedTypes) {
         try {
-            Class<? extends Block> blockClass = Class.forName(className).asSubclass(Block.class);
-            Constructor<? extends Block> constructor = findCompatibleConstructor(blockClass, providedTypes);
+            Class<? extends S> targetClass = Class.forName(className).asSubclass(superType);
+            Constructor<? extends S> constructor = findCompatibleConstructor(targetClass, providedTypes);
             constructor.setAccessible(true);
 
             try {
@@ -73,23 +117,23 @@ public final class BlockReflection {
                 return new ConstructorInvoker(constructor);
             }
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Block class not found: " + className, e);
+            throw new RuntimeException(superType.getSimpleName() + " class not found: " + className, e);
         }
     }
 
-    private static Constructor<? extends Block> findCompatibleConstructor(Class<? extends Block> blockClass, Class<?>[] providedTypes) {
-        Constructor<?>[] constructors = CONSTRUCTORS_CACHE.computeIfAbsent(blockClass, Class::getDeclaredConstructors);
+    private static <S> Constructor<? extends S> findCompatibleConstructor(Class<? extends S> targetClass, Class<?>[] providedTypes) {
+        Constructor<?>[] constructors = CONSTRUCTORS_CACHE.computeIfAbsent(targetClass, Class::getDeclaredConstructors);
 
-        return (Constructor<? extends Block>) Arrays.stream(constructors)
+        return (Constructor<? extends S>) Arrays.stream(constructors)
                 .filter(constructor -> constructor.getParameterCount() == providedTypes.length)
                 .min(Comparator.comparingInt(c -> calculateCompatibilityScore(c.getParameterTypes(), providedTypes)))
-                .orElseThrow(() -> createConstructorNotFoundException(blockClass, providedTypes, constructors));
+                .orElseThrow(() -> createConstructorNotFoundException(targetClass, providedTypes, constructors));
     }
 
-    private static RuntimeException createConstructorNotFoundException(Class<? extends Block> blockClass, Class<?>[] providedTypes, Constructor<?>[] availableConstructors) {
+    private static <S> RuntimeException createConstructorNotFoundException(Class<? extends S> targetClass, Class<?>[] providedTypes, Constructor<?>[] availableConstructors) {
         StringBuilder errorMessage = new StringBuilder()
                 .append("No compatible constructor found for ")
-                .append(blockClass.getName())
+                .append(targetClass.getName())
                 .append(" with parameter types: ")
                 .append(Arrays.toString(providedTypes))
                 .append("\nAvailable constructors:\n");
@@ -124,24 +168,24 @@ public final class BlockReflection {
         return -1;
     }
 
-    private static <T extends Block> T returnBlock(String className, ConstructorInvoker invoker, Object[] args) {
+    private static <T> T returnInstance(String className, ConstructorInvoker invoker, Object[] args) {
         try {
             return (T) invoker.invoke(args);
         } catch (Throwable t) {
-            throw new RuntimeException("Failed to instantiate block: " + className, t);
+            throw new RuntimeException("Failed to instantiate class: " + className, t);
         }
     }
 
     private static final class ConstructorInvoker {
         private final MethodHandle methodHandle;
-        private final Constructor<? extends Block> constructor;
+        private final Constructor<?> constructor;
 
         ConstructorInvoker(MethodHandle methodHandle) {
             this.methodHandle = methodHandle;
             this.constructor = null;
         }
 
-        ConstructorInvoker(Constructor<? extends Block> constructor) {
+        ConstructorInvoker(Constructor<?> constructor) {
             this.constructor = constructor;
             this.methodHandle = null;
         }
