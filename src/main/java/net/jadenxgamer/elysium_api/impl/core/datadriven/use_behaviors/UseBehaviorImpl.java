@@ -37,22 +37,15 @@ public class UseBehaviorImpl {
 
         Optional<UseBehavior> useBehavior = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BLOCK_USE_BEHAVIORS).stream()
                 .filter(s -> s.blocks().contains(state.getBlockHolder()) && s.itemCondition().contains(stack.getItemHolder())).findFirst();
-
-        if (level.isClientSide() || useBehavior.isEmpty()) return; // returns if no registry was found or client-side
+        if (level.isClientSide() || useBehavior.isEmpty()) return;
 
         UseBehavior registry = useBehavior.get();
         BlockPos regPos = getPosFromCodec(registry.behavior().pos(), registry.behavior().posOffset(), event);
 
-        if (placeRelated(registry) && !registry.behavior().canReplace() && !level.getBlockState(regPos).canBeReplaced()) return; // returns if the current block in pos cannot be replaced
+        if (placeRelated(registry) && !registry.behavior().canReplace() && !level.getBlockState(regPos).canBeReplaced()) return;
+        if (registry.blockstateCondition().isPresent() && !registry.blockstateCondition().get().matches(state)) return;
 
-        if (registry.blockstateCondition().isPresent()) {
-            if (!registry.blockstateCondition().get().equals(state)) return;
-        }
-
-        if (!player.getAbilities().instabuild) {
-            handleItemAfterUse(registry.behavior().afterUseItem(), stack, event);
-        }
-
+        if (!player.getAbilities().instabuild) handleItemAfterUse(registry.behavior().afterUseItem(), stack, event);
         if (registry.behavior().sounds().isPresent()) level.playSound(null, event.getPos(), registry.behavior().sounds().get().soundEvent(), SoundSource.BLOCKS, registry.behavior().sounds().get().volume(), registry.behavior().sounds().get().pitch());
         if (registry.behavior().particles().isPresent()) spawnParticles((ServerLevel) level, regPos, registry.behavior().particles().get().particleType(), registry.behavior().particles().get().count(), registry.behavior().particles().get().speed(), registry.behavior().particles().get().xOffset(), registry.behavior().particles().get().yOffset(), registry.behavior().particles().get().zOffset());
 

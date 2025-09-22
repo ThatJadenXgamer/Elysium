@@ -15,7 +15,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,15 +77,8 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
         FogSettings settings = FogSettings.FOG_SETTINGS.getOrDefault(biomeId, null);
         var defaultMultiplier = getDefaultForDimension(level);
 
-        float newStartMultiplier;
-        float newEndMultiplier;
-        if (settings != null) {
-            newStartMultiplier = settings.fogStartMultiplier();
-            newEndMultiplier = settings.fogEndMultiplier();
-        } else {
-            newStartMultiplier = defaultMultiplier.getLeft();
-            newEndMultiplier = defaultMultiplier.getRight();
-        }
+        float newStartMultiplier = settings != null ? settings.fogStartMultiplier() : defaultMultiplier.getLeft();
+        float newEndMultiplier = settings != null ? settings.fogEndMultiplier() : defaultMultiplier.getRight();
 
         float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
         currentStartMultiplier = Mth.lerp(delta * 0.05f, currentStartMultiplier, newStartMultiplier);

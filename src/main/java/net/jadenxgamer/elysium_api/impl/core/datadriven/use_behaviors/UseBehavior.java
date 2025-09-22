@@ -14,10 +14,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
-public record UseBehavior(HolderSet<Block> blocks, Optional<BlockState> blockstateCondition, HolderSet<Item> itemCondition, int chanceToFail, Behavior behavior) {
+public record UseBehavior(HolderSet<Block> blocks, Optional<BlockStatePropertiesCondition> blockstateCondition, HolderSet<Item> itemCondition, int chanceToFail, Behavior behavior) {
     public static final Codec<UseBehavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.BLOCK).fieldOf("blocks").forGetter(UseBehavior::blocks),
-            BlockState.CODEC.optionalFieldOf("blockstate_condition").forGetter(UseBehavior::blockstateCondition),
+            BlockStatePropertiesCondition.CODEC.optionalFieldOf("blockstate_condition").forGetter(UseBehavior::blockstateCondition),
             RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("item_condition").forGetter(UseBehavior::itemCondition),
             Codec.INT.optionalFieldOf("chance_to_fail", 0).forGetter(UseBehavior::chanceToFail),
             Behavior.CODEC.fieldOf("behaviors").forGetter(UseBehavior::behavior)
