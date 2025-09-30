@@ -17,7 +17,7 @@ import java.util.Optional;
 public class DecoratedPotPatternsMixin {
 
     @WrapMethod(method = "getPatternFromItem")
-    private static ResourceKey<DecoratedPotPattern> temple$getPatternFromItem(Item item, Operation<ResourceKey<DecoratedPotPattern>> original) {
+    private static ResourceKey<DecoratedPotPattern> elysium$getPatternFromItem(Item item, Operation<ResourceKey<DecoratedPotPattern>> original) {
         Holder<Item> holder = BuiltInRegistries.ITEM.wrapAsHolder(item);
         return Optional.ofNullable(holder.getData(ElysiumDataMaps.DECORATED_POT_PATTERNS)).orElse(original.call(item));
     }
