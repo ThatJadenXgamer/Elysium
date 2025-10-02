@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.core.datadriven.use_behaviors;
+package net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors;
 
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;

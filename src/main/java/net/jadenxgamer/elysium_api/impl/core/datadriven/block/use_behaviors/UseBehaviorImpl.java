@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.core.datadriven.use_behaviors;
+package net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors;
 
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.util.LookupRegistryHelper;
@@ -35,7 +35,7 @@ public class UseBehaviorImpl {
         Player player = event.getEntity();
         ItemStack stack = player.getItemInHand(event.getHand());
 
-        Optional<UseBehavior> useBehavior = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BLOCK_USE_BEHAVIORS).stream()
+        Optional<UseBehavior> useBehavior = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
                 .filter(s -> s.blocks().contains(state.getBlockHolder()) && s.itemCondition().contains(stack.getItemHolder())).findFirst();
         if (level.isClientSide() || useBehavior.isEmpty()) return;
 

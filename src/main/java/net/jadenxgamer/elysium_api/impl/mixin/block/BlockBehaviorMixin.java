@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.mixin.block;
 
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.sound_transformers.SoundTransformer;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -23,12 +23,7 @@ public abstract class BlockBehaviorMixin {
     )
     private void elysium$soundTransformer(BlockState state, CallbackInfoReturnable<SoundType> cir) {
         if (Elysium.registryAccess == null) return;
-
-        Optional<SoundTransformer> registry = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS).stream().filter(s -> s.blocks().contains(state.getBlockHolder())).findFirst();
-        if (registry.isEmpty()) return;
-
-        if (registry.get().blocks().contains(state.getBlockHolder())) {
-            cir.setReturnValue(registry.get().toSoundType());
-        }
+        Optional<BlockSoundTransformer> registry = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS).stream().filter(s -> s.blocks().contains(state.getBlockHolder())).findFirst();
+        registry.ifPresent(blockSoundTransformer -> cir.setReturnValue(blockSoundTransformer.toSoundType()));
     }
 }

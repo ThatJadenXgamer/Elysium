@@ -5,9 +5,10 @@ import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer.BiomeReplacerDataDriven;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.use_behaviors.UseBehavior;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.use_behaviors.UseBehaviorImpl;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.sound_transformers.SoundTransformer;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehaviorImpl;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Registry;
@@ -89,9 +90,10 @@ public class ElysiumEvents {
 
         @SubscribeEvent
         public static void datapackRegistry(DataPackRegistryEvent.NewRegistry event) {
-            event.dataPackRegistry(ElysiumRegistries.BLOCK_USE_BEHAVIORS, UseBehavior.CODEC);
-            event.dataPackRegistry(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS, SoundTransformer.CODEC);
+            event.dataPackRegistry(ElysiumRegistries.USE_BEHAVIORS, UseBehavior.CODEC);
+            event.dataPackRegistry(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS, BlockSoundTransformer.CODEC);
             event.dataPackRegistry(ElysiumRegistries.BIOME_REPLACER, BiomeReplacerDataDriven.CODEC);
+            event.dataPackRegistry(ElysiumRegistries.REMAINDER_TRANSFORMERS, RemainderTransformer.CODEC);
         }
     }
 }

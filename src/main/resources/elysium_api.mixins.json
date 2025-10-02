@@ -17,7 +17,8 @@
     "block.RootsBlockMixin",
     "block.SoulFireBlockMixin",
     "entity.LivingEntityMixin",
-    "entity.PiglinAiMixin"
+    "entity.PiglinAiMixin",
+    "item.IItemExtensionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

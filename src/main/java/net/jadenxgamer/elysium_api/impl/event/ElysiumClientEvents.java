@@ -1,21 +1,19 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.world.level.material.FogType;
-import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import org.apache.commons.lang3.tuple.Pair;
 
 @SuppressWarnings("unused")
 @EventBusSubscriber(modid = Elysium.MOD_ID, value = Dist.CLIENT)
@@ -29,6 +27,11 @@ public class ElysiumClientEvents {
     @SubscribeEvent
     public static void onClientTickPost(ClientTickEvent.Post event) {
 
+    }
+
+    @SubscribeEvent
+    public static void onClientLoggedIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        Elysium.registryAccess = event.getPlayer().registryAccess();
     }
 
     @SubscribeEvent
