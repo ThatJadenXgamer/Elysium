@@ -2,10 +2,13 @@ package net.jadenxgamer.elysium_api.api.client.screen_flash;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.impl.networking.to_client.ScreenFlashPayload;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ScreenFlash {
 
@@ -38,6 +41,20 @@ public class ScreenFlash {
         ScreenFlash.playing = true;
         ScreenFlash.firstPersonOnly = firstPersonOnly;
         ScreenFlash.startTime = -1;
+    }
+
+    /**
+     * Triggers a customizable Screen Flash for given ServerPlayer
+     * @param player the player that will receive the ScreenFlashPayload
+     * @param fadeIn duration in ticks for the ScreenFlash to fade into the screen
+     * @param hold duration in ticks to hold at maximum opacity after fade-in
+     * @param fadeOut duration in ticks for the ScreenFlash to fade away and be removed
+     * @param color ARGB color value (0xAARRGGBB) for the flash
+     * @param firstPersonOnly if true the screen flash will only play when in first person camera
+     * @param force if a screen flash is already playing it overwrites it and plays the new one
+     */
+    public static void triggerScreenFlash(ServerPlayer player, int fadeIn, int hold, int fadeOut, int color, boolean firstPersonOnly, boolean force) {
+        PacketDistributor.sendToPlayer(player, new ScreenFlashPayload(fadeIn, hold, fadeOut, color, firstPersonOnly, force));
     }
 
     /**
