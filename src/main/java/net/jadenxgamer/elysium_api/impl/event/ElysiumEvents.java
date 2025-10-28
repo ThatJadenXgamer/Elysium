@@ -10,6 +10,7 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseB
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
+import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -25,6 +26,7 @@ import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.Optional;
@@ -77,6 +79,11 @@ public class ElysiumEvents {
 
     @EventBusSubscriber(modid = Elysium.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
     public static class ModBusEvents {
+
+        @SubscribeEvent
+        public static void registerPayloads(final RegisterPayloadHandlersEvent event) {
+            ElysiumPayloads.registerPayloads(event);
+        }
 
         @SubscribeEvent
         public static void commonSetup(final FMLCommonSetupEvent event) {
