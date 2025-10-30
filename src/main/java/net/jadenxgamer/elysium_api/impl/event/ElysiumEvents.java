@@ -68,11 +68,6 @@ public class ElysiumEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        Elysium.registryAccess = event.getEntity().registryAccess();
-    }
-
-    @SubscribeEvent
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         UseBehaviorImpl.init(event);
     }
