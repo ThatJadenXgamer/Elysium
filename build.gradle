@@ -23,6 +23,10 @@ repositories {
             includeGroup("curse.maven")
         }
     }
+    maven {
+        name = "RedlanceMinecraft"
+        url = "https://repo.redlance.org/public"
+    }
 
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -39,6 +43,9 @@ dependencies {
     minecraft "net.minecraft:minecraft:$project.minecraft_version"
     mappings loom.officialMojangMappings()
     neoForge "net.neoforged:neoforge:$project.neoforge_version"
+
+    modImplementation "com.zigythebird.playeranim:PlayerAnimationLibNeo:$project.pal_version"
+    forgeRuntimeLibrary "org.javassist:javassist:3.30.2-GA"
 
     compileOnly "curse.maven:terrablender-940057:6054947"
 }
