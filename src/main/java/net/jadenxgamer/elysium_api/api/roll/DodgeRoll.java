@@ -15,7 +15,7 @@ public class DodgeRoll {
         if (!player.onGround()) return;
         if (invulnerable) player.invulnerableTime = 10;
         applyMovement(player);
-        PacketDistributor.sendToPlayer(player, new DodgeRollPayload());
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new DodgeRollPayload());
     }
 
     public static void applyMovement(Player player) {
