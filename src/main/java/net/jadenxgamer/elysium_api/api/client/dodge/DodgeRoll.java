@@ -5,7 +5,7 @@ import com.zigythebird.playeranim.api.PlayerAnimationAccess;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.impl.client.animation.AnimationControllers;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animations;
-import net.jadenxgamer.elysium_api.impl.networking.to_server.ServerboundDodgeRollPayload;
+import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +29,7 @@ public class DodgeRoll {
         }
         controller.triggerAnimation(Animations.DODGE_ROLL);
         applyMovement(player);
-        PacketDistributor.sendToServer(new ServerboundDodgeRollPayload());
+        PacketDistributor.sendToServer(new DodgeRollPayload());
     }
 
     public static void applyMovement(Player player) {

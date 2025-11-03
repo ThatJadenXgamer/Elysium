@@ -17,15 +17,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record ClientboundDodgeRollPayload(int id) implements CustomPacketPayload {
+public record DodgeRollAnimationPayload(int id) implements CustomPacketPayload {
 
-    public static final Type<ClientboundDodgeRollPayload> TYPE = new Type<>(Elysium.id("dodge_roll_client"));
+    public static final Type<DodgeRollAnimationPayload> TYPE = new Type<>(Elysium.id("dodge_roll_client"));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundDodgeRollPayload> CODEC = ByteBufCodecs.INT
-            .map(ClientboundDodgeRollPayload::new, ClientboundDodgeRollPayload::id).cast();
+    public static final StreamCodec<RegistryFriendlyByteBuf, DodgeRollAnimationPayload> CODEC = ByteBufCodecs.INT
+            .map(DodgeRollAnimationPayload::new, DodgeRollAnimationPayload::id).cast();
 
     @Override
-    public @NotNull Type<ClientboundDodgeRollPayload> type() {
+    public @NotNull Type<DodgeRollAnimationPayload> type() {
         return TYPE;
     }
 
