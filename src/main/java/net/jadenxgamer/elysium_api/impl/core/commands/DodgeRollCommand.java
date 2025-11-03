@@ -17,6 +17,7 @@ public class DodgeRollCommand {
                         sourceStack.sendFailure(Component.literal("Please provide a player!"));
                         return 0;
                     }
+                    //noinspection DataFlowIssue
                     DodgeRoll.dodgeRoll(sourceStack.getPlayer(), true);
                     sourceStack.sendSuccess(() -> Component.literal("Get rolled."), true);
                     return 1;
