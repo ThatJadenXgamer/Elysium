@@ -17,14 +17,14 @@ public class DodgeRollCommand {
                         sourceStack.sendFailure(Component.literal("Please provide a player!"));
                         return 0;
                     }
-                    DodgeRoll.dodgeRoll(sourceStack.getPlayer());
+                    DodgeRoll.dodgeRoll(sourceStack.getPlayer(), true);
                     sourceStack.sendSuccess(() -> Component.literal("Get rolled."), true);
                     return 1;
                 })
                 .then(Commands.argument("player", EntityArgument.player())
                         .executes(context -> {
                             ServerPlayer player = EntityArgument.getPlayer(context, "player");
-                            DodgeRoll.dodgeRoll(player);
+                            DodgeRoll.dodgeRoll(player, true);
                             context.getSource().sendSuccess(() -> Component.literal("Rolling."), true);
                             player.sendSystemMessage(Component.literal("Get rolled."), true);
                             return 1;

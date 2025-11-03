@@ -3,6 +3,7 @@ package net.jadenxgamer.elysium_api.impl.networking.to_client;
 import com.zigythebird.playeranim.animation.PlayerAnimationController;
 import com.zigythebird.playeranim.api.PlayerAnimationAccess;
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.api.roll.DodgeRoll;
 import net.jadenxgamer.elysium_api.impl.client.animation.AnimationControllers;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animations;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -28,6 +29,8 @@ public record DodgeRollPayload() implements CustomPacketPayload {
             Elysium.LOGGER.error("IPayloadContext#player() is not an AbstractClientPlayer!");
             return;
         }
+        DodgeRoll.applyMovement(clientPlayer);
+
         PlayerAnimationController controller = (PlayerAnimationController) PlayerAnimationAccess.getPlayerAnimationLayer(clientPlayer, AnimationControllers.MOVEMENT);
         if (controller == null) {
             Elysium.LOGGER.error("AnimationController \"elysium:movement\" is null!");
