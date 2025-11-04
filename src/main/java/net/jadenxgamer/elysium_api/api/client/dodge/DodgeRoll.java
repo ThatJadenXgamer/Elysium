@@ -13,8 +13,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.OptionalDouble;
-
 @OnlyIn(Dist.CLIENT)
 public class DodgeRoll {
 
