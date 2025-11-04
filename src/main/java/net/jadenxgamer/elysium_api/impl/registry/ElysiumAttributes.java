@@ -18,7 +18,7 @@ public class ElysiumAttributes {
                     1.7d,
                     0,
                     10
-            ));
+            ).setSyncable(true));
 
     public static void init(IEventBus eventBus) {
         ATTRIBUTES.register(eventBus);
