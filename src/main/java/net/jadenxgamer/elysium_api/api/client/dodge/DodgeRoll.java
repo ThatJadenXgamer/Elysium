@@ -36,7 +36,7 @@ public class DodgeRoll {
         player.addDeltaMovement(player.getForward()
                 .multiply(1, 0, 1)
                 .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
-                .scale(player.getSpeed()));
+                .scale(player.getSpeed() * 10));
 
         PacketDistributor.sendToServer(DodgeRollPayload.INSTANCE);
     }
