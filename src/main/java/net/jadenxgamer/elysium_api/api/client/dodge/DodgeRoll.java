@@ -33,8 +33,10 @@ public class DodgeRoll {
 
         controller.triggerAnimation(Animations.DODGE_ROLL);
 
-        OptionalDouble.of(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
-                .ifPresent(p -> player.addDeltaMovement(player.getForward().multiply(p, 0.0f, p)));
+        player.addDeltaMovement(player.getForward()
+                .multiply(1, 0, 1)
+                .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
+                .scale(player.getSpeed()));
 
         PacketDistributor.sendToServer(DodgeRollPayload.INSTANCE);
     }
