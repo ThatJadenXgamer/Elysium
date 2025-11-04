@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api;
 
 import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,7 @@ public final class Elysium {
 
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
         ElysiumMiscRegistries.init(modEventBus);
+        ElysiumAttributes.init(modEventBus);
     }
 
     public static ResourceLocation id(String path) {
