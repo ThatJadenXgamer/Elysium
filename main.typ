@@ -89,14 +89,8 @@
       _alt(
         "dodging enabled", {
           _seq("ES", "ES", comment: "movement + invulnerability")
-          _sync({
-            _seq("ES", "EMC", comment: "send animation packet")
-            _seq("ES", "EC", start-tip: "o", comment: "send animation packet")
-          })
-          _sync({
-            _seq("EMC", "EMC", comment: "play animation")
-            _seq("EC", "EC", end-tip: "x", comment: "ignore packet")
-          })
+          _seq("ES", "EMC", comment: "send animation packet")
+          _seq("EMC", "EMC", comment: "play animation")
         }
       )
     }
