@@ -33,6 +33,8 @@ public final class DodgeRollPayload implements CustomPacketPayload {
             Player player = context.player();
             player.invulnerableTime = 10;
 
+            player.getFoodData().addExhaustion(4f);
+
             player.addDeltaMovement(player.getForward()
                     .multiply(1, 0, 1)
                     .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
