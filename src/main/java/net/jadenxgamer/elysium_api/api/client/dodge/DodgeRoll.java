@@ -1,12 +1,6 @@
 package net.jadenxgamer.elysium_api.api.client.dodge;
 
-import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
-import dev.kosmx.playerAnim.api.layered.ModifierLayer;
-import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.client.animation.AnimationLayers;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
