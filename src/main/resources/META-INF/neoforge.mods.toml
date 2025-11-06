@@ -28,9 +28,9 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.elysium_api]]
-modId = "player_animation_library"
+modId = "playeranimator"
 type = "required"
-versionRange = "[1.0.14+mc1.21.1,)"
+versionRange = "[2.0.0-alpha1+1.21,)"
 ordering = "NONE"
 side = "CLIENT"
 

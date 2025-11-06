@@ -24,8 +24,8 @@ repositories {
         }
     }
     maven {
-        name = "RedlanceMinecraft"
-        url = "https://repo.redlance.org/public"
+        name "KosmX's maven"
+        url 'https://maven.kosmx.dev/'
     }
 
     // Add repositories to retrieve artifacts from in here.
@@ -44,8 +44,7 @@ dependencies {
     mappings loom.officialMojangMappings()
     neoForge "net.neoforged:neoforge:$project.neoforge_version"
 
-    modImplementation "com.zigythebird.playeranim:PlayerAnimationLibNeo:$project.pal_version"
-    forgeRuntimeLibrary "org.javassist:javassist:3.30.2-GA"
+    include modImplementation("dev.kosmx.player-anim:player-animation-lib-forge:${project.player_anim_version}")
 
     compileOnly "curse.maven:terrablender-940057:6054947"
 }

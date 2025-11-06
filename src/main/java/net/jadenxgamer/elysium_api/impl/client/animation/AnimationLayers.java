@@ -1,12 +1,12 @@
 package net.jadenxgamer.elysium_api.impl.client.animation;
 
-import com.zigythebird.playeranim.animation.PlayerAnimationController;
-import com.zigythebird.playeranim.api.PlayerAnimationFactory;
-import com.zigythebird.playeranimcore.enums.PlayState;
+
+import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.minecraft.resources.ResourceLocation;
 
-public final class AnimationControllers {
+public final class AnimationLayers {
 
     public static final ResourceLocation MOVEMENT = Elysium.id("movement");
 
@@ -14,7 +14,7 @@ public final class AnimationControllers {
         PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(
                 MOVEMENT,
                 1600,
-                player -> new PlayerAnimationController(player, (c, d, s) -> PlayState.STOP)
+                player -> new ModifierLayer<>()
         );
     }
 

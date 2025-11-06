@@ -1,10 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.networking.to_client;
 
-import com.zigythebird.playeranim.animation.PlayerAnimationController;
-import com.zigythebird.playeranim.api.PlayerAnimationAccess;
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.client.animation.AnimationControllers;
-import net.jadenxgamer.elysium_api.impl.client.animation.Animations;
+import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -36,12 +33,8 @@ public record DodgeRollAnimationPayload(int id) implements CustomPacketPayload {
                 Elysium.LOGGER.info("Not a RemotePlayer!");
                 return;
             }
-            PlayerAnimationController controller = (PlayerAnimationController) PlayerAnimationAccess.getPlayerAnimationLayer(player, AnimationControllers.MOVEMENT);
-            if (controller == null) {
-                Elysium.LOGGER.error("AnimationController \"elysium:movement\" is null!");
-                return;
-            }
-            controller.triggerAnimation(Animations.DODGE_ROLL);
+
+            Animation.DODGE_ROLL.play(player);
         });
     }
 }

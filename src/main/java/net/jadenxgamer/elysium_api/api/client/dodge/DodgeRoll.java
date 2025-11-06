@@ -1,10 +1,13 @@
 package net.jadenxgamer.elysium_api.api.client.dodge;
 
-import com.zigythebird.playeranim.animation.PlayerAnimationController;
-import com.zigythebird.playeranim.api.PlayerAnimationAccess;
+import dev.kosmx.playerAnim.api.layered.IAnimation;
+import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
+import dev.kosmx.playerAnim.api.layered.ModifierLayer;
+import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.client.animation.AnimationControllers;
-import net.jadenxgamer.elysium_api.impl.client.animation.Animations;
+import net.jadenxgamer.elysium_api.impl.client.animation.AnimationLayers;
+import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.minecraft.client.Minecraft;
@@ -23,13 +26,8 @@ public class DodgeRoll {
             return;
         }
         if (!player.onGround()) return;
-        PlayerAnimationController controller = (PlayerAnimationController) PlayerAnimationAccess.getPlayerAnimationLayer(player, AnimationControllers.MOVEMENT);
-        if (controller == null) {
-            Elysium.LOGGER.error("AnimationController \"elysium:movement\" is null!");
-            return;
-        }
 
-        controller.triggerAnimation(Animations.DODGE_ROLL);
+        Animation.DODGE_ROLL.play(player);
 
         player.addDeltaMovement(player.getForward()
                 .multiply(1, 0, 1)
