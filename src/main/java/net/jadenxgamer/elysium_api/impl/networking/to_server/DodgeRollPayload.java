@@ -29,14 +29,16 @@ public final class DodgeRollPayload implements CustomPacketPayload {
     }
 
     public void handleDataOnServer(IPayloadContext context) {
-        Player player = context.player();
-        player.invulnerableTime = 10;
+        if (Elysium.FEATURES.isDodgingEnabled()) {
+            Player player = context.player();
+            player.invulnerableTime = 10;
 
-        player.addDeltaMovement(player.getForward()
-                .multiply(1, 0, 1)
-                .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
-                .scale(player.getSpeed()));
+            player.addDeltaMovement(player.getForward()
+                    .multiply(1, 0, 1)
+                    .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
+                    .scale(player.getSpeed()));
 
-        PacketDistributor.sendToPlayersTrackingEntity(context.player(), new DodgeRollAnimationPayload(context.player().getId()));
+            PacketDistributor.sendToPlayersTrackingEntity(context.player(), new DodgeRollAnimationPayload(context.player().getId()));
+        }
     }
 }

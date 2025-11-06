@@ -18,6 +18,8 @@ public final class Elysium {
     public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
     public static RegistryAccess registryAccess;
 
+    public static final Features FEATURES = new Features();
+
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
         ElysiumMiscRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
@@ -29,5 +31,20 @@ public final class Elysium {
 
     public static ResourceLocation idPath(String namespace, String path) {
         return ResourceLocation.fromNamespaceAndPath(namespace, path);
+    }
+
+    public static final class Features {
+
+        private boolean dodging = false;
+
+        private Features() {}
+
+        public void enableDodging() {
+            dodging = true;
+        }
+
+        public boolean isDodgingEnabled() {
+            return dodging;
+        }
     }
 }
