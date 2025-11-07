@@ -20,7 +20,7 @@ public class DodgeRoll {
             Elysium.LOGGER.error("Client Player");
             return;
         }
-        if (!player.onGround()) return;
+
         if (ElysiumFeatures.DODGE_ROLL.test(player)) {
 
             Animation.DODGE_ROLL.play(player);

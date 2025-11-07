@@ -8,6 +8,13 @@ public class PredicateFeature<T> extends Feature {
 
     private final List<Predicate<T>> predicates = new ArrayList<>(List.of(t -> true));
 
+    public PredicateFeature() {}
+
+    public PredicateFeature(List<Predicate<T>> defaults) {
+        predicates.addAll(defaults);
+    }
+
+
     public void registerPredicate(Predicate<T> predicate) {
         predicates.add(predicate);
     }
