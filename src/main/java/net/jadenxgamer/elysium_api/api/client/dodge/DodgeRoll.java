@@ -1,6 +1,7 @@
 package net.jadenxgamer.elysium_api.api.client.dodge;
 
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumFeatures;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
@@ -19,16 +20,18 @@ public class DodgeRoll {
             Elysium.LOGGER.error("Client Player");
             return;
         }
-        if (!player.onGround()) return;
 
-        Animation.DODGE_ROLL.play(player);
+        if (ElysiumFeatures.DODGE_ROLL.test(player)) {
 
-        player.addDeltaMovement(player.getForward()
-                .multiply(1, 0, 1)
-                .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
-                .scale(player.getSpeed() * 10));
+            Animation.DODGE_ROLL.play(player);
 
-        PacketDistributor.sendToServer(DodgeRollPayload.INSTANCE);
+            player.addDeltaMovement(player.getForward()
+                    .multiply(1, 0, 1)
+                    .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
+                    .scale(player.getSpeed() * 10));
+
+            PacketDistributor.sendToServer(DodgeRollPayload.INSTANCE);
+        }
     }
 
 }
