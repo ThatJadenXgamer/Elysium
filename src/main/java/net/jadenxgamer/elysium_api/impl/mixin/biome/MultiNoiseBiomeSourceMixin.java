@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.mixin.biome;
 
 import com.mojang.datafixers.util.Either;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumTerrablenderHelper;
@@ -44,7 +44,7 @@ public abstract class MultiNoiseBiomeSourceMixin {
 
         if (this instanceof ElysiumBiomeSource sourceElysium && sourceElysium.getDimension() != null) {
             List<ElysiumBiomeHelper.BiomeReplacer> biomeReplacers = ElysiumBiomeHelper.biomesForDimension(sourceElysium.getDimension());
-            List<BiomeReplacerDataDriven> dataDrivenReplacers = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BIOME_REPLACER).stream().toList();
+            List<BiomeReplacerDataDriven> dataDrivenReplacers = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.BIOME_REPLACER).stream().toList();
 
             Holder<Biome> replacedBiome = replaceBiomeIfNeeded(x, z, currentBiome, biomeReplacers, dataDrivenReplacers, sourceElysium.getWorldSeed());
 
@@ -74,7 +74,7 @@ public abstract class MultiNoiseBiomeSourceMixin {
                     random.setSeed(uniqueSeed);
 
                     if (random.nextDouble() < replacer.rarity()) {
-                        return Elysium.registryAccess.registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.withBiome());
+                        return RegistryAccessHelper.getAccessOrThrow().registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.withBiome());
                     }
                 }
             }

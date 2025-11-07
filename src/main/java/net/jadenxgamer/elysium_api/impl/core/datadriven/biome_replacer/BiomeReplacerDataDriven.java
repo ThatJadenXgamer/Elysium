@@ -3,6 +3,7 @@ package net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -25,7 +26,7 @@ public record BiomeReplacerDataDriven(HolderSet<Biome> replaceBiomes, Holder<Bio
     ).apply(instance, BiomeReplacerDataDriven::new));
 
     public static void addDataDrivenPossibleBiomes() {
-        Registry<BiomeReplacerDataDriven> biomeReplacer = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.BIOME_REPLACER);
+        Registry<BiomeReplacerDataDriven> biomeReplacer = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.BIOME_REPLACER);
 
         biomeReplacer.stream().forEach(replacer -> {
             if (replacer.dimension().equals(Elysium.idPath("minecraft", "overworld"))) {

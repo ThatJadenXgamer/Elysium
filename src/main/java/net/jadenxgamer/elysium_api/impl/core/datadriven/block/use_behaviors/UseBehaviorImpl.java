@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors;
 
-import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.util.LookupRegistryHelper;
+import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,13 +29,13 @@ import java.util.Optional;
 public class UseBehaviorImpl {
 
     public static void init(PlayerInteractEvent.RightClickBlock event) {
-        if (Elysium.registryAccess == null) return;
+        if (!RegistryAccessHelper.hasAccess()) return;
         Level level = event.getLevel();
         BlockState state = level.getBlockState(event.getPos());
         Player player = event.getEntity();
         ItemStack stack = player.getItemInHand(event.getHand());
 
-        Optional<UseBehavior> useBehavior = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
+        Optional<UseBehavior> useBehavior = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
                 .filter(s -> s.blocks().contains(state.getBlockHolder()) && s.itemCondition().contains(stack.getItemHolder())).findFirst();
         if (level.isClientSide() || useBehavior.isEmpty()) return;
 

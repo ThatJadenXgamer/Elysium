@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.item;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.remainder_transformer.RemainderType;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
@@ -26,8 +26,8 @@ public interface IItemExtensionMixin {
             cancellable = true
     )
     private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (Elysium.registryAccess == null) return;
-        Optional<RemainderTransformer> registry = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
+        if (!RegistryAccessHelper.hasAccess()) return;
+        Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
 
         switch (registry.get().remainderType()) {
@@ -43,8 +43,8 @@ public interface IItemExtensionMixin {
             cancellable = true
     )
     private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (Elysium.registryAccess == null) return;
-        Optional<RemainderTransformer> registry = Elysium.registryAccess.registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
+        if (!RegistryAccessHelper.hasAccess()) return;
+        Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
 
         cir.setReturnValue(registry.get().remainderType() != RemainderType.NONE);

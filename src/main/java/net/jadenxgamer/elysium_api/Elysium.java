@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -16,7 +15,6 @@ public final class Elysium {
     public static final String MOD_ID = "elysium_api";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
-    public static RegistryAccess registryAccess;
 
     public static final Features FEATURES = new Features();
 
