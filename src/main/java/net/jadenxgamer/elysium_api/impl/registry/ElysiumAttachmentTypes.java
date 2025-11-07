@@ -17,6 +17,12 @@ public class ElysiumAttachmentTypes {
             "cooldown_tick", () -> AttachmentType.builder(() -> 0).build()
     );
 
+    public static final Supplier<AttachmentType<Cooldown>> DODGE_COOLDOWN = ATTACHMENT_TYPES.register(
+            "dodge_cooldown", () -> AttachmentType
+                    .builder(holder -> Cooldown.forHolder(holder, 10))
+                    .build()
+    );
+
     public static void init(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
     }

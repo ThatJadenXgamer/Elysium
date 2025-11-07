@@ -4,6 +4,7 @@ import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.ElysiumFeatures;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -23,6 +24,7 @@ public class DodgeRoll {
 
         if (ElysiumFeatures.DODGE_ROLL.test(player)) {
 
+            player.getData(ElysiumAttachmentTypes.DODGE_COOLDOWN).set();
             Animation.DODGE_ROLL.play(player);
 
             player.addDeltaMovement(player.getForward()

@@ -3,6 +3,7 @@ package net.jadenxgamer.elysium_api.impl.networking.to_server;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.ElysiumFeatures;
 import net.jadenxgamer.elysium_api.impl.networking.to_client.DodgeRollAnimationPayload;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -33,6 +34,7 @@ public final class DodgeRollPayload implements CustomPacketPayload {
         Player player = context.player();
         if (ElysiumFeatures.DODGE_ROLL.test(player)) {
 
+            player.getData(ElysiumAttachmentTypes.DODGE_COOLDOWN).set();
             player.invulnerableTime = 10;
 
             player.getFoodData().addExhaustion(4f);
