@@ -12,6 +12,7 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseB
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Registry;
@@ -29,6 +30,7 @@ import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
@@ -68,6 +70,11 @@ public class ElysiumEvents {
                 ElysiumSurfaceRulesManager.handleSurfaceRules(dimensionKey.get(), noiseGenerator);
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void tickPlayerPre(PlayerTickEvent.Pre event) {
+        event.getEntity().setData(ElysiumAttachmentTypes.COOLDOWN_TICK, event.getEntity().getData(ElysiumAttachmentTypes.COOLDOWN_TICK) + 1);
     }
 
     @SubscribeEvent
