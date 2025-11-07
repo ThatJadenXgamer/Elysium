@@ -1,16 +1,19 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
+import com.mojang.brigadier.CommandDispatcher;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
+import net.jadenxgamer.elysium_api.impl.client.commands.DodgeRollCommand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.level.material.FogType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.common.NeoForgeMod;
@@ -27,6 +30,13 @@ public class ElysiumClientEvents {
     @SubscribeEvent
     public static void onClientTickPost(ClientTickEvent.Post event) {
 
+    }
+
+    @SubscribeEvent
+    public static void onClientCommandsRegister(RegisterClientCommandsEvent event) {
+        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+
+        DodgeRollCommand.register(dispatcher);
     }
 
     @SubscribeEvent

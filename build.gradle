@@ -23,6 +23,10 @@ repositories {
             includeGroup("curse.maven")
         }
     }
+    maven {
+        name "KosmX's maven"
+        url 'https://maven.kosmx.dev/'
+    }
 
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -39,6 +43,8 @@ dependencies {
     minecraft "net.minecraft:minecraft:$project.minecraft_version"
     mappings loom.officialMojangMappings()
     neoForge "net.neoforged:neoforge:$project.neoforge_version"
+
+    include modImplementation("dev.kosmx.player-anim:player-animation-lib-forge:${project.player_anim_version}")
 
     compileOnly "curse.maven:terrablender-940057:6054947"
 }

@@ -5,16 +5,19 @@ import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer.BiomeReplacerDataDriven;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehaviorImpl;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -23,7 +26,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -74,6 +77,11 @@ public class ElysiumEvents {
 
     @EventBusSubscriber(modid = Elysium.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
     public static class ModBusEvents {
+
+        @SubscribeEvent
+        public static void modifyDefaultAttributes(EntityAttributeModificationEvent event) {
+            event.add(EntityType.PLAYER, ElysiumAttributes.DODGE_POWER);
+        }
 
         @SubscribeEvent
         public static void registerPayloads(final RegisterPayloadHandlersEvent event) {

@@ -27,6 +27,13 @@ versionRange = "[1.21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
+[[dependencies.elysium_api]]
+modId = "playeranimator"
+type = "required"
+versionRange = "[2.0.0-alpha1+1.21,)"
+ordering = "NONE"
+side = "CLIENT"
+
 [[mixins]]
 config = "elysium_api.mixins.json"
 
