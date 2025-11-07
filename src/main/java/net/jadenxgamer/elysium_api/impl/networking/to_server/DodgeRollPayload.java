@@ -1,6 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.networking.to_server;
 
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumFeatures;
 import net.jadenxgamer.elysium_api.impl.networking.to_client.DodgeRollAnimationPayload;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.minecraft.network.FriendlyByteBuf;
@@ -29,8 +30,9 @@ public final class DodgeRollPayload implements CustomPacketPayload {
     }
 
     public void handleDataOnServer(IPayloadContext context) {
-        if (Elysium.FEATURES.isDodgingEnabled()) {
-            Player player = context.player();
+        Player player = context.player();
+        if (ElysiumFeatures.DODGE_ROLL.test(player)) {
+
             player.invulnerableTime = 10;
 
             player.getFoodData().addExhaustion(4f);
