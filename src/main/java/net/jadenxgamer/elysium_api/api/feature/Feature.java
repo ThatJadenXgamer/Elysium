@@ -3,13 +3,16 @@ package net.jadenxgamer.elysium_api.api.feature;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.minecraft.resources.ResourceLocation;
 
-public class Feature {
+public class Feature<T> {
 
     private final ResourceLocation id;
     private boolean enabled;
+    private final T config;
 
-    public Feature(ResourceLocation id) {
+
+    public Feature(ResourceLocation id, T config) {
         this.id = id;
+        this.config = config;
     }
 
     public void enable() {
@@ -23,4 +26,7 @@ public class Feature {
         return enabled;
     }
 
+    public T config() {
+        return config;
+    }
 }

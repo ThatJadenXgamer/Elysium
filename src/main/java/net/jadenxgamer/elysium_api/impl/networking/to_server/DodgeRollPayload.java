@@ -32,7 +32,7 @@ public final class DodgeRollPayload implements CustomPacketPayload {
 
     public void handleDataOnServer(IPayloadContext context) {
         Player player = context.player();
-        if (ElysiumFeatures.DODGE_ROLL.test(player)) {
+        if (ElysiumFeatures.DODGE_ROLL.canDodge(player)) {
 
             player.getData(ElysiumAttachmentTypes.DODGE_COOLDOWN).set();
             player.invulnerableTime = 10;

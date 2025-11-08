@@ -22,7 +22,7 @@ public class DodgeRoll {
             return;
         }
 
-        if (ElysiumFeatures.DODGE_ROLL.test(player)) {
+        if (ElysiumFeatures.DODGE_ROLL.canDodge(player)) {
 
             player.getData(ElysiumAttachmentTypes.DODGE_COOLDOWN).set();
             Animation.DODGE_ROLL.play(player);
