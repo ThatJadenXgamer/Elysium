@@ -28,7 +28,7 @@ public class RegistryAccessHelper {
 
     public static Optional<RegistryAccess> getAccess() {
         if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) return getServerAccess();
-        return getServerAccess().or(RegistryAccessHelper::getClientAccess);
+        return getClientAccess().or(RegistryAccessHelper::getServerAccess);
     }
 
     public static RegistryAccess getServerAccessOrThrow() {
