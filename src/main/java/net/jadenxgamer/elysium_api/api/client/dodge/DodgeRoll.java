@@ -8,6 +8,7 @@ import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -27,8 +28,7 @@ public class DodgeRoll {
             player.getData(ElysiumAttachmentTypes.DODGE_COOLDOWN).set();
             Animation.DODGE_ROLL.play(player);
 
-            player.addDeltaMovement(player.getForward()
-                    .multiply(1, 0, 1)
+            player.addDeltaMovement(Vec3.directionFromRotation(0, player.getYRot())
                     .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
                     .scale(player.getSpeed() * 10));
 

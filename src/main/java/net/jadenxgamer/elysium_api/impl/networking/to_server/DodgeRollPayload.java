@@ -9,6 +9,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -39,10 +40,9 @@ public final class DodgeRollPayload implements CustomPacketPayload {
 
             player.getFoodData().addExhaustion(4f);
 
-            player.addDeltaMovement(player.getForward()
-                    .multiply(1, 0, 1)
+            player.addDeltaMovement(Vec3.directionFromRotation(0, player.getYRot())
                     .scale(player.getAttributeValue(ElysiumAttributes.DODGE_POWER))
-                    .scale(player.getSpeed()));
+                    .scale(player.getSpeed() * 10));
 
             PacketDistributor.sendToPlayersTrackingEntity(context.player(), new DodgeRollAnimationPayload(context.player().getId()));
         }
