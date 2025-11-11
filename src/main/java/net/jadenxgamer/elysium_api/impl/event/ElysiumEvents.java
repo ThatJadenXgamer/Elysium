@@ -1,10 +1,12 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
+import com.mojang.brigadier.CommandDispatcher;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper;
 import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
+import net.jadenxgamer.elysium_api.impl.core.commands.CooldownCommand;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer.BiomeReplacerDataDriven;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
@@ -12,12 +14,15 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseB
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
+import net.jadenxgamer.elysium_api.impl.networking.to_client.SyncDataAttachmentPayload;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -27,7 +32,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -69,6 +76,22 @@ public class ElysiumEvents {
             if (dimensionKey.isPresent() && generator instanceof NoiseBasedChunkGenerator noiseGenerator) {
                 ElysiumSurfaceRulesManager.handleSurfaceRules(dimensionKey.get(), noiseGenerator);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCommandsRegister(RegisterCommandsEvent event) {
+        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+
+        CooldownCommand.register(dispatcher);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player)  {
+            SyncDataAttachmentPayload.sync(player, ElysiumAttachmentTypes.COOLDOWN_TICK);
+        } else {
+            Elysium.LOGGER.error("Player {} is not a ServerPlayer!", event.getEntity());
         }
     }
 

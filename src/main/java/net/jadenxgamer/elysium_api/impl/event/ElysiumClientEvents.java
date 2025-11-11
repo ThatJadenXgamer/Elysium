@@ -3,6 +3,7 @@ package net.jadenxgamer.elysium_api.impl.event;
 import com.mojang.brigadier.CommandDispatcher;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
+import net.jadenxgamer.elysium_api.impl.client.commands.ClientCooldownCommand;
 import net.jadenxgamer.elysium_api.impl.client.commands.DodgeRollCommand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
@@ -37,6 +38,7 @@ public class ElysiumClientEvents {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
         DodgeRollCommand.register(dispatcher);
+        ClientCooldownCommand.register(dispatcher);
     }
 
     @SubscribeEvent
