@@ -108,7 +108,7 @@ public class ElysiumEvents {
         @SubscribeEvent
         public static void datapackRegistry(DataPackRegistryEvent.NewRegistry event) {
             event.dataPackRegistry(ElysiumRegistries.USE_BEHAVIORS, UseBehavior.CODEC);
-            event.dataPackRegistry(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS, BlockSoundTransformer.CODEC);
+            event.dataPackRegistry(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS, BlockSoundTransformer.CODEC, BlockSoundTransformer.CODEC);
             event.dataPackRegistry(ElysiumRegistries.BIOME_REPLACER, BiomeReplacerDataDriven.CODEC);
             event.dataPackRegistry(ElysiumRegistries.REMAINDER_TRANSFORMERS, RemainderTransformer.CODEC);
         }
