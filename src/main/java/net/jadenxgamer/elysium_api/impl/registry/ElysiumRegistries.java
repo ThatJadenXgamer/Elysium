@@ -11,8 +11,8 @@ import net.minecraft.resources.ResourceKey;
 public class ElysiumRegistries {
     public static final ResourceKey<Registry<UseBehavior>> USE_BEHAVIORS = key("block/use_behaviors");
     public static final ResourceKey<Registry<BlockSoundTransformer>> BLOCK_SOUND_TRANSFORMERS = key("block/sound_transformers");
-    public static final ResourceKey<Registry<RemainderTransformer>> REMAINDER_TRANSFORMERS = key("item/remainder_transformers");
     public static final ResourceKey<Registry<BiomeReplacerDataDriven>> BIOME_REPLACER = key("biome_replacer");
+    public static final ResourceKey<Registry<RemainderTransformer>> REMAINDER_TRANSFORMERS = key("item/remainder_transformers");
 
     private static <T> ResourceKey<Registry<T>> key(String name) {
         return ResourceKey.createRegistryKey(Elysium.id(name));

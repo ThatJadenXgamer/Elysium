@@ -14,6 +14,7 @@ public class ElysiumTags {
         public static final TagKey<Block> ROOTS_PLANTABLE_ON = createBlockTag("roots_plantable_on"); // Nether Roots are Plantable on these Blocks
         public static final TagKey<Block> NETHER_SPROUTS_PLANTABLE_ON = createBlockTag("nether_sprouts_plantable_on"); // Nether Sprouts are Plantable on these Blocks
         public static final TagKey<Block> NETHER_WART_PLANTABLE_ON = createBlockTag("nether_wart_plantable_on"); // Nether Warts are Plantable on these Blocks
+        public static final TagKey<Block> MULTILAYER_JIGSAW_NON_SOLID_VALID = createBlockTag("multilayer_jigsaw_non_solid_valid"); // Allows MultilayerJigsawStructures to place structures on these blocks even if they are non-solid
 
         private static TagKey<Block> createBlockTag(String name) {
             return TagKey.create(Registries.BLOCK, Elysium.id(name));

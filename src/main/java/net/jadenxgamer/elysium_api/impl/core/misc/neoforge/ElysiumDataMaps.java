@@ -12,8 +12,7 @@ public class ElysiumDataMaps {
 
     public static final DataMapType<Item, ResourceKey<DecoratedPotPattern>> DECORATED_POT_PATTERNS = DataMapType.builder(
             ResourceLocation.fromNamespaceAndPath(Elysium.MOD_ID, "decorated_pot_patterns"),
-            Registries.ITEM,
-            ResourceKey.codec(Registries.DECORATED_POT_PATTERN)
+            Registries.ITEM, ResourceKey.codec(Registries.DECORATED_POT_PATTERN)
     ).build();
 
 }

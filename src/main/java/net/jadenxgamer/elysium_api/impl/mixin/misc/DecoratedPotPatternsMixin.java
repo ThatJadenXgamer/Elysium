@@ -16,10 +16,11 @@ import java.util.Optional;
 @Mixin(DecoratedPotPatterns.class)
 public class DecoratedPotPatternsMixin {
 
-    @WrapMethod(method = "getPatternFromItem")
+    @WrapMethod(
+            method = "getPatternFromItem"
+    )
     private static ResourceKey<DecoratedPotPattern> elysium$getPatternFromItem(Item item, Operation<ResourceKey<DecoratedPotPattern>> original) {
         Holder<Item> holder = BuiltInRegistries.ITEM.wrapAsHolder(item);
         return Optional.ofNullable(holder.getData(ElysiumDataMaps.DECORATED_POT_PATTERNS)).orElse(original.call(item));
     }
-
 }

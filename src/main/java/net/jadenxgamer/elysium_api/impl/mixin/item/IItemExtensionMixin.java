@@ -22,7 +22,7 @@ public interface IItemExtensionMixin {
 
     @Inject(
             method = "getCraftingRemainingItem",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
@@ -33,20 +33,19 @@ public interface IItemExtensionMixin {
         switch (registry.get().remainderType()) {
             case NONE -> cir.setReturnValue(null);
             case NON_CONSUMABLE -> cir.setReturnValue(new ItemStack(self()));
-            case CHANGE_ITEM -> cir.setReturnValue(registry.get().changeItem().copy());
+            case CHANGE_ITEM -> cir.setReturnValue(registry.get().changeItem());
         }
     }
 
     @Inject(
             method = "hasCraftingRemainingItem",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (!RegistryAccessHelper.hasAccess()) return;
         Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
-
         cir.setReturnValue(registry.get().remainderType() != RemainderType.NONE);
     }
 }
