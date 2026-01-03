@@ -35,39 +35,43 @@ public class UseBehaviorImpl {
         Player player = event.getEntity();
         ItemStack stack = player.getItemInHand(event.getHand());
 
-        Optional<UseBehavior> useBehavior = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
-                .filter(s -> s.blocks().contains(state.getBlockHolder()) && s.itemCondition().contains(stack.getItemHolder())).findFirst();
+        Optional<UseBehavior> useBehavior = RegistryAccessHelper.getAccessOrThrow()
+                .registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
+                .filter(s -> s.blocks().contains(
+                        state.getBlockHolder()) // Checks for UseBehaviors registered to this block
+                        && s.itemCondition().contains(stack.getItemHolder())).findFirst(); // Narrows it down to a UserBehavior that fired with the current block in hand
         if (level.isClientSide() || useBehavior.isEmpty()) return;
-
         UseBehavior registry = useBehavior.get();
-        BlockPos regPos = getPosFromCodec(registry.behavior().pos(), registry.behavior().posOffset(), event);
+        BlockPos pos = getPosFromCodec(registry.behavior().pos(), registry.behavior().posOffset(), event);
 
-        if (placeRelated(registry) && !registry.behavior().canReplace() && !level.getBlockState(regPos).canBeReplaced()) return;
-        if (registry.blockstateCondition().isPresent() && !registry.blockstateCondition().get().matches(state)) return;
-
-        if (!player.getAbilities().instabuild) handleItemAfterUse(registry.behavior().afterUseItem(), stack, event);
-        if (registry.behavior().sounds().isPresent()) level.playSound(null, event.getPos(), registry.behavior().sounds().get().soundEvent(), SoundSource.BLOCKS, registry.behavior().sounds().get().volume(), registry.behavior().sounds().get().pitch());
-        if (registry.behavior().particles().isPresent()) spawnParticles((ServerLevel) level, regPos, registry.behavior().particles().get().particleType(), registry.behavior().particles().get().count(), registry.behavior().particles().get().speed(), registry.behavior().particles().get().xOffset(), registry.behavior().particles().get().yOffset(), registry.behavior().particles().get().zOffset());
+        if (isPlaceRelated(registry) && !registry.behavior().canReplace() && !level.getBlockState(pos).canBeReplaced()) return; // Fails if the useBehavior is trying to place something is non-replaceable while the boolean to replace is false
+        if (registry.blockstateCondition().isPresent() && !registry.blockstateCondition().get().matches(state)) return; // Fails if a blockstate_condition is present and the current block does not match said state
+        if (!player.getAbilities().instabuild) handleItemAfterUse(registry.behavior().afterUseItem(), stack, event); // Handles after use behaviors of the use item, this does not fire in creative mode
+        if (registry.behavior().sounds().isPresent()) {
+            var sounds = registry.behavior().sounds().get();
+            level.playSound(null, event.getPos(), sounds.soundEvent(), SoundSource.BLOCKS, sounds.volume(), sounds.pitch());
+        }
+        if (registry.behavior().particles().isPresent()) {
+            var particles = registry.behavior().particles().get();
+            trySpawnParticles((ServerLevel) level, pos, particles.particleType(), particles.count(), particles.speed(), particles.xOffset(), particles.yOffset(), particles.zOffset());
+        }
 
         int chanceToFail = registry.chanceToFail();
-        if (chanceToFail > 0) {
-            if (level.random.nextInt(chanceToFail) != 0) {
-                event.setCancellationResult(InteractionResult.SUCCESS);
-                event.setCanceled(true);
-                return;
-            }
+        if (chanceToFail > 0 && level.random.nextInt(chanceToFail) != 0) {
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
         }
 
         switch (registry.behavior().type()) {
-            case PLACE -> placeBlock(level, regPos, registry.behavior().block().get(), event);
-            case PLACE_ITSELF -> placeBlock(level, regPos, state, event);
-            case DROP -> dropStack(level, regPos, event.getFace(), registry.behavior().item().get(), registry.behavior().itemCount());
-            case DROP_ITSELF -> dropStack(level, regPos, event.getFace(), BuiltInRegistries.BLOCK.getKey(state.getBlock()), registry.behavior().itemCount());
-            case FEATURE -> placeFeature(level, regPos, registry.behavior().feature().get());
-            case INSERT_STACK -> insertStack(player, registry.behavior().item().get(), registry.behavior().itemCount());
+            case PLACE -> placeBlock(level, pos, registry.behavior().block().get(), event); // Places a Block
+            case PLACE_ITSELF -> placeBlock(level, pos, state, event); // Places a Block of itself
+            case DROP -> dropStack(level, pos, event.getFace(), registry.behavior().item().get(), registry.behavior().itemCount()); // Drops a Stack
+            case DROP_ITSELF -> dropStack(level, pos, event.getFace(), BuiltInRegistries.BLOCK.getKey(state.getBlock()), registry.behavior().itemCount()); // Drops a Stack of itself
+            case FEATURE -> placeFeature(level, pos, registry.behavior().feature().get()); // Places a PlacedFeature
+            case INSERT_STACK -> insertStack(player, registry.behavior().item().get(), registry.behavior().itemCount()); // Inserts a Stack within your inventory
         }
-
-        if (registry.behavior().breakParticles()) level.levelEvent(2001, regPos, Block.getId(state));
+        if (registry.behavior().breakParticles()) level.levelEvent(2001, pos, Block.getId(state)); // Spawns break particles in the modified position
 
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
@@ -113,11 +117,11 @@ public class UseBehaviorImpl {
             case SOUTH -> basePos.south(offset);
             case EAST -> basePos.east(offset);
             case WEST -> basePos.west(offset);
-            case RANDOM_HORIZONTAL -> {
+            case RANDOM_HORIZONTAL -> { // Randomly chooses between the 4 cardinal directions
                 Direction randomDir = Direction.Plane.HORIZONTAL.getRandomDirection(event.getLevel().random);
                 yield basePos.relative(randomDir);
             }
-            case RANDOM_VERTICAL -> {
+            case RANDOM_VERTICAL -> { // Randomly chooses between above and below
                 Direction randomDir = Direction.Plane.VERTICAL.getRandomDirection(event.getLevel().random);
                 yield basePos.relative(randomDir);
             }
@@ -125,14 +129,14 @@ public class UseBehaviorImpl {
         };
     }
 
-    private static void spawnParticles(ServerLevel level, BlockPos pos, ResourceLocation location, int count, double speed, double xOffset, double yOffset, double zOffset) {
+    private static void trySpawnParticles(ServerLevel level, BlockPos pos, ResourceLocation location, int count, double speed, double xOffset, double yOffset, double zOffset) {
         ParticleType<?> particleType = LookupRegistryHelper.getParticleType(location);
         if (particleType instanceof SimpleParticleType simple) {
             level.sendParticles(simple, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, count, xOffset, yOffset, zOffset, speed);
         }
     }
 
-    private static boolean placeRelated(UseBehavior registry) {
+    private static boolean isPlaceRelated(UseBehavior registry) {
         UseBehaviorTypeEnum type = registry.behavior().type();
         return type == UseBehaviorTypeEnum.PLACE || type == UseBehaviorTypeEnum.PLACE_ITSELF || type == UseBehaviorTypeEnum.FEATURE;
     }

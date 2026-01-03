@@ -50,6 +50,10 @@ public record UseBehavior(HolderSet<Block> blocks, Optional<BlockStateProperties
                 Codec.FLOAT.optionalFieldOf("volume", 1.0f).forGetter(Sounds::volume),
                 Codec.FLOAT.optionalFieldOf("pitch", 1.0f).forGetter(Sounds::pitch)
         ).apply(instance, Sounds::new));
+
+        public float getVolume() {
+            return volume;
+        }
     }
 
     public record Particles(ResourceLocation particleType, int count, double speed, double xOffset, double yOffset, double zOffset) {
