@@ -26,7 +26,7 @@ public interface IItemExtensionMixin {
             cancellable = true
     )
     private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (!RegistryAccessHelper.hasAccess()) return;
+        if (!RegistryAccessHelper.isRegistryAccessible()) return;
         Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
 
@@ -43,7 +43,7 @@ public interface IItemExtensionMixin {
             cancellable = true
     )
     private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (!RegistryAccessHelper.hasAccess()) return;
+        if (!RegistryAccessHelper.isRegistryAccessible()) return;
         Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
         cir.setReturnValue(registry.get().remainderType() != RemainderType.NONE);

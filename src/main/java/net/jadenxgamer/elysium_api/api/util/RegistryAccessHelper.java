@@ -1,36 +1,23 @@
 package net.jadenxgamer.elysium_api.api.util;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.RegistryAccess;
-import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.util.Optional;
 
 public class RegistryAccessHelper {
 
-    private static RegistryAccess serverRegAccess;
+    private static Optional<RegistryAccess> registryAccess;
 
     public static RegistryAccess getAccessOrThrow() {
-        if (FMLEnvironment.dist.isClient()) return getClientAccess().orElseThrow();
-        return getServerAccess().orElseThrow();
+        if (!isRegistryAccessible()) return null;
+        return registryAccess.get();
     }
 
     public static void updateAccess(RegistryAccess instance) {
-        serverRegAccess = instance;
+        registryAccess = Optional.of(instance);
     }
 
-    public static Optional<RegistryAccess> getServerAccess() {
-        if (FMLEnvironment.dist.isClient()) return Optional.empty();
-        return Optional.of(serverRegAccess);
-    }
-
-    public static Optional<RegistryAccess> getClientAccess() {
-        if (!FMLEnvironment.dist.isClient()) return Optional.empty();
-        return Optional.ofNullable(Minecraft.getInstance().getConnection()).map(ClientPacketListener::registryAccess);
-    }
-
-    public static boolean hasAccess() {
-        return serverRegAccess != null;
+    public static boolean isRegistryAccessible() {
+        return registryAccess.isPresent();
     }
 }

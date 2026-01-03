@@ -29,7 +29,7 @@ import java.util.Optional;
 public class UseBehaviorImpl {
 
     public static void init(PlayerInteractEvent.RightClickBlock event) {
-        if (!RegistryAccessHelper.hasAccess()) return;
+        if (!RegistryAccessHelper.isRegistryAccessible()) return;
         Level level = event.getLevel();
         BlockState state = level.getBlockState(event.getPos());
         Player player = event.getEntity();
