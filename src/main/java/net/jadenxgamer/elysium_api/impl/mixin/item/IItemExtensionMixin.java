@@ -27,7 +27,7 @@ public interface IItemExtensionMixin {
     )
     private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         if (!RegistryAccessHelper.hasAccess()) return;
-        Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
+        Optional<RemainderTransformer> registry = RegistryAccessHelper.getServerAccess().orElseThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
 
         switch (registry.get().remainderType()) {
@@ -44,7 +44,7 @@ public interface IItemExtensionMixin {
     )
     private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (!RegistryAccessHelper.hasAccess()) return;
-        Optional<RemainderTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
+        Optional<RemainderTransformer> registry = RegistryAccessHelper.getServerAccess().orElseThrow().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
         if (registry.isEmpty()) return;
         cir.setReturnValue(registry.get().remainderType() != RemainderType.NONE);
     }

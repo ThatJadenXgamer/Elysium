@@ -49,7 +49,7 @@ public class ElysiumEvents {
         //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.BADLANDS, Biomes.DESERT, 0.5, 24, new ResourceLocation(Elysium.MOD_ID, "replace_replaced_example"), registryAccess); // and yes, you can replace already replaced biomes too
 
         BiomeReplacerDataDriven.addDataDrivenPossibleBiomes();
-        Registry<LevelStem> levelStems = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(Registries.LEVEL_STEM);
+        Registry<LevelStem> levelStems = RegistryAccessHelper.getServerAccess().orElseThrow().registryOrThrow(Registries.LEVEL_STEM);
         for (LevelStem dimension : levelStems.stream().toList()) {
             Optional<ResourceKey<LevelStem>> dimensionKey = levelStems.getResourceKey(dimension);
             if (dimensionKey.isPresent() && dimension.generator().getBiomeSource() instanceof ElysiumBiomeSource biomeSource) {

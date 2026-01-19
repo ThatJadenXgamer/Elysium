@@ -44,7 +44,7 @@ public abstract class MultiNoiseBiomeSourceMixin {
 
         if (this instanceof ElysiumBiomeSource sourceElysium && sourceElysium.getDimension() != null) {
             List<ElysiumBiomeHelper.BiomeReplacer> biomeReplacers = ElysiumBiomeHelper.biomesForDimension(sourceElysium.getDimension());
-            List<BiomeReplacerDataDriven> dataDrivenReplacers = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.BIOME_REPLACER).stream().toList();
+            List<BiomeReplacerDataDriven> dataDrivenReplacers = RegistryAccessHelper.getServerAccess().orElseThrow().registryOrThrow(ElysiumRegistries.BIOME_REPLACER).stream().toList();
 
             Holder<Biome> replacedBiome = replaceBiomeIfNeeded(x, z, currentBiome, biomeReplacers, dataDrivenReplacers, sourceElysium.getWorldSeed());
 
@@ -74,7 +74,7 @@ public abstract class MultiNoiseBiomeSourceMixin {
                     random.setSeed(uniqueSeed);
 
                     if (random.nextDouble() < replacer.rarity()) {
-                        return RegistryAccessHelper.getAccessOrThrow().registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.withBiome());
+                        return RegistryAccessHelper.getServerAccess().orElseThrow().registryOrThrow(Registries.BIOME).getHolderOrThrow(replacer.withBiome());
                     }
                 }
             }

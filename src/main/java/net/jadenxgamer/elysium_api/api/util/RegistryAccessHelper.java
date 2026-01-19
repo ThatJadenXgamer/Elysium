@@ -11,17 +11,11 @@ public class RegistryAccessHelper {
 
     private static RegistryAccess serverRegAccess;
 
-    public static RegistryAccess getAccessOrThrow() {
-        if (FMLEnvironment.dist.isClient()) return getClientAccess().orElseThrow();
-        return getServerAccess().orElseThrow();
-    }
-
     public static void updateAccess(RegistryAccess instance) {
         serverRegAccess = instance;
     }
 
     public static Optional<RegistryAccess> getServerAccess() {
-        if (FMLEnvironment.dist.isClient()) return Optional.empty();
         return Optional.of(serverRegAccess);
     }
 
