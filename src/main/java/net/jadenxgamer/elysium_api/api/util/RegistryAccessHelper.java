@@ -15,8 +15,15 @@ public class RegistryAccessHelper {
         serverRegAccess = instance;
     }
 
+    /*
+       !!! Always call this on logical server !!!
+     */
     public static Optional<RegistryAccess> getServerAccess() {
-        return Optional.of(serverRegAccess);
+        return Optional.ofNullable(serverRegAccess);
+    }
+
+    public static Optional<RegistryAccess> getPreferredClientAccess() {
+        return getServerAccess().or(RegistryAccessHelper::getClientAccess);
     }
 
     public static Optional<RegistryAccess> getClientAccess() {

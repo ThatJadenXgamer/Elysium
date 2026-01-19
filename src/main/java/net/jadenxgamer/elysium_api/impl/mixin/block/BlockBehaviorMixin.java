@@ -24,8 +24,7 @@ public abstract class BlockBehaviorMixin {
     private void elysium$soundTransformer(BlockState state, CallbackInfoReturnable<SoundType> cir) {
         if (!RegistryAccessHelper.hasAccess()) return;
         Optional<BlockSoundTransformer> registry = RegistryAccessHelper
-                .getClientAccess()
-                .or(RegistryAccessHelper::getServerAccess)
+                .getPreferredClientAccess()
                 .orElseThrow()
                 .registryOrThrow(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS)
                 .stream()
