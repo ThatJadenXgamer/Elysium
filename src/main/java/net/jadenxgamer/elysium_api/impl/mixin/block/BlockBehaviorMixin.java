@@ -22,8 +22,8 @@ public abstract class BlockBehaviorMixin {
             cancellable = true
     )
     private void elysium$soundTransformer(BlockState state, CallbackInfoReturnable<SoundType> cir) {
-        if (!RegistryAccessHelper.isRegistryAccessible()) return;
-        Optional<BlockSoundTransformer> registry = RegistryAccessHelper.getAccessOrThrow().registryOrThrow(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS).stream().filter(s -> s.blocks().contains(state.getBlockHolder())).findFirst();
+        if (!RegistryAccessHelper.isRegistryAccessAvailable()) return;
+        Optional<BlockSoundTransformer> registry = RegistryAccessHelper.getServer().registryOrThrow(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS).stream().filter(s -> s.blocks().contains(state.getBlockHolder())).findFirst();
         registry.ifPresent(blockSoundTransformer -> cir.setReturnValue(blockSoundTransformer.toSoundType()));
     }
 }

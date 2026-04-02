@@ -46,7 +46,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge {
     enable {
         version = neoforge_version
-        disableRecompilation = true
+        disableRecompilation = false
     }
     // Validate AT files and raise errors when they have invalid targets
     // validateAccessTransformers = true
@@ -60,6 +60,7 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            jvmArguments = ['-Xmx2G']
         }
 
         server {

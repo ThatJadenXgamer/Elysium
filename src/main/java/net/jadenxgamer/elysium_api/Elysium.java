@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -21,6 +22,7 @@ public final class Elysium {
         ElysiumMiscRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
         ElysiumAttachmentTypes.init(modEventBus);
+        ElysiumItems.init(modEventBus);
     }
 
     public static ResourceLocation id(String path) {

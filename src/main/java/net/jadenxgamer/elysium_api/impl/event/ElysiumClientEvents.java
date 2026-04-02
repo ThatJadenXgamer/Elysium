@@ -4,9 +4,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
 import net.jadenxgamer.elysium_api.impl.client.commands.DodgeRollCommand;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.FogType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -17,6 +21,7 @@ import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @SuppressWarnings("unused")
 @EventBusSubscriber(modid = Elysium.MOD_ID, value = Dist.CLIENT)
@@ -52,16 +57,19 @@ public class ElysiumClientEvents {
     }
 
     @SubscribeEvent
+    public static void addToExistingTabs(BuildCreativeModeTabContentsEvent event) {
+        if (event.hasPermissions() && event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
+            event.insertAfter(Items.DEBUG_STICK.getDefaultInstance(), ElysiumItems.PANORAMA_CAMERA.get().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        }
+    }
+
+    @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Pre event) {
         ScreenFlash.handle(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
     }
 
-    @EventBusSubscriber(modid = Elysium.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ModBusClientEvents {
+    @SubscribeEvent
+    public static void clientSetup(FMLClientSetupEvent event) {
 
-        @SubscribeEvent
-        public static void clientSetup(FMLClientSetupEvent event) {
-
-        }
     }
 }

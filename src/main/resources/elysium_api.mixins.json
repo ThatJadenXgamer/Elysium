@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "client": [
+    "client.ClientLevelMixin",
     "entity.AbstractClientPlayerMixin",
     "entity.PlayerSkinAccessor"
   ],
@@ -11,6 +12,7 @@
     "biome.BiomeSourceMixin",
     "biome.MultiNoiseBiomeSourceMixin",
     "biome.NoiseGeneratorSettingsAccessor",
+    "block.BlockAccessor",
     "block.BlockBehaviorMixin",
     "block.NetherSproutsBlockMixin",
     "block.NetherWartBlockMixin",

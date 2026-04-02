@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors;
 
 import net.jadenxgamer.elysium_api.api.util.LookupRegistryHelper;
 import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
+import net.jadenxgamer.elysium_api.impl.mixin.block.BlockAccessor;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,13 +30,13 @@ import java.util.Optional;
 public class UseBehaviorImpl {
 
     public static void init(PlayerInteractEvent.RightClickBlock event) {
-        if (!RegistryAccessHelper.isRegistryAccessible()) return;
+        if (!RegistryAccessHelper.isRegistryAccessAvailable()) return;
         Level level = event.getLevel();
         BlockState state = level.getBlockState(event.getPos());
         Player player = event.getEntity();
         ItemStack stack = player.getItemInHand(event.getHand());
 
-        Optional<UseBehavior> useBehavior = RegistryAccessHelper.getAccessOrThrow()
+        Optional<UseBehavior> useBehavior = RegistryAccessHelper.getServer()
                 .registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
                 .filter(s -> s.blocks().contains(
                         state.getBlockHolder()) // Checks for UseBehaviors registered to this block
@@ -78,7 +79,7 @@ public class UseBehaviorImpl {
     }
 
     private static void placeBlock(Level level, BlockPos pos, BlockState state, PlayerInteractEvent.RightClickBlock event) {
-        if (state != null && state.getBlock().canSurvive(state, level, pos)) {
+        if (state != null && ((BlockAccessor) state.getBlock()).elysium_api$canSurvive(state, level, pos)) {
             level.setBlock(pos, state, Block.UPDATE_ALL);
         }
     }

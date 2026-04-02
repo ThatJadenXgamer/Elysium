@@ -1,23 +1,30 @@
 package net.jadenxgamer.elysium_api.api.util;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
-
-import java.util.Optional;
+import net.minecraft.server.MinecraftServer;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class RegistryAccessHelper {
 
-    private static Optional<RegistryAccess> registryAccess;
-
-    public static RegistryAccess getAccessOrThrow() {
-        if (!isRegistryAccessible()) return null;
-        return registryAccess.get();
+    public static RegistryAccess getServer() {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) throw new IllegalStateException("Server has not been initialised");
+        return server.registryAccess();
     }
 
-    public static void updateAccess(RegistryAccess instance) {
-        registryAccess = Optional.of(instance);
+    @OnlyIn(Dist.CLIENT)
+    public static RegistryAccess getClient() {
+        Minecraft client = Minecraft.getInstance();
+        if (client.level == null) throw new IllegalStateException("Client has not been initialised");
+        return client.level.registryAccess();
     }
 
-    public static boolean isRegistryAccessible() {
-        return registryAccess.isPresent();
+    public static boolean isRegistryAccessAvailable() {
+        if (FMLEnvironment.dist == Dist.CLIENT) return  Minecraft.getInstance().level != null;
+        else return ServerLifecycleHooks.getCurrentServer() != null;
     }
 }
