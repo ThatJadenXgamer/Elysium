@@ -31,16 +31,18 @@ public class UseBehaviorImpl {
 
     public static void init(PlayerInteractEvent.RightClickBlock event) {
         if (!RegistryAccessHelper.isRegistryAccessAvailable()) return;
+
         Level level = event.getLevel();
         BlockState state = level.getBlockState(event.getPos());
         Player player = event.getEntity();
         ItemStack stack = player.getItemInHand(event.getHand());
 
         Optional<UseBehavior> useBehavior = RegistryAccessHelper.getServer()
-                .registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
-                .filter(s -> s.blocks().contains(
-                        state.getBlockHolder()) // Checks for UseBehaviors registered to this block
-                        && s.itemCondition().contains(stack.getItemHolder())).findFirst(); // Narrows it down to a UserBehavior that fired with the current block in hand
+                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
+                        .filter(s -> s.blocks().contains(state.getBlockHolder())
+                                && s.itemCondition().contains(stack.getItemHolder()))
+                        .findFirst());
+
         if (level.isClientSide() || useBehavior.isEmpty()) return;
         UseBehavior registry = useBehavior.get();
         BlockPos pos = getPosFromCodec(registry.behavior().pos(), registry.behavior().posOffset(), event);

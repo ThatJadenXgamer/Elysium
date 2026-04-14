@@ -26,15 +26,17 @@ public interface IItemExtensionMixin {
             cancellable = true
     )
     private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
-        if (!RegistryAccessHelper.isRegistryAccessAvailable()) return;
-        Optional<RemainderTransformer> registry = RegistryAccessHelper.getServer().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
-        if (registry.isEmpty()) return;
-
-        switch (registry.get().remainderType()) {
-            case NONE -> cir.setReturnValue(null);
-            case NON_CONSUMABLE -> cir.setReturnValue(new ItemStack(self()));
-            case CHANGE_ITEM -> cir.setReturnValue(registry.get().changeItem());
-        }
+        RegistryAccessHelper.getServer()
+                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream()
+                        .filter(s -> s.items().contains(self().builtInRegistryHolder()))
+                        .findFirst())
+                .ifPresent(transformer -> {
+                    switch (transformer.remainderType()) {
+                        case NONE -> cir.setReturnValue(null);
+                        case NON_CONSUMABLE -> cir.setReturnValue(new ItemStack(self()));
+                        case CHANGE_ITEM -> cir.setReturnValue(transformer.changeItem());
+                    }
+                });
     }
 
     @Inject(
@@ -43,9 +45,10 @@ public interface IItemExtensionMixin {
             cancellable = true
     )
     private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (!RegistryAccessHelper.isRegistryAccessAvailable()) return;
-        Optional<RemainderTransformer> registry = RegistryAccessHelper.getServer().registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream().filter(s -> s.items().contains(self().builtInRegistryHolder())).findFirst();
-        if (registry.isEmpty()) return;
-        cir.setReturnValue(registry.get().remainderType() != RemainderType.NONE);
+        RegistryAccessHelper.getServer()
+                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream()
+                        .filter(s -> s.items().contains(self().builtInRegistryHolder()))
+                        .findFirst())
+                .ifPresent(transformer -> cir.setReturnValue(transformer.remainderType() != RemainderType.NONE));
     }
 }

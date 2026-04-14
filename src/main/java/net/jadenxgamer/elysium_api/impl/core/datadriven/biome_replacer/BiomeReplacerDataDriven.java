@@ -26,15 +26,14 @@ public record BiomeReplacerDataDriven(HolderSet<Biome> replaceBiomes, Holder<Bio
     ).apply(instance, BiomeReplacerDataDriven::new));
 
     public static void addDataDrivenPossibleBiomes() {
-        Registry<BiomeReplacerDataDriven> biomeReplacer = RegistryAccessHelper.getServer().registryOrThrow(ElysiumRegistries.BIOME_REPLACER);
-
-        biomeReplacer.stream().forEach(replacer -> {
-            if (replacer.dimension().equals(Elysium.idPath("minecraft", "overworld"))) {
-                overworldPossibleBiomes.add(replacer.withBiome());
-            }
-            else if (replacer.dimension().equals(Elysium.idPath("minecraft", "the_nether"))) {
-                netherPossibleBiomes.add(replacer.withBiome());
-            }
-        });
+        RegistryAccessHelper.getServer()
+                .flatMap(registryAccess -> registryAccess.registry(ElysiumRegistries.BIOME_REPLACER))
+                .ifPresent(biomeReplacer -> biomeReplacer.stream().forEach(replacer -> {
+                    if (replacer.dimension().equals(Elysium.idPath("minecraft", "overworld"))) {
+                        overworldPossibleBiomes.add(replacer.withBiome());
+                    } else if (replacer.dimension().equals(Elysium.idPath("minecraft", "the_nether"))) {
+                        netherPossibleBiomes.add(replacer.withBiome());
+                    }
+                }));
     }
 }

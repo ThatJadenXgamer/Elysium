@@ -49,6 +49,7 @@ public class ElysiumEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
 
+
         //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.SOUL_SAND_VALLEY, Biomes.BADLANDS, 0.5, 128, new ResourceLocation(Elysium.MOD_ID, "example"), Elysium.registryAccess); // example of how you can use BiomeReplacer
         //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.BADLANDS, Biomes.DESERT, 0.5, 24, new ResourceLocation(Elysium.MOD_ID, "replace_replaced_example"), registryAccess); // and yes, you can replace already replaced biomes too
 
@@ -108,9 +109,6 @@ public class ElysiumEvents {
 
     @SubscribeEvent
     public static void datapackRegistry(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(ElysiumRegistries.USE_BEHAVIORS, UseBehavior.CODEC);
-        event.dataPackRegistry(ElysiumRegistries.BLOCK_SOUND_TRANSFORMERS, BlockSoundTransformer.CODEC, BlockSoundTransformer.CODEC);
-        event.dataPackRegistry(ElysiumRegistries.BIOME_REPLACER, BiomeReplacerDataDriven.CODEC);
-        event.dataPackRegistry(ElysiumRegistries.REMAINDER_TRANSFORMERS, RemainderTransformer.CODEC);
+        ElysiumRegistries.datapackInit(event);
     }
 }

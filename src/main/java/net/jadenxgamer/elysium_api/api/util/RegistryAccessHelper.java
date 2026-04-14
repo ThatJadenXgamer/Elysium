@@ -8,23 +8,45 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-public class RegistryAccessHelper {
+import java.util.Optional;
 
-    public static RegistryAccess getServer() {
+public final class RegistryAccessHelper {
+
+    private RegistryAccessHelper() {}
+
+    /**
+     * @return An Optional containing the server-side RegistryAccess if available,
+     */
+    public static Optional<RegistryAccess> getServer() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) throw new IllegalStateException("Server has not been initialised");
-        return server.registryAccess();
+        return server == null ? Optional.empty() : Optional.of(server.registryAccess());
     }
 
+    /**
+     * @return An Optional containing the client-side RegistryAccess if a level is loaded,
+     */
     @OnlyIn(Dist.CLIENT)
-    public static RegistryAccess getClient() {
+    public static Optional<RegistryAccess> getClient() {
         Minecraft client = Minecraft.getInstance();
-        if (client.level == null) throw new IllegalStateException("Client has not been initialised");
-        return client.level.registryAccess();
+        return client.level == null ? Optional.empty() : Optional.of(client.level.registryAccess());
     }
 
+    /**
+     * Returns the appropriate RegistryAccess depending on the current environment,
+     * preferring server if available, falling back to client (if on client and level exists).
+     *
+     * @return Optional of the best currently available RegistryAccess
+     */
+    public static Optional<RegistryAccess> getCurrent() {
+        if (FMLEnvironment.dist == Dist.CLIENT) return getClient().or(RegistryAccessHelper::getServer);
+        else return getServer();
+    }
+
+    /**
+     * Checks whether any RegistryAccess is currently available.
+     */
     public static boolean isRegistryAccessAvailable() {
-        if (FMLEnvironment.dist == Dist.CLIENT) return  Minecraft.getInstance().level != null;
+        if (FMLEnvironment.dist == Dist.CLIENT) return Minecraft.getInstance().level != null;
         else return ServerLifecycleHooks.getCurrentServer() != null;
     }
 }
