@@ -30,6 +30,19 @@ repositories {
         url 'https://maven.kosmx.dev/'
     }
 
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -98,6 +111,10 @@ dependencies {
     }
 
     compileOnly "curse.maven:terrablender-940057:6054947"
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    //runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+    compileOnly "dev.emi:emi-neoforge:1.1.22+1.21.1:api"
+    runtimeOnly "dev.emi:emi-neoforge:1.1.22+1.21.1"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

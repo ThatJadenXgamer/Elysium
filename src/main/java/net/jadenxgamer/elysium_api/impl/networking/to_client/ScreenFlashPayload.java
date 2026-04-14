@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public record ScreenFlashPayload(int fadeIn, int hold, int fadeOut,
                                  int color, boolean firstPersonOnly, boolean force) implements CustomPacketPayload {
 
-    public static final Type<ScreenFlashPayload> TYPE = new Type<>(Elysium.id("screen_flash"));
+    public static final Type<ScreenFlashPayload> TYPE = new Type<>(Elysium.elysiumPath("screen_flash"));
 
     public static final StreamCodec<FriendlyByteBuf, ScreenFlashPayload> CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, ScreenFlashPayload::fadeIn,

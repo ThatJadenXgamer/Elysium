@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ScreenFlash {
 
-    private static final ResourceLocation TEXTURE = Elysium.id("textures/misc/screen_flash.png");
+    private static final ResourceLocation TEXTURE = Elysium.elysiumPath("textures/misc/screen_flash.png");
     private static int fadeInDuration = 0;
     private static int holdDuration = 0;
     private static int fadeOutDuration = 0;

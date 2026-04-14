@@ -27,8 +27,8 @@ public final class RegistryAccessHelper {
      */
     @OnlyIn(Dist.CLIENT)
     public static Optional<RegistryAccess> getClient() {
-        Minecraft client = Minecraft.getInstance();
-        return client.level == null ? Optional.empty() : Optional.of(client.level.registryAccess());
+        var connection = Minecraft.getInstance().getConnection();
+        return connection == null ? Optional.empty() : Optional.of(connection.registryAccess());
     }
 
     /**

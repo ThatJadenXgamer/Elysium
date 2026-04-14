@@ -25,7 +25,7 @@ public final class Elysium {
         ElysiumItems.init(modEventBus);
     }
 
-    public static ResourceLocation id(String path) {
+    public static ResourceLocation elysiumPath(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 

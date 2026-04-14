@@ -31,7 +31,7 @@ public abstract class AbstractClientPlayerMixin {
     private void elysium$getCustomCapeTexture(CallbackInfoReturnable<PlayerSkin> cir) {
         PlayerInfo info = this.getPlayerInfo();
         if (info != null && DEV_CAPE_PLAYERS.contains(info.getProfile().getName())) {
-            ResourceLocation capeTexture = Elysium.id("textures/entity/cape/jadenxgamer.png");
+            ResourceLocation capeTexture = Elysium.elysiumPath("textures/entity/cape/jadenxgamer.png");
             ((PlayerSkinAccessor) (Object) cir.getReturnValue()).elysium$setCapeTexture(capeTexture);
         }
     }

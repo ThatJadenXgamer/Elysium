@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class DodgeRollPayload implements CustomPacketPayload {
 
-    public static final Type<DodgeRollPayload> TYPE = new Type<>(Elysium.id("dodge_roll_server"));
+    public static final Type<DodgeRollPayload> TYPE = new Type<>(Elysium.elysiumPath("dodge_roll_server"));
 
     public static final DodgeRollPayload INSTANCE = new DodgeRollPayload();
 

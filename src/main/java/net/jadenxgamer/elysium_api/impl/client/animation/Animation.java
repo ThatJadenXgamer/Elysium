@@ -17,7 +17,7 @@ public interface Animation {
     Animation DODGE_ROLL = animation("dodge_roll", AnimationLayers.MOVEMENT);
 
     private static Animation animation(String id, ResourceLocation layerId) {
-        ResourceLocation animationId = Elysium.id(id);
+        ResourceLocation animationId = Elysium.elysiumPath(id);
         return player -> {
             //noinspection unchecked
             ModifierLayer<IAnimation> layer = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(player).get(layerId);

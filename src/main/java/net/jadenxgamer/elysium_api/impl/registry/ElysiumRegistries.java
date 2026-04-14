@@ -18,7 +18,7 @@ public class ElysiumRegistries {
     public static final ResourceKey<Registry<ElysiumBrewingRecipe>> BREWING_RECIPES = key("brewing_recipes");
 
     private static <T> ResourceKey<Registry<T>> key(String name) {
-        return ResourceKey.createRegistryKey(Elysium.id(name));
+        return ResourceKey.createRegistryKey(Elysium.elysiumPath(name));
     }
 
     public static void datapackInit(DataPackRegistryEvent.NewRegistry event) {

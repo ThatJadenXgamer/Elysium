@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class AnimationLayers {
 
-    public static final ResourceLocation MOVEMENT = Elysium.id("movement");
+    public static final ResourceLocation MOVEMENT = Elysium.elysiumPath("movement");
 
     public static void boostrap() {
         PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(

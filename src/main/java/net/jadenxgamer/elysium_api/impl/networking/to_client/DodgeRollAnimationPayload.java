@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public record DodgeRollAnimationPayload(int id) implements CustomPacketPayload {
 
-    public static final Type<DodgeRollAnimationPayload> TYPE = new Type<>(Elysium.id("dodge_roll_client"));
+    public static final Type<DodgeRollAnimationPayload> TYPE = new Type<>(Elysium.elysiumPath("dodge_roll_client"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DodgeRollAnimationPayload> CODEC = ByteBufCodecs.INT
             .map(DodgeRollAnimationPayload::new, DodgeRollAnimationPayload::id).cast();
