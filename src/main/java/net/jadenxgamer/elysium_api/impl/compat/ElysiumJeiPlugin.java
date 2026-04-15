@@ -52,8 +52,6 @@ public class ElysiumJeiPlugin implements IModPlugin {
             }
         }
 
-        if (!jeiRecipes.isEmpty()) {
-            registration.addRecipes(RecipeTypes.BREWING, jeiRecipes);
-        }
+        if (!jeiRecipes.isEmpty()) registration.addRecipes(RecipeTypes.BREWING, jeiRecipes);
     }
 }

@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 
 @EmiEntrypoint
 public class ElysiumEmiPlugin implements EmiPlugin {
@@ -29,16 +28,11 @@ public class ElysiumEmiPlugin implements EmiPlugin {
             if (registry != null) {
                 for (var entry : registry.entrySet()) {
                     ResourceLocation recipeId = entry.getKey().location();
-                    ElysiumBrewingRecipe recipe = entry.getValue();
+                    ElysiumBrewingRecipe recipe = entry.getValue();;
 
-                    ItemStack inputItem = new ItemStack(recipe.inputItem());
-                    if (!recipe.inputComponents().isEmpty()) inputItem.applyComponents(recipe.inputComponents());
-                    ItemStack ingredientItem = new ItemStack(recipe.ingredient());
-                    ItemStack outputItem = recipe.createResult(inputItem);
-
-                    EmiStack inputStack = EmiStack.of(inputItem);
-                    EmiIngredient ingredientStack = EmiStack.of(ingredientItem);
-                    EmiStack outputStack = EmiStack.of(outputItem);
+                    EmiStack inputStack = EmiStack.of(recipe.inputItem(), recipe.inputComponents());
+                    EmiIngredient ingredientStack = EmiStack.of(recipe.ingredient());
+                    EmiStack outputStack = EmiStack.of(recipe.outputItem(), recipe.outputComponents());
 
                     emiRegistry.addRecipe(new ElysiumEmiBrewingRecipe(inputStack, ingredientStack, outputStack, recipeId));
                 }
