@@ -9,6 +9,9 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,14 +30,21 @@ public record DodgeRollAnimationPayload(int id) implements CustomPacketPayload {
     }
 
     public void handleDataOnClient(IPayloadContext ignoredContext) {
-        Optional.ofNullable(Minecraft.getInstance().level).ifPresent(level -> {
-            Entity entity = level.getEntity(id);
-            if (!(entity instanceof RemotePlayer player)) {
-                Elysium.LOGGER.info("Not a RemotePlayer!");
-                return;
-            }
+        if (FMLEnvironment.dist.isClient()) Client.handleDodgeRollAnimation(this,  ignoredContext);
+    }
 
-            Animation.DODGE_ROLL.play(player);
-        });
+    @OnlyIn(Dist.CLIENT)
+    private static class Client {
+
+        public static void handleDodgeRollAnimation(final DodgeRollAnimationPayload payload, final IPayloadContext context) {
+            Optional.ofNullable(Minecraft.getInstance().level).ifPresent(level -> {
+                Entity entity = level.getEntity(payload.id());
+                if (!(entity instanceof RemotePlayer player)) {
+                    Elysium.LOGGER.info("Not a RemotePlayer!");
+                    return;
+                }
+                Animation.DODGE_ROLL.play(player);
+            });
+        }
     }
 }
