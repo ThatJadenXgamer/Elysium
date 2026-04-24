@@ -1,5 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.jadenxgamer.elysium_api.Elysium;
@@ -7,8 +9,8 @@ import net.jadenxgamer.elysium_api.impl.client.lightmap_settings.LightmapSetting
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.FMLLoader;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,17 +25,21 @@ public class LightTextureMixin {
     private static final Vector3f elysium$skyMultiplier = new Vector3f(1.0f, 1.0f, 1.0f);
     @Unique
     private static final Vector3f elysium$blockMultiplier = new Vector3f(1.0f, 1.0f, 1.0f);
+    @Unique
+    private static float elysium$ambientBrightnessMultiplier = 1.0f;
 
     @Inject(method = "updateLightTexture", at = @At("HEAD"))
     private void elysium$updateLightmapMultipliers(float partialTicks, CallbackInfo ci) {
         Player player = Minecraft.getInstance().player;
         if (player != null) {
-            var multipliers = Elysium.LIGHTMAP_SETTINGS.getSettings(player);
-            elysium$skyMultiplier.set(multipliers.getLeft());
-            elysium$blockMultiplier.set(multipliers.getRight());
+            var settings = Elysium.LIGHTMAP_SETTINGS.getSettings(player);
+            elysium$skyMultiplier.set(settings.getLeft());
+            elysium$blockMultiplier.set(settings.getMiddle());
+            elysium$ambientBrightnessMultiplier = settings.getRight();
         } else {
             elysium$skyMultiplier.set(1.0f, 1.0f, 1.0f);
             elysium$blockMultiplier.set(1.0f, 1.0f, 1.0f);
+            elysium$ambientBrightnessMultiplier = 1.0f;
         }
     }
 
@@ -49,6 +55,14 @@ public class LightTextureMixin {
             float partialTicks, CallbackInfo ci, @Local(name = "vector3f1") Vector3f vector3f1, @Local(name = "vector3f2") Vector3f vector3f2) {
         vector3f1.mul(elysium$blockMultiplier);
         vector3f2.mul(elysium$skyMultiplier);
+    }
+
+    @WrapOperation(
+            method = "getBrightness",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/dimension/DimensionType;ambientLight()F")
+    )
+    private static float elysium$getBrightness(DimensionType instance, Operation<Float> original) {
+        return instance.ambientLight() * elysium$ambientBrightnessMultiplier;
     }
 
     @Inject(

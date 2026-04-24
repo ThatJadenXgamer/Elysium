@@ -10,11 +10,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -25,6 +26,7 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
 
     private static final Vector3f currentSkyColor = new Vector3f(1.0f, 1.0f, 1.0f);
     private static final Vector3f currentBlockColor = new Vector3f(1.0f, 1.0f, 1.0f);
+    private static float currentAmbientBrightness = 1.0f;
     public static final ResourceLocation GUI_LIGHTMAP = Elysium.elysiumPath("textures/misc/gui.png");
     private boolean usingGuiLightmap = false;
 
@@ -70,10 +72,8 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
         }
     }
 
-    public Pair<Vector3f, Vector3f> getSettings(Player player) {
-        if (player == null) {
-            return Pair.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f));
-        }
+    public Triple<Vector3f, Vector3f, Float> getSettings(Player player) {
+        if (player == null) return Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
 
         Level level = player.level();
         BlockPos pos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
@@ -81,27 +81,28 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
         ResourceLocation biomeId = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
 
         LightmapSettings settings = LightmapSettings.LIGHTMAP_SETTINGS.get(biomeId);
-        var defaultColors = getDefaultForDimension(level);
+        var defaultForDimension = getDefaultForDimension(level);
 
-        Vector3f targetSky = settings != null ? settings.skyLightColor() : defaultColors.getLeft();
-        Vector3f targetBlock = settings != null ? settings.blockLightColor() : defaultColors.getRight();
+        Vector3f targetSky = settings != null ? settings.skyLightColor() : defaultForDimension.getLeft();
+        Vector3f targetBlock = settings != null ? settings.blockLightColor() : defaultForDimension.getMiddle();
+        float targetBrightness = settings != null ? settings.ambientBrightnessMultiplier() : defaultForDimension.getRight();
 
         float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
-        currentSkyColor.lerp(targetSky, delta * 0.01f);
-        currentBlockColor.lerp(targetBlock, delta * 0.01f);
+        currentSkyColor.lerp(targetSky, delta * 0.03f);
+        currentBlockColor.lerp(targetBlock, delta * 0.03f);
+        currentAmbientBrightness = Mth.lerp(delta * 0.03f, currentAmbientBrightness, targetBrightness);
 
-        return Pair.of(currentSkyColor, currentBlockColor);
+        return Triple.of(currentSkyColor, currentBlockColor, currentAmbientBrightness);
     }
 
-    private static Pair<Vector3f, Vector3f> getDefaultForDimension(Level level) {
-        var fallback = Pair.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f));
+    private static Triple<Vector3f, Vector3f, Float> getDefaultForDimension(Level level) {
+        var fallback = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
         LightmapSettings settings = LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS.get(level.dimension().location());
-        return settings != null ? Pair.of(settings.skyLightColor(), settings.blockLightColor()) : fallback;
+        return settings != null ? Triple.of(settings.skyLightColor(), settings.blockLightColor(), settings.ambientBrightnessMultiplier()) : fallback;
     }
-
 
     // It's based on how Polytone solves gui being affected by the lightmaps
-    // Elysium will do absolutely nothing if Polytone is present and will just let that mod handle this
+    // Elysium will do absolutely nothing if Polytone is present, and will just let that mod handle this
     // https://github.com/MehVahdJukaar/polytone/blob/1.21.1/common/src/main/java/net/mehvahdjukaar/polytone/lightmap/LightmapsManager.java#L161
     public void setupForGUI(boolean gui) {
         usingGuiLightmap = gui;

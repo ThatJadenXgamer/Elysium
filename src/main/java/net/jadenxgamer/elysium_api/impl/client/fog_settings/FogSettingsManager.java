@@ -75,14 +75,14 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
         Biome biome = level.getBiome(pos).value();
         ResourceLocation biomeId = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
         FogSettings settings = FogSettings.FOG_SETTINGS.getOrDefault(biomeId, null);
-        var defaultMultiplier = getDefaultForDimension(level);
+        var defaultForDimension = getDefaultForDimension(level);
 
-        float newStartMultiplier = settings != null ? settings.fogStartMultiplier() : defaultMultiplier.getLeft();
-        float newEndMultiplier = settings != null ? settings.fogEndMultiplier() : defaultMultiplier.getRight();
+        float targetStartMultiplier = settings != null ? settings.fogStartMultiplier() : defaultForDimension.getLeft();
+        float targetEndMultiplier = settings != null ? settings.fogEndMultiplier() : defaultForDimension.getRight();
 
         float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
-        currentStartMultiplier = Mth.lerp(delta * 0.05f, currentStartMultiplier, newStartMultiplier);
-        currentEndMultiplier = Mth.lerp(delta * 0.05f, currentEndMultiplier, newEndMultiplier);
+        currentStartMultiplier = Mth.lerp(delta * 0.05f, currentStartMultiplier, targetStartMultiplier);
+        currentEndMultiplier = Mth.lerp(delta * 0.05f, currentEndMultiplier, targetEndMultiplier);
 
         return Pair.of(fogStart * currentStartMultiplier, fogEnd * currentEndMultiplier);
     }
