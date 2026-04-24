@@ -5,6 +5,8 @@
   "minVersion": "0.8",
   "client": [
     "client.ClientLevelMixin",
+    "client.GameRendererMixin",
+    "client.LightTextureMixin",
     "entity.AbstractClientPlayerMixin",
     "entity.PlayerSkinAccessor"
   ],

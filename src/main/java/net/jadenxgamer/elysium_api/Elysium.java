@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api;
 
 import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
+import net.jadenxgamer.elysium_api.impl.client.lightmap_settings.LightmapSettingsManager;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
@@ -17,6 +18,7 @@ public final class Elysium {
     public static final String MOD_ID = "elysium_api";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
+    public static final LightmapSettingsManager LIGHTMAP_SETTINGS = new LightmapSettingsManager();
 
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
         ElysiumMiscRegistries.init(modEventBus);
