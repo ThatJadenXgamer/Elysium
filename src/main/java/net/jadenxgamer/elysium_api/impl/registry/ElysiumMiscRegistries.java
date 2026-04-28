@@ -32,8 +32,8 @@ public class ElysiumMiscRegistries {
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(BuiltInRegistries.FEATURE, Elysium.MOD_ID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPE = DeferredRegister.create(BuiltInRegistries.STRUCTURE_TYPE, Elysium.MOD_ID);
 
-    public static final Supplier<Feature<StructureStamp.StructureStampConfiguration>> STRUCTURE_STAMP = FEATURES.register("structure_stamp", () ->
-            new StructureStamp(StructureStamp.StructureStampConfiguration.CODEC));
+    public static final Supplier<Feature<StructureStamp.Config>> STRUCTURE_STAMP = FEATURES.register("structure_stamp", () ->
+            new StructureStamp(StructureStamp.Config.CODEC));
 
     public static final Supplier<StructureType<MultilayerJigsawStructure>> MULTILAYERED_JIGSAW = STRUCTURE_TYPE.register("multilayered_jigsaw", () ->
             () -> MultilayerJigsawStructure.CODEC);

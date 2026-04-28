@@ -38,7 +38,7 @@ import java.util.Optional;
  * Rather than just pasting in the structure at whatever Y coordinate it choose from its range it first iterates through
  * the current Y it choose all the way down till the sea level of the dimension and tries to find a valid floor to paste it on
  * <p>
- * This prevents weird floating structures or islands forming because of it since it is guaranteed to always spawn on some kind of pre-generated floor
+ * This prevents weird floating template or islands forming because of it since it is guaranteed to always spawn on some kind of pre-generated floor
  */
 public class MultilayerJigsawStructure extends Structure {
     public static final DimensionPadding DEFAULT_DIMENSION_PADDING = DimensionPadding.ZERO;

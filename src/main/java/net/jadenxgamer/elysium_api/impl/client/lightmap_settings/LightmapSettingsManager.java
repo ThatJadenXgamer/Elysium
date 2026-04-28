@@ -43,29 +43,8 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
                 JsonObject json = element.getAsJsonObject();
                 LightmapSettings settings = LightmapSettings.parseSetting(json);
 
-                if (json.has("dimensions")) {
-                    JsonElement dimensionsElement = json.get("dimensions");
-                    if (dimensionsElement.isJsonArray()) {
-                        for (JsonElement entry : dimensionsElement.getAsJsonArray()) {
-                            ResourceLocation dimension = ResourceLocation.tryParse(entry.getAsString());
-                            if (dimension != null) LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS.put(dimension, settings);
-                        }
-                    } else if (dimensionsElement.isJsonPrimitive()) {
-                        ResourceLocation dimension = ResourceLocation.tryParse(dimensionsElement.getAsString());
-                        if (dimension != null) LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS.put(dimension, settings);
-                    }
-                } else if (json.has("biomes")) {
-                    JsonElement biomesElement = json.get("biomes");
-                    if (biomesElement.isJsonArray()) {
-                        for (JsonElement entry : biomesElement.getAsJsonArray()) {
-                            ResourceLocation biome = ResourceLocation.tryParse(entry.getAsString());
-                            if (biome != null) LightmapSettings.LIGHTMAP_SETTINGS.put(biome, settings);
-                        }
-                    } else if (biomesElement.isJsonPrimitive()) {
-                        ResourceLocation biome = ResourceLocation.tryParse(biomesElement.getAsString());
-                        if (biome != null) LightmapSettings.LIGHTMAP_SETTINGS.put(biome, settings);
-                    }
-                }
+                addToMap(json, "dimensions", LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS, settings);
+                addToMap(json, "biomes", LightmapSettings.LIGHTMAP_SETTINGS, settings);
             } catch (Exception e) {
                 Elysium.LOGGER.warn("Couldn't load lightmap settings: {}", e.getMessage());
             }
@@ -99,6 +78,21 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
         var fallback = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
         LightmapSettings settings = LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS.get(level.dimension().location());
         return settings != null ? Triple.of(settings.skyLightColor(), settings.blockLightColor(), settings.ambientBrightnessMultiplier()) : fallback;
+    }
+
+    private void addToMap(JsonObject json, String key, Map<ResourceLocation, LightmapSettings> targetMap, LightmapSettings settings) {
+        if (!json.has(key)) return;
+
+        JsonElement element = json.get(key);
+        if (element.isJsonArray()) {
+            for (JsonElement entry : element.getAsJsonArray()) {
+                ResourceLocation location = ResourceLocation.tryParse(entry.getAsString());
+                if (location != null) targetMap.put(location, settings);
+            }
+        } else if (element.isJsonPrimitive()) {
+            ResourceLocation location = ResourceLocation.tryParse(element.getAsString());
+            if (location != null) targetMap.put(location, settings);
+        }
     }
 
     // It's based on how Polytone solves gui being affected by the lightmaps

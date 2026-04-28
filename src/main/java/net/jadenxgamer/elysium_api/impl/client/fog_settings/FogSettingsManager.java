@@ -38,29 +38,8 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
                 JsonObject json = element.getAsJsonObject();
                 FogSettings settings = FogSettings.parseSetting(json);
 
-                if (json.has("dimensions")) {
-                    JsonElement dimensionsElement = json.get("dimensions");
-                    if (dimensionsElement.isJsonArray()) {
-                        for (JsonElement entry : dimensionsElement.getAsJsonArray()) {
-                            ResourceLocation dimension = ResourceLocation.tryParse(entry.getAsString());
-                            if (dimension != null) FogSettings.DIMENSION_FOG_SETTINGS.put(dimension, settings);
-                        }
-                    } else if (dimensionsElement.isJsonPrimitive()) {
-                        ResourceLocation dimension = ResourceLocation.tryParse(dimensionsElement.getAsString());
-                        if (dimension != null) FogSettings.DIMENSION_FOG_SETTINGS.put(dimension, settings);
-                    }
-                } else if (json.has("biomes")) {
-                    JsonElement biomesElement = json.get("biomes");
-                    if (biomesElement.isJsonArray()) {
-                        for (JsonElement entry : biomesElement.getAsJsonArray()) {
-                            ResourceLocation biome = ResourceLocation.tryParse(entry.getAsString());
-                            if (biome != null) FogSettings.FOG_SETTINGS.put(biome, settings);
-                        }
-                    } else if (biomesElement.isJsonPrimitive()) {
-                        ResourceLocation biome = ResourceLocation.tryParse(biomesElement.getAsString());
-                        if (biome != null) FogSettings.FOG_SETTINGS.put(biome, settings);
-                    }
-                }
+                addToMap(json, "dimensions", FogSettings.DIMENSION_FOG_SETTINGS, settings);
+                addToMap(json, "biomes", FogSettings.FOG_SETTINGS, settings);
             } catch (Exception e) {
                 Elysium.LOGGER.warn("Couldn't load fog settings: {}", e.getMessage());
             }
@@ -91,5 +70,20 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
         var fallback = Pair.of(1.0f, 1.0f);
         FogSettings settings = FogSettings.DIMENSION_FOG_SETTINGS.get(level.dimension().location());
         return settings != null ? Pair.of(settings.fogStartMultiplier(), settings.fogEndMultiplier()) : fallback;
+    }
+
+    private void addToMap(JsonObject json, String key, Map<ResourceLocation, FogSettings> targetMap, FogSettings settings) {
+        if (!json.has(key)) return;
+
+        JsonElement element = json.get(key);
+        if (element.isJsonArray()) {
+            for (JsonElement entry : element.getAsJsonArray()) {
+                ResourceLocation location = ResourceLocation.tryParse(entry.getAsString());
+                if (location != null) targetMap.put(location, settings);
+            }
+        } else if (element.isJsonPrimitive()) {
+            ResourceLocation location = ResourceLocation.tryParse(element.getAsString());
+            if (location != null) targetMap.put(location, settings);
+        }
     }
 }
