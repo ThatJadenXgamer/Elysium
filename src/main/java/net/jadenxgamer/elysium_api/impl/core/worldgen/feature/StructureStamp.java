@@ -44,6 +44,7 @@ public class StructureStamp extends Feature<StructureStamp.Config> {
         template.placeInWorld(level, placementPos, placementPos, settings, random, 3);
         return true;
     }
+
     private static BlockPos offsetChunkPos(BlockPos.MutableBlockPos pos, Rotation rotation, Vec3i size) {
         int halfX = size.getX() / 2, halfZ = size.getZ() / 2;
         int offsetX = 0, offsetZ = 0;

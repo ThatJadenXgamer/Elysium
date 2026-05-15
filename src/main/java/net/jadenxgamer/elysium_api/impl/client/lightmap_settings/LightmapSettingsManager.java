@@ -14,19 +14,25 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.logging.log4j.util.InternalApi;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import java.util.Map;
+import java.util.*;
 
 public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new Gson();
 
+    protected static final Triple<Vector3f, Vector3f, Float> DEFAULT = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
     private static final Vector3f currentSkyColor = new Vector3f(1.0f, 1.0f, 1.0f);
     private static final Vector3f currentBlockColor = new Vector3f(1.0f, 1.0f, 1.0f);
     private static float currentAmbientBrightness = 1.0f;
+
+    private static final List<LightmapSettings> LIGHTMAP_SETTINGS = new ArrayList<>();
+    private static final Set<ResourceLocation> ENABLED_EVENT_FLAGS = new HashSet<>();
+
     public static final ResourceLocation GUI_LIGHTMAP = Elysium.elysiumPath("textures/misc/gui.png");
     private boolean usingGuiLightmap = false;
 
@@ -36,72 +42,105 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> elements, @NotNull ResourceManager manager, @NotNull ProfilerFiller profiler) {
-        LightmapSettings.LIGHTMAP_SETTINGS.clear();
-        LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS.clear();
+        LIGHTMAP_SETTINGS.clear();
         for (JsonElement element : elements.values()) {
             try {
                 JsonObject json = element.getAsJsonObject();
                 LightmapSettings settings = LightmapSettings.parseSetting(json);
-
-                addToMap(json, "dimensions", LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS, settings);
-                addToMap(json, "biomes", LightmapSettings.LIGHTMAP_SETTINGS, settings);
+                LIGHTMAP_SETTINGS.add(settings);
             } catch (Exception e) {
                 Elysium.LOGGER.warn("Couldn't load lightmap settings: {}", e.getMessage());
             }
         }
+        LIGHTMAP_SETTINGS.sort(Comparator.comparingInt(LightmapSettings::priority).reversed());
     }
 
+    @InternalApi
     public Triple<Vector3f, Vector3f, Float> getSettings(Player player) {
-        if (player == null) return Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
+        if (player == null) return DEFAULT;
 
         Level level = player.level();
         BlockPos pos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
-        Biome biome = level.getBiome(pos).value();
-        ResourceLocation biomeId = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
+        ResourceLocation biome = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(level.getBiome(pos).value());
+        ResourceLocation dimension = level.dimension().location();
 
-        LightmapSettings settings = LightmapSettings.LIGHTMAP_SETTINGS.get(biomeId);
-        var defaultForDimension = getDefaultForDimension(level);
+        LightmapSettings matched = null;
+        for (LightmapSettings settings : LIGHTMAP_SETTINGS) {
+            if (matches(settings, biome, dimension)) {
+                matched = settings;
+                break;
+            }
+        }
 
-        Vector3f targetSky = settings != null ? settings.skyLightColor() : defaultForDimension.getLeft();
-        Vector3f targetBlock = settings != null ? settings.blockLightColor() : defaultForDimension.getMiddle();
-        float targetBrightness = settings != null ? settings.ambientBrightnessMultiplier() : defaultForDimension.getRight();
+        Vector3f targetSky = DEFAULT.getLeft();
+        Vector3f targetBlock = DEFAULT.getMiddle();
+        float targetBrightness = DEFAULT.getRight();
+        float fadeMultiplier = 1.0f;
 
-        float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
-        currentSkyColor.lerp(targetSky, delta * 0.03f);
-        currentBlockColor.lerp(targetBlock, delta * 0.03f);
-        currentAmbientBrightness = Mth.lerp(delta * 0.03f, currentAmbientBrightness, targetBrightness);
+        if (matched != null) {
+            targetSky = matched.skyLightColor();
+            targetBlock = matched.blockLightColor();
+            targetBrightness = matched.ambientBrightnessMultiplier();
+            fadeMultiplier = matched.fadeMultiplier();
+        }
+
+        float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks() * 0.03f * fadeMultiplier;
+        currentSkyColor.lerp(targetSky, delta);
+        currentBlockColor.lerp(targetBlock, delta);
+        currentAmbientBrightness = Mth.lerp(delta, currentAmbientBrightness, targetBrightness);
 
         return Triple.of(currentSkyColor, currentBlockColor, currentAmbientBrightness);
     }
 
-    private static Triple<Vector3f, Vector3f, Float> getDefaultForDimension(Level level) {
-        var fallback = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
-        LightmapSettings settings = LightmapSettings.DIMENSION_LIGHTMAP_SETTINGS.get(level.dimension().location());
-        return settings != null ? Triple.of(settings.skyLightColor(), settings.blockLightColor(), settings.ambientBrightnessMultiplier()) : fallback;
+    private boolean matches(LightmapSettings settings, ResourceLocation biome, ResourceLocation dimension) {
+        if (!settings.eventFlags().isEmpty()) {
+            for (ResourceLocation flag : settings.eventFlags()) if (!ENABLED_EVENT_FLAGS.contains(flag)) return false;
+        }
+
+        return switch (settings.type()) {
+            case GLOBAL -> true;
+            case BIOME -> settings.biomes().contains(biome);
+            case DIMENSION -> settings.dimensions().contains(dimension);
+            case NOT_BIOME -> !settings.biomes().contains(biome);
+            case NOT_DIMENSION -> !settings.dimensions().contains(dimension);
+        };
     }
 
-    private void addToMap(JsonObject json, String key, Map<ResourceLocation, LightmapSettings> targetMap, LightmapSettings settings) {
-        if (!json.has(key)) return;
+    /**
+     * An event flag is essentially a namespaced boolean that any lightmap settings that can be toggled dynamically
+     * allowing for more expressive conditional loading of lightmaps such as during weather events or boss fights for example
+     * <p>
+     * This particular method is for enabling event flags
+     * <p>
+     * When an event flag is enabled, any {@link LightmapSettings} entry that includes this flag
+     * in its {@code event_flags} set will become eligible for matching, provided all other
+     * conditions are also satisfied.
+     *
+     * @param flag the namespaced identification of an event flag to enable
+     * @see #disableEventFlag(ResourceLocation)
+     */
+    public static void enableEventFlag(ResourceLocation flag) {
+        ENABLED_EVENT_FLAGS.add(flag);
+    }
 
-        JsonElement element = json.get(key);
-        if (element.isJsonArray()) {
-            for (JsonElement entry : element.getAsJsonArray()) {
-                ResourceLocation location = ResourceLocation.tryParse(entry.getAsString());
-                if (location != null) targetMap.put(location, settings);
-            }
-        } else if (element.isJsonPrimitive()) {
-            ResourceLocation location = ResourceLocation.tryParse(element.getAsString());
-            if (location != null) targetMap.put(location, settings);
-        }
+    /**
+     * Used to disable any event flags
+     * @param flag the namespaced identification of an event flag to enable
+     * @see #enableEventFlag(ResourceLocation)
+     */
+    public static void disableEventFlag(ResourceLocation flag) {
+        ENABLED_EVENT_FLAGS.remove(flag);
     }
 
     // It's based on how Polytone solves gui being affected by the lightmaps
-    // Elysium will do absolutely nothing if Polytone is present, and will just let that mod handle this
-    // https://github.com/MehVahdJukaar/polytone/blob/1.21.1/common/src/main/java/net/mehvahdjukaar/polytone/lightmap/LightmapsManager.java#L161
+    // Elysium will do absolutely nothing if Polytone is present, and will just let that mod handle the gui light patching
+    // https://github.com/MehVahdJukaar/polytone/blob/1.21.1/common/src/main/java/net/mehvahdjukaar/polytone/lightmap/LightmapsManager.java
+    @ApiStatus.Internal
     public void setupForGUI(boolean gui) {
         usingGuiLightmap = gui;
     }
 
+    @ApiStatus.Internal
     public boolean isGui() {
         return usingGuiLightmap;
     }

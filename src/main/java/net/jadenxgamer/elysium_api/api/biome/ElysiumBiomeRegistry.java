@@ -23,6 +23,7 @@ public class ElysiumBiomeRegistry {
      * @param id unique named identifier for your BiomeReplacer
      * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
+    @Deprecated(since = "1.4.0", forRemoval = true)
     public static void replaceOverworldBiome(ResourceKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
         HolderSet<Biome> replaceBiomeSet = HolderSet.direct(biomeRegistry.getHolderOrThrow(replaceBiome));
@@ -39,6 +40,7 @@ public class ElysiumBiomeRegistry {
      * @param id unique named identifier for your BiomeReplacer
      * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
+    @Deprecated(since = "1.4.0", forRemoval = true)
     public static void replaceNetherBiome(ResourceKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
         HolderSet<Biome> replaceBiomeSet = HolderSet.direct(biomeRegistry.getHolderOrThrow(replaceBiome));
@@ -55,6 +57,7 @@ public class ElysiumBiomeRegistry {
      * @param id unique named identifier for your BiomeReplacer
      * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
+    @Deprecated(since = "1.4.0", forRemoval = true)
     public static void replaceOverworldBiome(TagKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
         HolderSet<Biome> replaceBiomeSet = biomeRegistry.getOrCreateTag(replaceBiome);
@@ -71,6 +74,7 @@ public class ElysiumBiomeRegistry {
      * @param id unique named identifier for your BiomeReplacer
      * @param registryAccess pass in a RegistryAccess, preferably from ServerAboutToStartEvent
      */
+    @Deprecated(since = "1.4.0", forRemoval = true)
     public static void replaceNetherBiome(TagKey<Biome> replaceBiome, ResourceKey<Biome> withBiome, double rarity, int size, ResourceLocation id, RegistryAccess registryAccess) {
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
         HolderSet<Biome> replaceBiomeSet = biomeRegistry.getOrCreateTag(replaceBiome);
