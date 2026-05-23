@@ -38,7 +38,7 @@ public class UseBehaviorImpl {
         ItemStack stack = player.getItemInHand(event.getHand());
 
         Optional<UseBehavior> useBehavior = RegistryAccessHelper.getServer()
-                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.USE_BEHAVIORS).stream()
+                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.Keys.USE_BEHAVIORS).stream()
                         .filter(s -> s.blocks().contains(state.getBlockHolder())
                                 && s.itemCondition().contains(stack.getItemHolder()))
                         .findFirst());

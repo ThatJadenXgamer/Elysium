@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.jadenxgamer.elysium_api.api.tags.ElysiumTags;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -123,6 +123,6 @@ public class MultilayerJigsawStructure extends Structure {
 
     @Override
     public @NotNull StructureType<?> type() {
-        return ElysiumMiscRegistries.MULTILAYERED_JIGSAW.get();
+        return ElysiumRegistries.MULTILAYERED_JIGSAW.get();
     }
 }

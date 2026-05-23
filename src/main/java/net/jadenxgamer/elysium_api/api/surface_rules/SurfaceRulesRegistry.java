@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.api.surface_rules;
 
-import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumTerrablenderHelper;
+import net.jadenxgamer.elysium_api.impl.core.biome.biome_replacer.ElysiumTerrablenderHelper;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.neoforged.fml.ModList;

@@ -1,7 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.item;
 
 import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.remainder_transformer.RemainderType;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.world.item.Item;
@@ -12,8 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
 
 @Mixin(IItemExtension.class)
 public interface IItemExtensionMixin {
@@ -27,7 +24,7 @@ public interface IItemExtensionMixin {
     )
     private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         RegistryAccessHelper.getServer()
-                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream()
+                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.Keys.REMAINDER_TRANSFORMERS).stream()
                         .filter(s -> s.items().contains(self().builtInRegistryHolder()))
                         .findFirst())
                 .ifPresent(transformer -> {
@@ -46,7 +43,7 @@ public interface IItemExtensionMixin {
     )
     private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         RegistryAccessHelper.getServer()
-                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.REMAINDER_TRANSFORMERS).stream()
+                .flatMap(access -> access.registryOrThrow(ElysiumRegistries.Keys.REMAINDER_TRANSFORMERS).stream()
                         .filter(s -> s.items().contains(self().builtInRegistryHolder()))
                         .findFirst())
                 .ifPresent(transformer -> cir.setReturnValue(transformer.remainderType() != RemainderType.NONE));

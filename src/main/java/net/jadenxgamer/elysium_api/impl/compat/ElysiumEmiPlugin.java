@@ -22,7 +22,7 @@ public class ElysiumEmiPlugin implements EmiPlugin {
 
         if (connection != null) {
             Registry<ElysiumBrewingRecipe> registry = connection.registryAccess()
-                    .registry(ElysiumRegistries.BREWING_RECIPES)
+                    .registry(ElysiumRegistries.Keys.BREWING_RECIPES)
                     .orElse(null);
 
             if (registry != null) {

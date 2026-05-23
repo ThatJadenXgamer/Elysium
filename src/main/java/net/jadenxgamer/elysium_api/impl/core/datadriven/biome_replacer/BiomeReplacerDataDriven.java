@@ -7,13 +7,12 @@ import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
-import static net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper.*;
+import static net.jadenxgamer.elysium_api.impl.core.biome.biome_replacer.ElysiumBiomeHelper.*;
 
 public record BiomeReplacerDataDriven(HolderSet<Biome> replaceBiomes, Holder<Biome> withBiome, double rarity, int size, ResourceLocation uniqueId, ResourceLocation dimension) {
     public static final Codec<BiomeReplacerDataDriven> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -27,7 +26,7 @@ public record BiomeReplacerDataDriven(HolderSet<Biome> replaceBiomes, Holder<Bio
 
     public static void addDataDrivenPossibleBiomes() {
         RegistryAccessHelper.getServer()
-                .flatMap(registryAccess -> registryAccess.registry(ElysiumRegistries.BIOME_REPLACER))
+                .flatMap(registryAccess -> registryAccess.registry(ElysiumRegistries.Keys.BIOME_REPLACER))
                 .ifPresent(biomeReplacer -> biomeReplacer.stream().forEach(replacer -> {
                     if (replacer.dimension().equals(Elysium.idPath("minecraft", "overworld"))) {
                         overworldPossibleBiomes.add(replacer.withBiome());

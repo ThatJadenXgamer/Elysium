@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.client.lightmap_settings;
+package net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings;
 
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;

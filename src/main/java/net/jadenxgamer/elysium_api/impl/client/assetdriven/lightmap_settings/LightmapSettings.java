@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.client.lightmap_settings;
+package net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

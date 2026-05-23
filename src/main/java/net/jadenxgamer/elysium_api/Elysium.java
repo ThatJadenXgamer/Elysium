@@ -1,12 +1,9 @@
 package net.jadenxgamer.elysium_api;
 
 import com.mojang.logging.LogUtils;
-import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
-import net.jadenxgamer.elysium_api.impl.client.lightmap_settings.LightmapSettingsManager;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumMiscRegistries;
+import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
+import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
+import net.jadenxgamer.elysium_api.impl.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -21,7 +18,7 @@ public final class Elysium {
     public static final LightmapSettingsManager LIGHTMAP_SETTINGS = new LightmapSettingsManager();
 
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
-        ElysiumMiscRegistries.init(modEventBus);
+        ElysiumRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
         ElysiumAttachmentTypes.init(modEventBus);
         ElysiumItems.init(modEventBus);

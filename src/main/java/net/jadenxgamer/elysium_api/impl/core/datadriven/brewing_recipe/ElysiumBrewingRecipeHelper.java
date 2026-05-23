@@ -12,7 +12,7 @@ public final class ElysiumBrewingRecipeHelper {
 
     private static List<ElysiumBrewingRecipe> getRecipes() {
         return RegistryAccessHelper.getServer()
-                .map(access -> access.registryOrThrow(ElysiumRegistries.BREWING_RECIPES).stream().toList())
+                .map(access -> access.registryOrThrow(ElysiumRegistries.Keys.BREWING_RECIPES).stream().toList())
                 .orElse(List.of());
     }
 

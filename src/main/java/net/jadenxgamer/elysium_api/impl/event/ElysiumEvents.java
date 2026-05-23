@@ -1,21 +1,23 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
 import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.client.fog_settings.FogSettingsManager;
-import net.jadenxgamer.elysium_api.impl.client.lightmap_settings.LightmapSettingsManager;
-import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeHelper;
-import net.jadenxgamer.elysium_api.impl.core.biome.ElysiumBiomeSource;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer.BiomeReplacerDataDriven;
+import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
+import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
+import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehaviorImpl;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -31,7 +33,9 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 @EventBusSubscriber(modid = Elysium.MOD_ID)
@@ -39,32 +43,23 @@ public class ElysiumEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+        RegistryAccess registryAccess = event.getServer().registryAccess();
 
-        //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.SOUL_SAND_VALLEY, Biomes.BADLANDS, 0.5, 128, new ResourceLocation(Elysium.MOD_ID, "example"), Elysium.registryAccess); // example of how you can use BiomeReplacer
-        //ElysiumBiomeRegistry.replaceNetherBiome(Biomes.BADLANDS, Biomes.DESERT, 0.5, 24, new ResourceLocation(Elysium.MOD_ID, "replace_replaced_example"), registryAccess); // and yes, you can replace already replaced biomes too
-
-        BiomeReplacerDataDriven.addDataDrivenPossibleBiomes();
-        Registry<LevelStem> levelStems = event.getServer().registryAccess().registryOrThrow(Registries.LEVEL_STEM);
+        Registry<LevelStem> levelStems = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
         for (LevelStem dimension : levelStems.stream().toList()) {
             Optional<ResourceKey<LevelStem>> dimensionKey = levelStems.getResourceKey(dimension);
-            if (dimensionKey.isPresent() && dimension.generator().getBiomeSource() instanceof ElysiumBiomeSource biomeSource) {
-                if (dimensionKey.get().equals(LevelStem.OVERWORLD)) {
-                    biomeSource.setDimension(LevelStem.OVERWORLD);
-                    biomeSource.addPossibleBiomes(ElysiumBiomeHelper.overworldPossibleBiomes);
-                    biomeSource.setWorldSeed(event.getServer().getWorldData().worldGenOptions().seed());
-                }
-                else if (dimensionKey.get().equals(LevelStem.NETHER)) {
-                    biomeSource.setDimension(LevelStem.NETHER);
-                    biomeSource.addPossibleBiomes(ElysiumBiomeHelper.netherPossibleBiomes);
-                    biomeSource.setWorldSeed(event.getServer().getWorldData().worldGenOptions().seed());
-                }
-                //TODO: End Biomes
+
+            if (dimensionKey.isPresent() && dimension.generator().getBiomeSource() instanceof MosaicBiomeSource biomeSource) {
+                Set<Holder<Biome>> biomesToAdd = new HashSet<>();
+                var seed = event.getServer().getWorldData().worldGenOptions().seed();
+                for (MosaicBiomeEntry entry : registryAccess.registryOrThrow(ElysiumRegistries.Keys.MOSAIC_BIOME_ENTRY))
+                    if (entry.dimension().equals(dimensionKey.get().location())) biomesToAdd.add(entry.biome());
+                biomeSource.initialize(seed, dimensionKey.get(), biomesToAdd);
             }
 
             ChunkGenerator generator = dimension.generator();
-            if (dimensionKey.isPresent() && generator instanceof NoiseBasedChunkGenerator noiseGenerator) {
+            if (dimensionKey.isPresent() && generator instanceof NoiseBasedChunkGenerator noiseGenerator)
                 ElysiumSurfaceRulesManager.handleSurfaceRules(dimensionKey.get(), noiseGenerator);
-            }
         }
     }
 

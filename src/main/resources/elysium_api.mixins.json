@@ -11,8 +11,6 @@
     "entity.PlayerSkinAccessor"
   ],
   "mixins": [
-    "biome.BiomeSourceMixin",
-    "biome.MultiNoiseBiomeSourceMixin",
     "biome.NoiseGeneratorSettingsAccessor",
     "block.BlockAccessor",
     "block.BlockBehaviorMixin",

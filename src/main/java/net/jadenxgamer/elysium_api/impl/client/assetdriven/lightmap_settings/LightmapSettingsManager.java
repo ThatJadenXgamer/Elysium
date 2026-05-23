@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.client.lightmap_settings;
+package net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -108,9 +108,9 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
 
     /**
      * An event flag is essentially a namespaced boolean that any lightmap settings that can be toggled dynamically
-     * allowing for more expressive conditional loading of lightmaps such as during weather events or boss fights for example
+     * allowing for more expressive conditional loading of lightmaps such as during weather events or boss fights for example.
      * <p>
-     * This particular method is for enabling event flags
+     * This particular method is for enabling event flags.
      * <p>
      * When an event flag is enabled, any {@link LightmapSettings} entry that includes this flag
      * in its {@code event_flags} set will become eligible for matching, provided all other
@@ -124,7 +124,7 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     }
 
     /**
-     * Used to disable any event flags
+     * Used to disable any event flags.
      * @param flag the namespaced identification of an event flag to enable
      * @see #enableEventFlag(ResourceLocation)
      */

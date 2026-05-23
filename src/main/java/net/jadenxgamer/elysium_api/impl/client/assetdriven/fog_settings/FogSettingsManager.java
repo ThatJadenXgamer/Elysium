@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.impl.client.fog_settings;
+package net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
