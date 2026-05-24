@@ -3,9 +3,8 @@ package net.jadenxgamer.elysium_api.impl.registry;
 import com.mojang.serialization.MapCodec;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.biome_replacer.BiomeReplacerDataDriven;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.brewing_recipe.ElysiumBrewingRecipe;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
@@ -65,7 +64,6 @@ public class ElysiumRegistries {
     public static void datapackInit(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(Keys.USE_BEHAVIORS, UseBehavior.CODEC);
         event.dataPackRegistry(Keys.BLOCK_SOUND_TRANSFORMERS, BlockSoundTransformer.CODEC, BlockSoundTransformer.CODEC);
-        event.dataPackRegistry(Keys.BIOME_REPLACER, BiomeReplacerDataDriven.CODEC);
         event.dataPackRegistry(Keys.REMAINDER_TRANSFORMERS, RemainderTransformer.CODEC);
         event.dataPackRegistry(Keys.BREWING_RECIPES, ElysiumBrewingRecipe.CODEC, ElysiumBrewingRecipe.CODEC);
         event.dataPackRegistry(Keys.MOSAIC_BIOME_ENTRY, MosaicBiomeEntry.CODEC);
@@ -77,7 +75,6 @@ public class ElysiumRegistries {
         // Data-Driven Registries
         public static final ResourceKey<Registry<UseBehavior>> USE_BEHAVIORS = key("block/use_behaviors");
         public static final ResourceKey<Registry<BlockSoundTransformer>> BLOCK_SOUND_TRANSFORMERS = key("block/sound_transformers");
-        public static final ResourceKey<Registry<BiomeReplacerDataDriven>> BIOME_REPLACER = key("biome_replacer");
         public static final ResourceKey<Registry<RemainderTransformer>> REMAINDER_TRANSFORMERS = key("item/remainder_transformers");
         public static final ResourceKey<Registry<ElysiumBrewingRecipe>> BREWING_RECIPES = key("brewing_recipes");
         public static final ResourceKey<Registry<MosaicBiomeEntry>> MOSAIC_BIOME_ENTRY = key("mosaic_biome_entry");
