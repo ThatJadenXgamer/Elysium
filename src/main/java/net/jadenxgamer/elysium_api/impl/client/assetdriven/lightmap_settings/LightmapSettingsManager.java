@@ -25,10 +25,9 @@ import java.util.*;
 public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new Gson();
 
-    protected static final Triple<Vector3f, Vector3f, Float> DEFAULT = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 0.0f);
-    private static final Vector3f currentSkyColor = DEFAULT.getLeft();
-    private static final Vector3f currentBlockColor = DEFAULT.getMiddle();
-    private static float currentAmbientBrightness = DEFAULT.getRight();
+    private static final Vector3f currentSkyColor = new Vector3f(1.0f, 1.0f, 1.0f);
+    private static final Vector3f currentBlockColor = new Vector3f(1.0f, 1.0f, 1.0f);
+    private static float currentAmbientBrightness = 0.0f;
 
     private static final List<LightmapSettings> LIGHTMAP_SETTINGS = new ArrayList<>();
     private static final Set<ResourceLocation> ENABLED_EVENT_FLAGS = new HashSet<>();
@@ -49,15 +48,15 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
                 LightmapSettings settings = LightmapSettings.parseSetting(json);
                 LIGHTMAP_SETTINGS.add(settings);
             } catch (Exception e) {
-                Elysium.LOGGER.warn("Couldn't load lightmap settings: {}", e.getMessage());
+                Elysium.LOGGER.warn("Couldn't load LightmapSettings: {}", e.getMessage());
             }
         }
         LIGHTMAP_SETTINGS.sort(Comparator.comparingInt(LightmapSettings::priority).reversed());
     }
 
-    @InternalApi
+    @ApiStatus.Internal
     public Triple<Vector3f, Vector3f, Float> getSettings(Player player) {
-        if (player == null) return DEFAULT;
+        if (player == null) return Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 0.0f);
 
         Level level = player.level();
         BlockPos pos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
@@ -72,9 +71,9 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
             }
         }
 
-        Vector3f targetSky = DEFAULT.getLeft();
-        Vector3f targetBlock = DEFAULT.getMiddle();
-        float targetBrightness = DEFAULT.getRight();
+        Vector3f targetSky = new Vector3f(1.0f, 1.0f, 1.0f);
+        Vector3f targetBlock = new Vector3f(1.0f, 1.0f, 1.0f);
+        float targetBrightness = 0.0f;
         float fadeMultiplier = 1.0f;
 
         if (matched != null) {
@@ -93,9 +92,7 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     }
 
     private boolean matches(LightmapSettings settings, ResourceLocation biome, ResourceLocation dimension) {
-        if (!settings.eventFlags().isEmpty()) {
-            for (ResourceLocation flag : settings.eventFlags()) if (!ENABLED_EVENT_FLAGS.contains(flag)) return false;
-        }
+        if (!settings.eventFlags().isEmpty()) for (ResourceLocation flag : settings.eventFlags()) if (!ENABLED_EVENT_FLAGS.contains(flag)) return false;
 
         return switch (settings.type()) {
             case GLOBAL -> true;

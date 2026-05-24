@@ -51,8 +51,7 @@ public class LightTextureMixin {
                     shift = At.Shift.BEFORE
             )
     )
-    private void elysium$applyLightmapColors(
-            float partialTicks, CallbackInfo ci, @Local(name = "vector3f1") Vector3f vector3f1, @Local(name = "vector3f2") Vector3f vector3f2) {
+    private void elysium$applyLightmapColors(float partialTicks, CallbackInfo ci, @Local(name = "vector3f1") Vector3f vector3f1, @Local(name = "vector3f2") Vector3f vector3f2) {
         vector3f1.mul(elysium$blockMultiplier);
         vector3f2.mul(elysium$skyMultiplier);
     }

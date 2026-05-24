@@ -41,7 +41,7 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
                 addToMap(json, "dimensions", FogSettings.DIMENSION_FOG_SETTINGS, settings);
                 addToMap(json, "biomes", FogSettings.FOG_SETTINGS, settings);
             } catch (Exception e) {
-                Elysium.LOGGER.warn("Couldn't load fog settings: {}", e.getMessage());
+                Elysium.LOGGER.warn("Couldn't load FogSettings: {}", e.getMessage());
             }
         }
     }

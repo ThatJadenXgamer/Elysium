@@ -22,9 +22,9 @@ public record LightmapSettings(LightmapSettingsType type, Set<ResourceLocation> 
         int priority = json.has("priority") ? json.get("priority").getAsInt() : 0;
         float fadeMultiplier = json.has("fade_multiplier") ? json.get("fade_multiplier").getAsFloat() : 1.0f;
 
-        Vector3f skyColor = LightmapSettingsManager.DEFAULT.getLeft();
-        Vector3f blockColor = LightmapSettingsManager.DEFAULT.getMiddle();
-        float ambientBrightness = LightmapSettingsManager.DEFAULT.getRight();
+        Vector3f skyColor = new Vector3f(1.0f, 1.0f, 1.0f);
+        Vector3f blockColor = new Vector3f(1.0f, 1.0f, 1.0f);
+        float ambientBrightness = 0.0f;
 
         if (json.has("sky_light_color")) skyColor = parseHex(json.get("sky_light_color").getAsString());
         if (json.has("block_light_color")) blockColor = parseHex(json.get("block_light_color").getAsString());
