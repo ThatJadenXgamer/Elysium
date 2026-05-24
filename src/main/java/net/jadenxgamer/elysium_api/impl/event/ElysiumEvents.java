@@ -50,11 +50,8 @@ public class ElysiumEvents {
             Optional<ResourceKey<LevelStem>> dimensionKey = levelStems.getResourceKey(dimension);
 
             if (dimensionKey.isPresent() && dimension.generator().getBiomeSource() instanceof MosaicBiomeSource biomeSource) {
-                Set<Holder<Biome>> biomesToAdd = new HashSet<>();
                 var seed = event.getServer().getWorldData().worldGenOptions().seed();
-                for (MosaicBiomeEntry entry : registryAccess.registryOrThrow(ElysiumRegistries.Keys.MOSAIC_BIOME_ENTRY))
-                    if (entry.dimension().equals(dimensionKey.get().location())) biomesToAdd.add(entry.biome());
-                biomeSource.initialize(seed, dimensionKey.get(), biomesToAdd);
+                biomeSource.initialize(seed, dimensionKey.get());
             }
 
             ChunkGenerator generator = dimension.generator();

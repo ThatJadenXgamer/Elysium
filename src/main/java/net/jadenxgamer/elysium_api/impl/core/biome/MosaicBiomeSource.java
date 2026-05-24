@@ -8,10 +8,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -36,13 +38,15 @@ public class MosaicBiomeSource extends BiomeSource {
             Codec.DOUBLE.optionalFieldOf("distortion_strength", 24.0).forGetter(s -> s.distortionStrength),
             Codec.DOUBLE.optionalFieldOf("distortion_scale", 0.016).forGetter(s -> s.distortionScale),
             Codec.INT.optionalFieldOf("warp_iterations", 1).forGetter(s -> s.warpIterations),
-            Codec.INT.optionalFieldOf("noise_octaves", 3).forGetter(s -> s.noiseOctaves)
+            Codec.INT.optionalFieldOf("noise_octaves", 3).forGetter(s -> s.noiseOctaves),
+            TagKey.codec(Registries.BIOME).optionalFieldOf("auto_populate_entries_from_tag", null).forGetter(s -> s.autoPopulateEntriesFromTag)
     ).apply(instance, MosaicBiomeSource::new));
 
     private final int gridCellSize;
     private final int climateCount;
     private final float jitterStrength;
     private final boolean avoidDiagonalNeighbors;
+    @Nullable private final TagKey<Biome> autoPopulateEntriesFromTag;
 
     private final double distortionStrength;
     private final double distortionScale;
@@ -70,11 +74,14 @@ public class MosaicBiomeSource extends BiomeSource {
             });
 
     public MosaicBiomeSource(int gridCellSize, int climateCount, float jitterStrength, boolean avoidDiagonalNeighbors,
-                             double distortionStrength, double distortionScale, int warpIterations, int noiseOctaves) {
+                             double distortionStrength, double distortionScale, int warpIterations, int noiseOctaves,
+                             @Nullable TagKey<Biome> autoPopulateEntriesFromTag) {
         this.gridCellSize = gridCellSize;
         this.climateCount = climateCount;
         this.jitterStrength = jitterStrength;
         this.avoidDiagonalNeighbors = avoidDiagonalNeighbors;
+        this.autoPopulateEntriesFromTag = autoPopulateEntriesFromTag;
+
         this.distortionStrength = distortionStrength;
         this.distortionScale = distortionScale;
         this.warpIterations = warpIterations;
@@ -102,30 +109,34 @@ public class MosaicBiomeSource extends BiomeSource {
      * Lazy-Initialization of entriesByClimate, possibleBiomes and worldSeed since we need RegistryAccess to be present for this.
      * @see net.jadenxgamer.elysium_api.impl.event.ElysiumEvents#onServerAboutToStart(ServerAboutToStartEvent)
      */
-    public void initialize(long seed, ResourceKey<LevelStem> dimension, Set<Holder<Biome>> possibleBiomes) {
+    public void initialize(long seed, ResourceKey<LevelStem> dimension) {
         if (isInitialized) return;
         this.worldSeed = seed;
-        this.possibleBiomes = Suppliers.memoize(() -> possibleBiomes.stream().distinct().collect(ImmutableSet.toImmutableSet()));
 
-        WeightedBiomeList[] entriesByClimate = new WeightedBiomeList[this.climateCount];
+        WeightedBiomeList[] entriesByClimate = new WeightedBiomeList[climateCount];
+        Set<ResourceKey<Biome>> assignedBiomeKeys = new HashSet<>();
+
         RegistryAccessHelper.getServer()
                 .flatMap(access -> access.registry(ElysiumRegistries.Keys.MOSAIC_BIOME_ENTRY))
-                .ifPresent(registry -> {
-                    for (MosaicBiomeEntry entry : registry) {
-                        if (entry.dimension().equals(dimension.location())) {
-                            int climatePoint = entry.climatePoint();
-                            if (climatePoint >= 0 && climatePoint < this.climateCount) {
-                                if (entriesByClimate[climatePoint] == null) entriesByClimate[climatePoint] = new WeightedBiomeList();
-                                entriesByClimate[climatePoint].add(entry.biome(), entry.weight());
-                            }
-                        }
-                    }
-                });
+                .ifPresent(registry -> registry.forEach(entry -> {
+                    if (!entry.dimension().equals(dimension.location())) return;
+                    int climateP = entry.climatePoint();
+                    if (climateP < 0 || climateP >= climateCount) return;
+                    if (entriesByClimate[climateP] == null) entriesByClimate[climateP] = new WeightedBiomeList();
+                    entriesByClimate[climateP].add(entry.biome(), entry.weight());
+                    entry.biome().unwrapKey().ifPresent(assignedBiomeKeys::add);
+                }));
+
+        tagProvidedEntries(assignedBiomeKeys, entriesByClimate);
+
+        Set<Holder<Biome>> providePossibleBiomes = new HashSet<>();
+        for (WeightedBiomeList list : entriesByClimate) if (list != null) for (BiomeEntry entry : list.entries) providePossibleBiomes.add(entry.biome);
+        this.possibleBiomes = Suppliers.memoize(() -> providePossibleBiomes.stream().distinct().collect(ImmutableSet.toImmutableSet()));
+
         boolean hasAnyValidEntry = false;
-        for (int i = 0; i < this.climateCount; i++) {
-            if (entriesByClimate[i] != null && !entriesByClimate[i].isEmpty()) {
-                hasAnyValidEntry = true;
-            } else entriesByClimate[i] = null;
+        for (int i = 0; i < climateCount; i++) {
+            if (entriesByClimate[i] != null && !entriesByClimate[i].isEmpty()) hasAnyValidEntry = true;
+            else entriesByClimate[i] = null;
         }
         if (!hasAnyValidEntry) throw new IllegalStateException("MosaicBiomeSource for dimension '" + dimension.location() + "' has no entries to populate any of the climate points");
 
@@ -133,7 +144,7 @@ public class MosaicBiomeSource extends BiomeSource {
         this.isInitialized = true;
 
         Elysium.LOGGER.info("MosaicBiomeSource successfully initialized for dimension: '{}'", dimension.location());
-        Elysium.LOGGER.debug(buildDebugInfo(seed, dimension, possibleBiomes).toString());
+        Elysium.LOGGER.debug(buildDebugInfo(seed, dimension, possibleBiomes.get()).toString());
     }
 
     @Override
@@ -374,9 +385,28 @@ public class MosaicBiomeSource extends BiomeSource {
         return debug;
     }
 
-    ////////////////////
-    // HELPER CLASSES //
-    ////////////////////
+    /////////////
+    // HELPERS //
+    /////////////
+
+    private void tagProvidedEntries(Set<ResourceKey<Biome>> assignedBiomeKeys, WeightedBiomeList[] entriesByClimate) {
+        if (autoPopulateEntriesFromTag == null) return;
+        RegistryAccessHelper.getServer()
+                .flatMap(access -> access.registry(Registries.BIOME))
+                .ifPresent(biomeRegistry -> biomeRegistry.getTagOrEmpty(autoPopulateEntriesFromTag)
+                        .forEach(holder -> holder.unwrapKey().ifPresent(key -> {
+                            if (!assignedBiomeKeys.contains(key)) {
+                                int climate = Math.abs(key.location().toString().hashCode()) % climateCount;
+                                WeightedBiomeList list = entriesByClimate[climate];
+                                int weight = (list == null) ? 1 : Math.max(1, list.totalWeight / list.entries.size());
+
+                                if (list == null) entriesByClimate[climate] = list = new WeightedBiomeList();
+                                list.add(holder, weight);
+                                assignedBiomeKeys.add(key);
+                            }
+                        }))
+                );
+    }
 
     private static class WeightedBiomeList {
         final List<BiomeEntry> entries = new ArrayList<>();
