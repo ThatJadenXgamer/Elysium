@@ -49,7 +49,6 @@ public class ElysiumClientEvents {
         if (event.getCamera().getFluidInCamera() == FogType.NONE && event.getMode() == FogRenderer.FogMode.FOG_TERRAIN && (event.getCamera().getEntity().getEyeInFluidType() == NeoForgeMod.EMPTY_TYPE.value())) {
             var settings = Elysium.FOG_SETTINGS.getSettings(Minecraft.getInstance().player);
             if (settings != null) {
-                event.setCanceled(true);
                 event.scaleNearPlaneDistance(settings.getLeft());
                 event.scaleFarPlaneDistance(settings.getRight());
             }
