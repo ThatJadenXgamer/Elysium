@@ -25,10 +25,10 @@ import java.util.*;
 public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new Gson();
 
-    protected static final Triple<Vector3f, Vector3f, Float> DEFAULT = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 1.0f);
-    private static final Vector3f currentSkyColor = new Vector3f(1.0f, 1.0f, 1.0f);
-    private static final Vector3f currentBlockColor = new Vector3f(1.0f, 1.0f, 1.0f);
-    private static float currentAmbientBrightness = 1.0f;
+    protected static final Triple<Vector3f, Vector3f, Float> DEFAULT = Triple.of(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 1.0f, 1.0f), 0.0f);
+    private static final Vector3f currentSkyColor = DEFAULT.getLeft();
+    private static final Vector3f currentBlockColor = DEFAULT.getMiddle();
+    private static float currentAmbientBrightness = DEFAULT.getRight();
 
     private static final List<LightmapSettings> LIGHTMAP_SETTINGS = new ArrayList<>();
     private static final Set<ResourceLocation> ENABLED_EVENT_FLAGS = new HashSet<>();
@@ -80,7 +80,7 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
         if (matched != null) {
             targetSky = matched.skyLightColor();
             targetBlock = matched.blockLightColor();
-            targetBrightness = matched.ambientBrightnessMultiplier();
+            targetBrightness = matched.ambientBrightness();
             fadeMultiplier = matched.fadeMultiplier();
         }
 

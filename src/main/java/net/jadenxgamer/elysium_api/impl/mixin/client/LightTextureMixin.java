@@ -26,7 +26,7 @@ public class LightTextureMixin {
     @Unique
     private static final Vector3f elysium$blockMultiplier = new Vector3f(1.0f, 1.0f, 1.0f);
     @Unique
-    private static float elysium$ambientBrightnessMultiplier = 1.0f;
+    private static float elysium$ambientBrightness = 0.0f;
 
     @Inject(method = "updateLightTexture", at = @At("HEAD"))
     private void elysium$updateLightmapMultipliers(float partialTicks, CallbackInfo ci) {
@@ -35,11 +35,11 @@ public class LightTextureMixin {
             var settings = Elysium.LIGHTMAP_SETTINGS.getSettings(player);
             elysium$skyMultiplier.set(settings.getLeft());
             elysium$blockMultiplier.set(settings.getMiddle());
-            elysium$ambientBrightnessMultiplier = settings.getRight();
+            elysium$ambientBrightness = settings.getRight();
         } else {
             elysium$skyMultiplier.set(1.0f, 1.0f, 1.0f);
             elysium$blockMultiplier.set(1.0f, 1.0f, 1.0f);
-            elysium$ambientBrightnessMultiplier = 1.0f;
+            elysium$ambientBrightness = 0.0f;
         }
     }
 
@@ -62,7 +62,7 @@ public class LightTextureMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/dimension/DimensionType;ambientLight()F")
     )
     private static float elysium$getBrightness(DimensionType instance, Operation<Float> original) {
-        return instance.ambientLight() * elysium$ambientBrightnessMultiplier;
+        return instance.ambientLight() + elysium$ambientBrightness;
     }
 
     @Inject(

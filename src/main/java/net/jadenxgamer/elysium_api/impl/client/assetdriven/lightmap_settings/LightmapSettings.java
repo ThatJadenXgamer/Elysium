@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public record LightmapSettings(LightmapSettingsType type, Set<ResourceLocation> biomes, Set<ResourceLocation> dimensions, Set<ResourceLocation> eventFlags,
-        int priority, float fadeMultiplier, Vector3f skyLightColor, Vector3f blockLightColor, float ambientBrightnessMultiplier) {
+        int priority, float fadeMultiplier, Vector3f skyLightColor, Vector3f blockLightColor, float ambientBrightness) {
 
     public static LightmapSettings parseSetting(JsonObject json) {
         LightmapSettingsType type = LightmapSettingsType.GLOBAL;
@@ -24,13 +24,13 @@ public record LightmapSettings(LightmapSettingsType type, Set<ResourceLocation> 
 
         Vector3f skyColor = LightmapSettingsManager.DEFAULT.getLeft();
         Vector3f blockColor = LightmapSettingsManager.DEFAULT.getMiddle();
-        float ambientBrightnessMultiplier = LightmapSettingsManager.DEFAULT.getRight();
+        float ambientBrightness = LightmapSettingsManager.DEFAULT.getRight();
 
         if (json.has("sky_light_color")) skyColor = parseHex(json.get("sky_light_color").getAsString());
         if (json.has("block_light_color")) blockColor = parseHex(json.get("block_light_color").getAsString());
-        if (json.has("ambient_brightness_multiplier")) ambientBrightnessMultiplier = json.get("ambient_brightness_multiplier").getAsFloat();
+        if (json.has("ambient_brightness")) ambientBrightness = json.get("ambient_brightness").getAsFloat();
 
-        return new LightmapSettings(type, biomes, dimensions, eventFlags, priority, fadeMultiplier, skyColor, blockColor, ambientBrightnessMultiplier);
+        return new LightmapSettings(type, biomes, dimensions, eventFlags, priority, fadeMultiplier, skyColor, blockColor, ambientBrightness);
     }
 
     private static Set<ResourceLocation> parseIdentifierSet(JsonObject json, String key) {
