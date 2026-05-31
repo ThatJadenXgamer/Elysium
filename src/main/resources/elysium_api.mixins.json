@@ -3,6 +3,7 @@
   "package": "net.jadenxgamer.elysium_api.impl.mixin",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
+  "plugin": "net.jadenxgamer.elysium_api.impl.mixin.ElysiumMixinPlugin",
   "client": [
     "client.ClientLevelMixin",
     "client.GameRendererMixin",
@@ -21,6 +22,7 @@
     "brewing.BrewingStandBlockEntityMixin",
     "brewing.PotionBrewingMixin",
     "brewing.PotionSlotMixin",
+    "compat.LevelUtilsMixin",
     "entity.LivingEntityMixin",
     "entity.PiglinAiMixin",
     "item.IItemExtensionMixin",

@@ -1,12 +1,7 @@
-package net.jadenxgamer.elysium_api.impl.core.biome;
+package net.jadenxgamer.elysium_api.impl.compat;
 
-import net.minecraft.core.Holder;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import terrablender.api.SurfaceRuleManager;
-import terrablender.worldgen.IExtendedParameterList;
 
 public class ElysiumTerrablenderHelper {
 

@@ -22,7 +22,6 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -39,14 +38,16 @@ public class MosaicBiomeSource extends BiomeSource {
             Codec.DOUBLE.optionalFieldOf("distortion_scale", 0.016).forGetter(s -> s.distortionScale),
             Codec.INT.optionalFieldOf("warp_iterations", 1).forGetter(s -> s.warpIterations),
             Codec.INT.optionalFieldOf("noise_octaves", 3).forGetter(s -> s.noiseOctaves),
-            TagKey.codec(Registries.BIOME).optionalFieldOf("auto_populate_entries_from_tag", null).forGetter(s -> s.autoPopulateEntriesFromTag)
+            TagKey.codec(Registries.BIOME).optionalFieldOf("auto_populate_entries_from_tag").forGetter(s -> s.autoPopulateEntriesFromTag),
+            TagKey.codec(Registries.BIOME).optionalFieldOf("auto_populate_exclusion_tag").forGetter(s -> s.autoPopulateExclusionTag)
     ).apply(instance, MosaicBiomeSource::new));
 
     private final int gridCellSize;
     private final int climateCount;
     private final float jitterStrength;
     private final boolean avoidDiagonalNeighbors;
-    @Nullable private final TagKey<Biome> autoPopulateEntriesFromTag;
+    private final Optional<TagKey<Biome>> autoPopulateEntriesFromTag;
+    private final Optional<TagKey<Biome>> autoPopulateExclusionTag;
 
     private final double distortionStrength;
     private final double distortionScale;
@@ -75,12 +76,14 @@ public class MosaicBiomeSource extends BiomeSource {
 
     public MosaicBiomeSource(int gridCellSize, int climateCount, float jitterStrength, boolean avoidDiagonalNeighbors,
                              double distortionStrength, double distortionScale, int warpIterations, int noiseOctaves,
-                             @Nullable TagKey<Biome> autoPopulateEntriesFromTag) {
+                             Optional<TagKey<Biome>> autoPopulateEntriesFromTag,
+                             Optional<TagKey<Biome>> autoPopulateExclusionTag) {
         this.gridCellSize = gridCellSize;
         this.climateCount = climateCount;
         this.jitterStrength = jitterStrength;
         this.avoidDiagonalNeighbors = avoidDiagonalNeighbors;
         this.autoPopulateEntriesFromTag = autoPopulateEntriesFromTag;
+        this.autoPopulateExclusionTag = autoPopulateExclusionTag;
 
         this.distortionStrength = distortionStrength;
         this.distortionScale = distortionScale;
@@ -390,11 +393,12 @@ public class MosaicBiomeSource extends BiomeSource {
     /////////////
 
     private void tagProvidedEntries(Set<ResourceKey<Biome>> assignedBiomeKeys, WeightedBiomeList[] entriesByClimate) {
-        if (autoPopulateEntriesFromTag == null) return;
+        if (autoPopulateEntriesFromTag.isEmpty()) return;
         RegistryAccessHelper.getServer()
                 .flatMap(access -> access.registry(Registries.BIOME))
-                .ifPresent(biomeRegistry -> biomeRegistry.getTagOrEmpty(autoPopulateEntriesFromTag)
+                .ifPresent(biomeRegistry -> biomeRegistry.getTagOrEmpty(autoPopulateEntriesFromTag.get())
                         .forEach(holder -> holder.unwrapKey().ifPresent(key -> {
+                            if (autoPopulateExclusionTag.isPresent() && holder.is(autoPopulateExclusionTag.get())) return;
                             if (!assignedBiomeKeys.contains(key)) {
                                 int climate = Math.abs(key.location().toString().hashCode()) % climateCount;
                                 WeightedBiomeList list = entriesByClimate[climate];

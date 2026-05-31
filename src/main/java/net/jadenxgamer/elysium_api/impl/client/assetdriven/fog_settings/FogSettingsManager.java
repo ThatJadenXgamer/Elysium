@@ -46,7 +46,7 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
         }
     }
 
-    public Pair<Float, Float> getSettings(Player player) {
+    public Pair<Float, Float> getSettings(Player player, float fogStart, float fogEnd) {
         if (player == null) return null;
 
         Level level = player.level();
@@ -63,7 +63,7 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
         currentStartMultiplier = Mth.lerp(delta * 0.05f, currentStartMultiplier, targetStartMultiplier);
         currentEndMultiplier = Mth.lerp(delta * 0.05f, currentEndMultiplier, targetEndMultiplier);
 
-        return Pair.of(currentStartMultiplier, currentEndMultiplier);
+        return Pair.of(fogStart * currentStartMultiplier, fogEnd * currentEndMultiplier);
     }
 
     private static Pair<Float, Float> getDefaultForDimension(Level level) {
