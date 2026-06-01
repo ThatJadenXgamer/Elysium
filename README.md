@@ -4,7 +4,6 @@
     <a href="https://discord.gg/y9zpxHeQuC"><img src="https://cdn.modrinth.com/data/cached_images/8e38323ab140c9e9d294b375795a3ecb383faa3d.png" alt="Discord" /></a>
     <a href="https://github.com/ThatJadenXgamer/Elysium/wiki"><img src="https://cdn.modrinth.com/data/cached_images/63a464a48d8e3e39bfa23751be259b871090c423.png" alt="Elysium Wiki" /></a>
     <a href="https://modrinth.com/mod/elysium-api/version/1.21.1-1.2.0-ALPHA.12"><img src="https://cdn.modrinth.com/data/cached_images/1309b16a19ebbb4cedfa1757cc3cf56d04ccaeeb.png" alt="Download Elysium for Forge" /></a>
-    <img src="https://cdn.modrinth.com/data/cached_images/fdbf493c2b88ad402fdbea160270cf76d358ebc8.png" alt="Elysium for Fabric Coming Soon" /></a>
 </p>
 
 ![linebreak](https://cdn.modrinth.com/data/cached_images/6a7b4189d580191e8b7254ac5fb37e054f654d9f.png)
