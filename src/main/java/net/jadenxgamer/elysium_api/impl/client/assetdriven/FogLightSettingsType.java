@@ -1,9 +1,9 @@
-package net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings;
+package net.jadenxgamer.elysium_api.impl.client.assetdriven;
 
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
-public enum LightmapSettingsType implements StringRepresentable {
+public enum FogLightSettingsType implements StringRepresentable {
     GLOBAL("global"),
     BIOME("biome"),
     DIMENSION("dimension"),
@@ -12,7 +12,7 @@ public enum LightmapSettingsType implements StringRepresentable {
 
     private final String name;
 
-    LightmapSettingsType(String name) {
+    FogLightSettingsType(String name) {
         this.name = name;
     }
 
@@ -21,8 +21,8 @@ public enum LightmapSettingsType implements StringRepresentable {
         return this.name;
     }
 
-    public static LightmapSettingsType byName(String name, LightmapSettingsType fallback) {
-        for (LightmapSettingsType type : values()) {
+    public static FogLightSettingsType byName(String name, FogLightSettingsType fallback) {
+        for (FogLightSettingsType type : values()) {
             if (type.name.equals(name)) return type;
         }
         return fallback;

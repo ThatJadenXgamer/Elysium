@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.jadenxgamer.elysium_api.impl.client.assetdriven.FogLightSettingsType;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
@@ -9,12 +10,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public record LightmapSettings(LightmapSettingsType type, Set<ResourceLocation> biomes, Set<ResourceLocation> dimensions, Set<ResourceLocation> eventFlags,
-        int priority, float fadeMultiplier, Vector3f skyLightColor, Vector3f blockLightColor, float ambientBrightness) {
+public record LightmapSettings(FogLightSettingsType type, Set<ResourceLocation> biomes, Set<ResourceLocation> dimensions, Set<ResourceLocation> eventFlags,
+                               int priority, float fadeMultiplier, Vector3f skyLightColor, Vector3f blockLightColor, float ambientBrightness) {
 
     public static LightmapSettings parseSetting(JsonObject json) {
-        LightmapSettingsType type = LightmapSettingsType.GLOBAL;
-        if (json.has("type")) type = LightmapSettingsType.byName(json.get("type").getAsString(), LightmapSettingsType.GLOBAL);
+        FogLightSettingsType type = FogLightSettingsType.GLOBAL;
+        if (json.has("type")) type = FogLightSettingsType.byName(json.get("type").getAsString(), FogLightSettingsType.GLOBAL);
 
         Set<ResourceLocation> biomes = parseIdentifierSet(json, "biomes");
         Set<ResourceLocation> dimensions = parseIdentifierSet(json, "dimensions");

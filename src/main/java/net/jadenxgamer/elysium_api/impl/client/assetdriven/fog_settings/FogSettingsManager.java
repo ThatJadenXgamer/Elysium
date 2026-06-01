@@ -14,16 +14,20 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.util.*;
 
 public class FogSettingsManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new Gson();
-    private static float currentStartMultiplier;
-    private static float currentEndMultiplier;
+
+    private static float currentStartMultiplier = 1.0f;
+    private static float currentEndMultiplier = 1.0f;
+
+    private static final List<FogSettings> FOG_SETTINGS = new ArrayList<>();
+    private static final Set<ResourceLocation> ENABLED_EVENT_FLAGS = new HashSet<>();
 
     public FogSettingsManager() {
         super(GSON, "elysium_api/fog_settings");
@@ -31,59 +35,84 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> elements, @NotNull ResourceManager manager, @NotNull ProfilerFiller profiler) {
-        FogSettings.FOG_SETTINGS.clear();
-        FogSettings.DIMENSION_FOG_SETTINGS.clear();
+        FOG_SETTINGS.clear();
         for (JsonElement element : elements.values()) {
             try {
                 JsonObject json = element.getAsJsonObject();
                 FogSettings settings = FogSettings.parseSetting(json);
-
-                addToMap(json, "dimensions", FogSettings.DIMENSION_FOG_SETTINGS, settings);
-                addToMap(json, "biomes", FogSettings.FOG_SETTINGS, settings);
+                FOG_SETTINGS.add(settings);
             } catch (Exception e) {
                 Elysium.LOGGER.warn("Couldn't load FogSettings: {}", e.getMessage());
             }
         }
+        FOG_SETTINGS.sort(Comparator.comparingInt(FogSettings::priority).reversed());
     }
 
+    @ApiStatus.Internal
     public Pair<Float, Float> getSettings(Player player, float fogStart, float fogEnd) {
-        if (player == null) return null;
+        if (player == null) return Pair.of(fogStart, fogEnd);
 
         Level level = player.level();
         BlockPos pos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
-        Biome biome = level.getBiome(pos).value();
-        ResourceLocation biomeId = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
-        FogSettings settings = FogSettings.FOG_SETTINGS.getOrDefault(biomeId, null);
-        var defaultForDimension = getDefaultForDimension(level);
+        ResourceLocation biome = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(level.getBiome(pos).value());
+        ResourceLocation dimension = level.dimension().location();
 
-        float targetStartMultiplier = settings != null ? settings.fogStartMultiplier() : defaultForDimension.getLeft();
-        float targetEndMultiplier = settings != null ? settings.fogEndMultiplier() : defaultForDimension.getRight();
+        FogSettings matched = null;
+        for (FogSettings settings : FOG_SETTINGS) {
+            if (matches(settings, biome, dimension)) {
+                matched = settings;
+                break;
+            }
+        }
 
-        float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
-        currentStartMultiplier = Mth.lerp(delta * 0.05f, currentStartMultiplier, targetStartMultiplier);
-        currentEndMultiplier = Mth.lerp(delta * 0.05f, currentEndMultiplier, targetEndMultiplier);
+        float targetStartMultiplier = 1.0f;
+        float targetEndMultiplier = 1.0f;
+        float fadeMultiplier = 1.0f;
+
+        if (matched != null) {
+            targetStartMultiplier = matched.fogStartMultiplier();
+            targetEndMultiplier = matched.fogEndMultiplier();
+            fadeMultiplier = matched.fadeMultiplier();
+        }
+
+        float delta = Minecraft.getInstance().getTimer().getGameTimeDeltaTicks() * 0.03f * fadeMultiplier;
+        currentStartMultiplier = Mth.lerp(delta, currentStartMultiplier, targetStartMultiplier);
+        currentEndMultiplier = Mth.lerp(delta, currentEndMultiplier, targetEndMultiplier);
 
         return Pair.of(fogStart * currentStartMultiplier, fogEnd * currentEndMultiplier);
     }
 
-    private static Pair<Float, Float> getDefaultForDimension(Level level) {
-        var fallback = Pair.of(1.0f, 1.0f);
-        FogSettings settings = FogSettings.DIMENSION_FOG_SETTINGS.get(level.dimension().location());
-        return settings != null ? Pair.of(settings.fogStartMultiplier(), settings.fogEndMultiplier()) : fallback;
+    private boolean matches(FogSettings settings, ResourceLocation biome, ResourceLocation dimension) {
+        if (!settings.eventFlags().isEmpty()) {
+            for (ResourceLocation flag : settings.eventFlags()) if (!ENABLED_EVENT_FLAGS.contains(flag)) return false;
+        }
+
+        return switch (settings.type()) {
+            case GLOBAL -> true;
+            case BIOME -> settings.biomes().contains(biome);
+            case DIMENSION -> settings.dimensions().contains(dimension);
+            case NOT_BIOME -> !settings.biomes().contains(biome);
+            case NOT_DIMENSION -> !settings.dimensions().contains(dimension);
+        };
     }
 
-    private void addToMap(JsonObject json, String key, Map<ResourceLocation, FogSettings> targetMap, FogSettings settings) {
-        if (!json.has(key)) return;
+    /**
+     * Enables an event flag, making fog settings that require it become active.
+     *
+     * @param flag the namespaced identifier of the event flag
+     * @see #disableEventFlag(ResourceLocation)
+     */
+    public static void enableEventFlag(ResourceLocation flag) {
+        ENABLED_EVENT_FLAGS.add(flag);
+    }
 
-        JsonElement element = json.get(key);
-        if (element.isJsonArray()) {
-            for (JsonElement entry : element.getAsJsonArray()) {
-                ResourceLocation location = ResourceLocation.tryParse(entry.getAsString());
-                if (location != null) targetMap.put(location, settings);
-            }
-        } else if (element.isJsonPrimitive()) {
-            ResourceLocation location = ResourceLocation.tryParse(element.getAsString());
-            if (location != null) targetMap.put(location, settings);
-        }
+    /**
+     * Disables an event flag.
+     *
+     * @param flag the namespaced identifier of the event flag
+     * @see #enableEventFlag(ResourceLocation)
+     */
+    public static void disableEventFlag(ResourceLocation flag) {
+        ENABLED_EVENT_FLAGS.remove(flag);
     }
 }

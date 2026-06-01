@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.impl.client.assetdriven.FogLightSettingsType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -15,7 +16,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.logging.log4j.util.InternalApi;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -92,7 +92,9 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     }
 
     private boolean matches(LightmapSettings settings, ResourceLocation biome, ResourceLocation dimension) {
-        if (!settings.eventFlags().isEmpty()) for (ResourceLocation flag : settings.eventFlags()) if (!ENABLED_EVENT_FLAGS.contains(flag)) return false;
+        if (!settings.eventFlags().isEmpty()) {
+            for (ResourceLocation flag : settings.eventFlags()) if (!ENABLED_EVENT_FLAGS.contains(flag)) return false;
+        }
 
         return switch (settings.type()) {
             case GLOBAL -> true;
@@ -103,35 +105,14 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
         };
     }
 
-    /**
-     * An event flag is essentially a namespaced boolean that any lightmap settings that can be toggled dynamically
-     * allowing for more expressive conditional loading of lightmaps such as during weather events or boss fights for example.
-     * <p>
-     * This particular method is for enabling event flags.
-     * <p>
-     * When an event flag is enabled, any {@link LightmapSettings} entry that includes this flag
-     * in its {@code event_flags} set will become eligible for matching, provided all other
-     * conditions are also satisfied.
-     *
-     * @param flag the namespaced identification of an event flag to enable
-     * @see #disableEventFlag(ResourceLocation)
-     */
     public static void enableEventFlag(ResourceLocation flag) {
         ENABLED_EVENT_FLAGS.add(flag);
     }
 
-    /**
-     * Used to disable any event flags.
-     * @param flag the namespaced identification of an event flag to enable
-     * @see #enableEventFlag(ResourceLocation)
-     */
     public static void disableEventFlag(ResourceLocation flag) {
         ENABLED_EVENT_FLAGS.remove(flag);
     }
 
-    // It's based on how Polytone solves gui being affected by the lightmaps
-    // Elysium will do absolutely nothing if Polytone is present, and will just let that mod handle the gui light patching
-    // https://github.com/MehVahdJukaar/polytone/blob/1.21.1/common/src/main/java/net/mehvahdjukaar/polytone/lightmap/LightmapsManager.java
     @ApiStatus.Internal
     public void setupForGUI(boolean gui) {
         usingGuiLightmap = gui;
