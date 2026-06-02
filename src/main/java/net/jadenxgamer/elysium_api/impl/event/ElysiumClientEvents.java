@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.jadenxgamer.elysium_api.Elysium;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
 import net.jadenxgamer.elysium_api.impl.client.commands.DodgeRollCommand;
+import net.jadenxgamer.elysium_api.impl.registry.ElysiumBlocks;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
@@ -61,6 +62,7 @@ public class ElysiumClientEvents {
     public static void addToExistingTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.hasPermissions() && event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.insertAfter(Items.DEBUG_STICK.getDefaultInstance(), ElysiumItems.PANORAMA_CAMERA.get().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.insertAfter(Items.JIGSAW.getDefaultInstance(), ElysiumItems.STRUCTURE_STAMP_ANCHOR.get().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         }
     }
 

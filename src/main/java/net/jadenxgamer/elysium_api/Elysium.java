@@ -21,6 +21,7 @@ public final class Elysium {
         ElysiumRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
         ElysiumAttachmentTypes.init(modEventBus);
+        ElysiumBlocks.init(modEventBus);
         ElysiumItems.init(modEventBus);
     }
 

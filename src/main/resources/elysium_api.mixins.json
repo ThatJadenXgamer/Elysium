@@ -15,6 +15,7 @@
     "biome.NoiseGeneratorSettingsAccessor",
     "block.BlockAccessor",
     "block.BlockBehaviorMixin",
+    "block.FungusBlockMixin",
     "block.NetherSproutsBlockMixin",
     "block.NetherWartBlockMixin",
     "block.RootsBlockMixin",

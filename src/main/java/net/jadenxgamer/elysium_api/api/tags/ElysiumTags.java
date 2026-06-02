@@ -11,6 +11,7 @@ public class ElysiumTags {
 
     public static class Blocks {
         public static final TagKey<Block> NON_SOLID_FIRE_SUPPORT = createBlockTag("non_solid_fire_support"); // Blocks in this tag can have soul fire lit on faces that are not solid
+        public static final TagKey<Block> FUNGUS_PLANTABLE_ON = createBlockTag("fungus_plantable_on"); // Nether Fungi are Plantable on these Blocks
         public static final TagKey<Block> ROOTS_PLANTABLE_ON = createBlockTag("roots_plantable_on"); // Nether Roots are Plantable on these Blocks
         public static final TagKey<Block> NETHER_SPROUTS_PLANTABLE_ON = createBlockTag("nether_sprouts_plantable_on"); // Nether Sprouts are Plantable on these Blocks
         public static final TagKey<Block> NETHER_WART_PLANTABLE_ON = createBlockTag("nether_wart_plantable_on"); // Nether Warts are Plantable on these Blocks
