@@ -13,6 +13,7 @@ group = project.mod_group_id
 version = project.mod_version
 
 repositories {
+    mavenCentral()
     // Add NeoForged repository.
     maven {
         name = 'NeoForged'
@@ -103,6 +104,12 @@ configurations {
 }
 
 dependencies {
+
+    jarJar(implementation("org.mozilla:rhino:1.7.15")) {
+        version {
+            prefer "1.7.15"
+        }
+    }
 
     jarJar(implementation("dev.kosmx.player-anim:player-animation-lib-forge")) {
         version {
