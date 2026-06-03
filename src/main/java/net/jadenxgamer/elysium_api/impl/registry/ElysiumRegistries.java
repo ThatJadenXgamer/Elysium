@@ -11,12 +11,14 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
 import net.jadenxgamer.elysium_api.impl.core.misc.neoforge.EffectsBiomeModifier;
 import net.jadenxgamer.elysium_api.impl.core.worldgen.feature.StructureStamp;
 import net.jadenxgamer.elysium_api.impl.core.worldgen.structure.MultilayerJigsawStructure;
+import net.jadenxgamer.elysium_api.impl.core.worldgen.structure.processor.ProtectNonReplaceableProcessor;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.structure.StructureType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
@@ -36,11 +38,13 @@ public class ElysiumRegistries {
     private static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, Elysium.MOD_ID);
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(BuiltInRegistries.FEATURE, Elysium.MOD_ID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPE = DeferredRegister.create(BuiltInRegistries.STRUCTURE_TYPE, Elysium.MOD_ID);
+    public static final DeferredRegister<StructureProcessorType<?>> STRUCTURE_PROCESSOR = DeferredRegister.create(BuiltInRegistries.STRUCTURE_PROCESSOR, Elysium.MOD_ID);
 
     public static final Supplier<MapCodec<MosaicBiomeSource>> MOSAIC = BIOME_SOURCES.register("mosaic", () -> MosaicBiomeSource.CODEC);
     public static final Supplier<MapCodec<EffectsBiomeModifier>> EFFECTS_MODIFIER = BIOME_MODIFIERS.register("effects_modifier", () -> EffectsBiomeModifier.CODEC);
     public static final Supplier<Feature<StructureStamp.Config>> STRUCTURE_STAMP = FEATURES.register("structure_stamp", () -> new StructureStamp(StructureStamp.Config.CODEC));
     public static final Supplier<StructureType<MultilayerJigsawStructure>> MULTILAYERED_JIGSAW = STRUCTURE_TYPE.register("multilayered_jigsaw", () -> () -> MultilayerJigsawStructure.CODEC);
+    public static final Supplier<StructureProcessorType<ProtectNonReplaceableProcessor>> PROTECT_NON_REPLACEABLE = STRUCTURE_PROCESSOR.register("protect_non_replaceable", () -> () -> ProtectNonReplaceableProcessor.CODEC);
 
     /**
      * Elysium Registries (currently nothing)
@@ -55,6 +59,7 @@ public class ElysiumRegistries {
         BIOME_MODIFIERS.register(eventBus);
         FEATURES.register(eventBus);
         STRUCTURE_TYPE.register(eventBus);
+        STRUCTURE_PROCESSOR.register(eventBus);
     }
 
     public static void registryInit(NewRegistryEvent event) {
