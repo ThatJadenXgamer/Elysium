@@ -29,7 +29,7 @@ public class ElysiumItems {
             new PanoramaScreenshotItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)));
 
     public static final Supplier<Item> STRUCTURE_STAMP_ANCHOR = ITEMS.register("structure_stamp_anchor", () ->
-            new GameMasterBlockItem(ElysiumBlocks.STRUCTURE_STAMP_ANCHOR.get(), new Item.Properties().rarity(Rarity.EPIC).component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)));
+            new GameMasterBlockItem(ElysiumBlocks.STRUCTURE_STAMP_ANCHOR.get(), new Item.Properties().rarity(Rarity.EPIC)));
 
     public static void init(IEventBus eventBus) {
         ITEMS.register(eventBus);
