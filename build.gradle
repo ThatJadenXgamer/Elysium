@@ -105,12 +105,6 @@ configurations {
 
 dependencies {
 
-    jarJar(implementation("org.mozilla:rhino:1.7.15")) {
-        version {
-            prefer "1.7.15"
-        }
-    }
-
     jarJar(implementation("dev.kosmx.player-anim:player-animation-lib-forge")) {
         version {
             prefer player_anim_version
