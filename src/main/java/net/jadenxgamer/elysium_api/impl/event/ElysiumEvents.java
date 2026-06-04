@@ -5,19 +5,20 @@ import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSetti
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehaviorImpl;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
-import net.minecraft.core.Holder;
+import net.jadenxgamer.elysium_api.scripting.TartarusScriptManager;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -32,10 +33,11 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @EventBusSubscriber(modid = Elysium.MOD_ID)
@@ -57,6 +59,28 @@ public class ElysiumEvents {
             ChunkGenerator generator = dimension.generator();
             if (dimensionKey.isPresent() && generator instanceof NoiseBasedChunkGenerator noiseGenerator)
                 ElysiumSurfaceRulesManager.handleSurfaceRules(dimensionKey.get(), noiseGenerator);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRegister(RegisterEvent event) {
+        // Block Registration
+        if (event.getRegistryKey().equals(Registries.BLOCK)) {
+            Map<ResourceLocation, Supplier<Object>> pendingBlocks = TartarusScriptManager.getTartarusRegistry().pendingBlocks;
+            for (Map.Entry<ResourceLocation, Supplier<Object>> entry : pendingBlocks.entrySet()) {
+                // Instantiate the block now (registry is writable)
+                Block block = (Block) entry.getValue().get();
+                event.register(Registries.BLOCK, entry.getKey(), () -> block);
+            }
+        }
+
+        // Item Registration
+        if (event.getRegistryKey().equals(Registries.ITEM)) {
+            Map<ResourceLocation, Supplier<Object>> pendingItems = TartarusScriptManager.getTartarusRegistry().pendingItems;
+            for (Map.Entry<ResourceLocation, Supplier<Object>> entry : pendingItems.entrySet()) {
+                Item item = (Item) entry.getValue().get();
+                event.register(Registries.ITEM, entry.getKey(), () -> item);
+            }
         }
     }
 

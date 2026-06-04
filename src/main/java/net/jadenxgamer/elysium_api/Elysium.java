@@ -4,6 +4,8 @@ import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
 import net.jadenxgamer.elysium_api.impl.registry.*;
+import net.jadenxgamer.elysium_api.scripting.TartarusLoader;
+import net.jadenxgamer.elysium_api.scripting.TartarusScriptManager;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -18,6 +20,9 @@ public final class Elysium {
     public static final LightmapSettingsManager LIGHTMAP_SETTINGS = new LightmapSettingsManager();
 
     public Elysium(IEventBus modEventBus, ModContainer modContainer) {
+        TartarusScriptManager.initializeEngine();
+        TartarusLoader.loadAllPacks();
+
         ElysiumRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
         ElysiumAttachmentTypes.init(modEventBus);
