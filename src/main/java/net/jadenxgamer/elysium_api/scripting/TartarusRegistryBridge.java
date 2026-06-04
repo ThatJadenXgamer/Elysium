@@ -16,6 +16,10 @@ public class TartarusRegistryBridge {
 
     private static final String BLOCK = "BLOCK";
     private static final String ITEM = "ITEM";
+    private static final String MOB_EFFECT = "MOB_EFFECT";
+    private static final String ENTITY_TYPE = "ENTITY_TYPE";
+    private static final String BLOCK_ENTITY_TYPE = "BLOCK_ENTITY_TYPE";
+    private static final String BLOCK_TYPE = "BLOCK_TYPE";
 
     public final Map<ResourceLocation, Supplier<Object>> pendingBlocks = new LinkedHashMap<>();
     public final Map<ResourceLocation, Supplier<Object>> pendingItems = new LinkedHashMap<>();
@@ -60,6 +64,10 @@ public class TartarusRegistryBridge {
         return switch (type) {
             case BLOCK -> BuiltInRegistries.BLOCK.get(location);
             case ITEM -> BuiltInRegistries.ITEM.get(location);
+            case MOB_EFFECT -> BuiltInRegistries.MOB_EFFECT.get(location);
+            case ENTITY_TYPE -> BuiltInRegistries.ENTITY_TYPE.get(location);
+            case BLOCK_ENTITY_TYPE -> BuiltInRegistries.BLOCK_ENTITY_TYPE.get(location);
+            case BLOCK_TYPE -> BuiltInRegistries.BLOCK_TYPE.get(location);
             default -> null;
         };
     }

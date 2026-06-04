@@ -69,8 +69,8 @@ public class TartarusScriptManager {
 
         // Properties
         exposeClass("BlockBehaviour", BlockBehaviour.class);
-        exposeClass("BlockBehaviour.Properties", BlockBehaviour.Properties.class);
-        exposeClass("Item.Properties", Item.Properties.class);
+        exposeClass("BlockBehaviour$Properties", BlockBehaviour.Properties.class);
+        exposeClass("Item$Properties", Item.Properties.class);
 
         // Block helpers
         exposeClass("MapColor", MapColor.class);
