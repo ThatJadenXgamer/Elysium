@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.scripting;
+package net.jadenxgamer.elysium_api.tartarus_scripting.impl.pack;
 
 import com.electronwill.nightconfig.core.Config;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record TartarusPackInfo(String scriptId, String version, String displayName, String authors, String description,
-                               String minecraftVersionSpec, String elysiumVersionSpec, String license,
+                               String minecraftVersionSpec, VersionRange minecraftVersionRange,
+                               String elysiumVersionSpec, VersionRange elysiumVersionRange,
+                               String license,
                                List<ModDependency> modDependencies, List<ScriptDependency> scriptDependencies,
                                Path packPath, boolean isZip) {
 
@@ -21,10 +23,13 @@ public record TartarusPackInfo(String scriptId, String version, String displayNa
         String elysiumVersionSpec = config.get("elysiumVersion");
         String license = config.get("license");
 
+        VersionRange minecraftRange = TartarusLoader.parseVersionRange(minecraftVersionSpec);
+        VersionRange elysiumRange = TartarusLoader.parseVersionRange(elysiumVersionSpec);
+
         List<ModDependency> modDependencies = new ArrayList<>();
-        List<Config> modDepsList = config.get("mod_dependencies");
-        if (modDepsList != null) {
-            for (Config entry : modDepsList) {
+        List<Config> mdList = config.get("mod_dependencies");
+        if (mdList != null) {
+            for (Config entry : mdList) {
                 String modId = entry.get("modId");
                 String type = entry.get("type");
                 String versionRangeStr = entry.get("versionRange");
@@ -35,9 +40,9 @@ public record TartarusPackInfo(String scriptId, String version, String displayNa
         }
 
         List<ScriptDependency> scriptDependencies = new ArrayList<>();
-        List<Config> scriptDepsList = config.get("script_dependencies");
-        if (scriptDepsList != null) {
-            for (Config entry : scriptDepsList) {
+        List<Config> sdList = config.get("script_dependencies");
+        if (sdList != null) {
+            for (Config entry : sdList) {
                 String scriptIdDep = entry.get("scriptId");
                 String type = entry.get("type");
                 String versionRangeStr = entry.get("versionRange");
@@ -49,14 +54,13 @@ public record TartarusPackInfo(String scriptId, String version, String displayNa
 
         return new TartarusPackInfo(
                 scriptId, version, displayName, authors, description,
-                minecraftVersionSpec, elysiumVersionSpec, license,
+                minecraftVersionSpec, minecraftRange,
+                elysiumVersionSpec, elysiumRange,
+                license,
                 modDependencies, scriptDependencies, packPath, isZip
         );
     }
 
-    public record ModDependency(String modId, boolean required, VersionRange versionRange) {
-    }
-
-    public record ScriptDependency(String scriptId, boolean required, VersionRange versionRange) {
-    }
+    public record ModDependency(String modId, boolean required, VersionRange versionRange) {}
+    public record ScriptDependency(String scriptId, boolean required, VersionRange versionRange) {}
 }

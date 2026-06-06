@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.networking;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.networking.to_client.DodgeRollAnimationPayload;
 import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
 import net.jadenxgamer.elysium_api.impl.networking.to_client.ScreenFlashPayload;
@@ -11,7 +11,7 @@ public class ElysiumPayloads {
     private static final String VERSION = "0.1.0";
 
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(Elysium.MOD_ID).versioned(VERSION);
+        PayloadRegistrar registrar = event.registrar(ElysiumAPI.MOD_ID).versioned(VERSION);
 
         registrar.playToClient(ScreenFlashPayload.TYPE, ScreenFlashPayload.CODEC, ScreenFlashPayload::handleDataOnClient);
         registrar.playToClient(DodgeRollAnimationPayload.TYPE, DodgeRollAnimationPayload.CODEC, DodgeRollAnimationPayload::handleDataOnClient);

@@ -1,17 +1,17 @@
-package net.jadenxgamer.elysium_api.scripting;
+package net.jadenxgamer.elysium_api.tartarus_scripting.impl.pack;
 
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.toml.TomlParser;
+import net.jadenxgamer.elysium_api.tartarus_scripting.scripting.TartarusScriptManager;
+import net.jadenxgamer.elysium_api.tartarus_scripting.util.ScriptCallerHelper;
+import net.jadenxgamer.elysium_api.tartarus_scripting.scripting.ScriptSource;
 import net.minecraft.SharedConstants;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -21,14 +21,18 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static net.jadenxgamer.elysium_api.tartarus_scripting.TartarusScripting.LOGGER;
+
 public final class TartarusLoader {
-    private static final Logger LOGGER = LoggerFactory.getLogger("TartarusLoader");
     private static final String METADATA_FILE = "tartarus.toml";
     private static final String SCRIPTS_FOLDER = "scripts";
     private static final String MAIN_SCRIPT = "main.js";
     private static final int SCRIPT_LINE_NUMBER = 1;
+    private static final Map<String, ScriptSource> LOADED_SCRIPT_SOURCES = new HashMap<>();
 
     private TartarusLoader() {}
+
+    // ENTRY POINT //
 
     public static void loadAllPacks() {
         Path packsDir = FMLPaths.GAMEDIR.get().resolve("tartarus_packs");
@@ -47,7 +51,9 @@ public final class TartarusLoader {
                 if (info != null) {
                     if (allPacks.containsKey(info.scriptId())) {
                         LOGGER.warn("Duplicate scriptId '{}' found in {}, skipping", info.scriptId(), path);
-                    } else allPacks.put(info.scriptId(), info);
+                    } else {
+                        allPacks.put(info.scriptId(), info);
+                    }
                 }
             });
         } catch (IOException e) {
@@ -66,6 +72,8 @@ public final class TartarusLoader {
             }
         }
     }
+
+    // METADATA READING //
 
     private static TartarusPackInfo readPackMetadata(Path packPath) {
         if (Files.isDirectory(packPath)) return readDirectoryMetadata(packPath);
@@ -102,7 +110,7 @@ public final class TartarusLoader {
         }
     }
 
-    static VersionRange parseVersionRange(String spec) {
+    public static VersionRange parseVersionRange(String spec) {
         if (spec == null || spec.isBlank()) return null;
         try {
             return VersionRange.createFromVersionSpec(spec);
@@ -112,36 +120,46 @@ public final class TartarusLoader {
         }
     }
 
+    // DEPENDENCY RESOLUTION //
+
     private static List<TartarusPackInfo> resolveDependencyOrder(Map<String, TartarusPackInfo> allPacks) {
         Map<String, Set<String>> graph = new HashMap<>();
         for (TartarusPackInfo pack : allPacks.values()) {
             graph.putIfAbsent(pack.scriptId(), new HashSet<>());
             for (var dep : pack.scriptDependencies()) {
-                if (dep.required()) {
-                    graph.computeIfAbsent(pack.scriptId(), k -> new HashSet<>()).add(dep.scriptId());
-                }
+                if (dep.required()) graph.computeIfAbsent(pack.scriptId(), k -> new HashSet<>()).add(dep.scriptId());
             }
         }
 
         List<TartarusPackInfo> sorted = new ArrayList<>();
         Set<String> visited = new HashSet<>();
         Set<String> visiting = new HashSet<>();
+        Set<String> cyclic = new HashSet<>();
 
         for (String id : graph.keySet()) {
-            if (!visited.contains(id)) {
-                if (hasCycle(id, graph, visited, visiting, sorted, allPacks))
-                    LOGGER.warn("Circular dependency detected involving {}", id);
+            if (!visited.contains(id) && !cyclic.contains(id)) {
+                if (hasCycle(id, graph, visited, visiting, cyclic, sorted, allPacks))
+                    LOGGER.warn("Circular dependency detected involving {}. Skipping affected packs.", cyclic);
             }
         }
+        sorted.removeIf(pack -> cyclic.contains(pack.scriptId()));
         return sorted;
     }
 
-    private static boolean hasCycle(String id, Map<String, Set<String>> graph, Set<String> visited, Set<String> visiting, List<TartarusPackInfo> sorted, Map<String, TartarusPackInfo> allPacks) {
-        if (visiting.contains(id)) return true;
+    private static boolean hasCycle(String id, Map<String, Set<String>> graph,
+                                    Set<String> visited, Set<String> visiting, Set<String> cyclic,
+                                    List<TartarusPackInfo> sorted, Map<String, TartarusPackInfo> allPacks) {
+        if (visiting.contains(id)) {
+            cyclic.add(id);
+            return true;
+        }
         if (visited.contains(id)) return false;
         visiting.add(id);
         for (String dep : graph.getOrDefault(id, Set.of())) {
-            if (hasCycle(dep, graph, visited, visiting, sorted, allPacks)) return true;
+            if (hasCycle(dep, graph, visited, visiting, cyclic, sorted, allPacks)) {
+                cyclic.add(id);
+                return true;
+            }
         }
         visiting.remove(id);
         visited.add(id);
@@ -150,30 +168,31 @@ public final class TartarusLoader {
         return false;
     }
 
+    // VALIDATION //
+
     private static boolean validatePack(TartarusPackInfo pack, Map<String, TartarusPackInfo> allPacks, Set<String> loadedScriptIds) {
-        String currentMcVersion = SharedConstants.getCurrentVersion().getName();
-        if (!matchesVersion(currentMcVersion, pack.minecraftVersionSpec())) {
-            LOGGER.warn("Pack {} requires Minecraft {}, but we have {}", pack.scriptId(), pack.minecraftVersionSpec(), currentMcVersion);
-            return false;
-        }
-        String elysiumVersion = ModList.get().getModContainerById("elysium_api")
+        var minecraftVersion = SharedConstants.getCurrentVersion().getName();
+        var modList = ModList.get();
+        String elysiumVersion = modList.getModContainerById("elysium_api")
                 .map(container -> container.getModInfo().getVersion().toString())
                 .orElse("0.0.0");
-        if (!matchesVersion(elysiumVersion, pack.elysiumVersionSpec())) {
+        if (!matchesVersion(minecraftVersion, pack.minecraftVersionRange())) {
+            LOGGER.warn("Pack {} requires Minecraft {}, but we have {}", pack.scriptId(), pack.minecraftVersionSpec(), minecraftVersion);
+            return false;
+        }
+        if (!matchesVersion(elysiumVersion, pack.elysiumVersionRange())) {
             LOGGER.warn("Pack {} requires Elysium API {}, but we have {}", pack.scriptId(), pack.elysiumVersionSpec(), elysiumVersion);
             return false;
         }
-
         for (var modDependency : pack.modDependencies()) {
-            boolean modPresent = ModList.get().isLoaded(modDependency.modId());
+            boolean modPresent = modList.isLoaded(modDependency.modId());
             if (modDependency.required() && !modPresent) {
                 LOGGER.warn("Pack {} requires mod {} but it is missing", pack.scriptId(), modDependency.modId());
                 return false;
             }
             if (modPresent && modDependency.versionRange() != null) {
-                String modVersion = ModList.get().getModContainerById(modDependency.modId())
-                        .get().getModInfo().getVersion().toString();
-                if (!modDependency.versionRange().containsVersion(new org.apache.maven.artifact.versioning.DefaultArtifactVersion(modVersion))) {
+                String modVersion = modList.getModContainerById(modDependency.modId()).get().getModInfo().getVersion().toString();
+                if (!modDependency.versionRange().containsVersion(new DefaultArtifactVersion(modVersion))) {
                     LOGGER.warn("Pack {} requires mod {} version {}, but found {}", pack.scriptId(), modDependency.modId(), modDependency.versionRange(), modVersion);
                     return false;
                 }
@@ -181,15 +200,15 @@ public final class TartarusLoader {
         }
 
         for (var scriptDependency : pack.scriptDependencies()) {
-            TartarusPackInfo depPack = allPacks.get(scriptDependency.scriptId());
-            boolean depLoaded = loadedScriptIds.contains(scriptDependency.scriptId());
-            if (scriptDependency.required() && !depLoaded && depPack == null) {
+            TartarusPackInfo dependencyPack = allPacks.get(scriptDependency.scriptId());
+            boolean dependencyLoaded = loadedScriptIds.contains(scriptDependency.scriptId());
+            if (scriptDependency.required() && !dependencyLoaded && dependencyPack == null) {
                 LOGGER.warn("Pack {} requires tartarus pack {} but it is missing", pack.scriptId(), scriptDependency.scriptId());
                 return false;
             }
-            if (depLoaded && scriptDependency.versionRange() != null) {
+            if (dependencyLoaded && scriptDependency.versionRange() != null) {
                 TartarusPackInfo existing = allPacks.get(scriptDependency.scriptId());
-                if (existing != null && !matchesVersion(existing.version(), String.valueOf(scriptDependency.versionRange()))) {
+                if (existing != null && !matchesVersion(existing.version(), scriptDependency.versionRange())) {
                     LOGGER.warn("Pack {} requires script {} version {}, but loaded version is {}",
                             pack.scriptId(), scriptDependency.scriptId(), scriptDependency.versionRange(), existing.version());
                     return false;
@@ -199,13 +218,12 @@ public final class TartarusLoader {
         return true;
     }
 
-    private static boolean matchesVersion(String version, String spec) {
-        if (spec == null || spec.isBlank()) return true;
-        VersionRange range = parseVersionRange(spec);
-        if (range == null) return version.equals(spec);
-        return range.containsVersion(new org.apache.maven.artifact.versioning.DefaultArtifactVersion(version));
+    private static boolean matchesVersion(String version, VersionRange range) {
+        if (range == null) return true;
+        return range.containsVersion(new DefaultArtifactVersion(version));
     }
 
+    // EXECUTION //
     private static void executePack(TartarusPackInfo pack) {
         if (pack.isZip()) executeZipPack(pack);
         else executeDirectoryPack(pack);
@@ -219,6 +237,7 @@ public final class TartarusLoader {
             return;
         }
         ScriptSource source = new DirectoryScriptSource(scriptsDir);
+        LOADED_SCRIPT_SOURCES.put(pack.scriptId(), source);
         try (Reader reader = Files.newBufferedReader(mainScript)) {
             runScript(source, reader, pack.scriptId());
         } catch (IOException e) {
@@ -227,13 +246,14 @@ public final class TartarusLoader {
     }
 
     private static void executeZipPack(TartarusPackInfo pack) {
+        ScriptSource source = new ZipScriptSource(pack.packPath());
+        LOADED_SCRIPT_SOURCES.put(pack.scriptId(), source);
         try (ZipFile zipFile = new ZipFile(pack.packPath().toFile())) {
             ZipEntry mainEntry = zipFile.getEntry(SCRIPTS_FOLDER + "/" + MAIN_SCRIPT);
             if (mainEntry == null) {
                 LOGGER.warn("No main.js found in zip pack {}", pack.scriptId());
                 return;
             }
-            ScriptSource source = new ZipScriptSource(zipFile);
             try (Reader reader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(mainEntry)))) {
                 runScript(source, reader, pack.scriptId());
             }
@@ -247,7 +267,7 @@ public final class TartarusLoader {
         try {
             Scriptable globalScope = TartarusScriptManager.getGlobalScope();
             Scriptable packScope = createChildScope(cx, globalScope);
-            attachLoadFunctions(source, packScope);
+            ScriptCallerHelper.attachStandardFunctions(packScope, source);
             cx.evaluateReader(packScope, mainScriptReader, packName + "/" + MAIN_SCRIPT, SCRIPT_LINE_NUMBER, null);
         } catch (IOException e) {
             throw new RuntimeException("Failed to evaluate pack: " + packName, e);
@@ -259,18 +279,11 @@ public final class TartarusLoader {
     private static Scriptable createChildScope(Context cx, Scriptable parent) {
         Scriptable child = cx.newObject(parent);
         child.setPrototype(parent);
-        child.setParentScope(parent);
+        child.setParentScope(null);
         return child;
     }
 
-    private static void attachLoadFunctions(ScriptSource source, Scriptable scope) {
-        ScriptableObject.putProperty(scope, "includeScript", new IncludeScriptFunction(source));
-        ScriptableObject.putProperty(scope, "loadScript", new LoadScriptFunction(source));
-    }
-
-    private interface ScriptSource {
-        Reader getScriptReader(String relativePath) throws IOException;
-    }
+    // SCRIPT SOURCE IMPLEMENTATIONS //
 
     private record DirectoryScriptSource(Path scriptsDir) implements ScriptSource {
         @Override
@@ -282,46 +295,48 @@ public final class TartarusLoader {
         }
     }
 
-    private record ZipScriptSource(ZipFile zipFile) implements ScriptSource {
+    private record ZipScriptSource(Path zipPath) implements ScriptSource {
         @Override
         public Reader getScriptReader(String relativePath) throws IOException {
             String safePath = SCRIPTS_FOLDER + "/" + relativePath.replace('\\', '/');
             if (safePath.contains("..")) throw new SecurityException("Invalid script path: " + relativePath);
-            ZipEntry entry = zipFile.getEntry(safePath);
-            if (entry == null) throw new FileNotFoundException("Script not found in zip: " + relativePath);
-            return new InputStreamReader(zipFile.getInputStream(entry));
-        }
-    }
-
-    /*
-     * SCRIPT LOADERS
-     */
-
-    private record IncludeScriptFunction(ScriptSource source) implements Callable {
-        @Override
-        public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-            if (args.length == 0 || !(args[0] instanceof String path)) return null;
-            try (Reader reader = source.getScriptReader(path)) {
-                return cx.evaluateReader(scope, reader, path, SCRIPT_LINE_NUMBER, null);
+            ZipFile zipFile = new ZipFile(zipPath.toFile());
+            try {
+                ZipEntry entry = zipFile.getEntry(safePath);
+                if (entry == null) throw new FileNotFoundException("Script not found in zip: " + relativePath);
+                return new ZipFileReader(zipFile, entry);
             } catch (Exception e) {
-                throw new RuntimeException("Failed to include script: " + path, e);
+                zipFile.close();
+                throw e;
+            }
+        }
+
+        private static class ZipFileReader extends Reader {
+            private final ZipFile zipFile;
+            private final Reader delegate;
+
+            ZipFileReader(ZipFile zipFile, ZipEntry entry) throws IOException {
+                this.zipFile = zipFile;
+                this.delegate = new InputStreamReader(zipFile.getInputStream(entry));
+            }
+
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                return delegate.read(cbuf, off, len);
+            }
+
+            @Override
+            public void close() throws IOException {
+                try {
+                    delegate.close();
+                } finally {
+                    zipFile.close();
+                }
             }
         }
     }
 
-    private record LoadScriptFunction(ScriptSource source) implements Callable {
-        @Override
-        public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-            if (args.length == 0 || !(args[0] instanceof String path)) return null;
-            try (Reader reader = source.getScriptReader(path)) {
-                Scriptable global = TartarusScriptManager.getGlobalScope();
-                Scriptable isolated = cx.newObject(global);
-                isolated.setPrototype(global);
-                isolated.setParentScope(global);
-                return cx.evaluateReader(isolated, reader, path, SCRIPT_LINE_NUMBER, null);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to load script: " + path, e);
-            }
-        }
+    public static ScriptSource getScriptSource(String scriptId) {
+        return LOADED_SCRIPT_SOURCES.get(scriptId);
     }
 }

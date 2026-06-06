@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.networking.to_client;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.RemotePlayer;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public record DodgeRollAnimationPayload(int id) implements CustomPacketPayload {
 
-    public static final Type<DodgeRollAnimationPayload> TYPE = new Type<>(Elysium.elysiumPath("dodge_roll_client"));
+    public static final Type<DodgeRollAnimationPayload> TYPE = new Type<>(ElysiumAPI.elysiumPath("dodge_roll_client"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DodgeRollAnimationPayload> CODEC = ByteBufCodecs.INT
             .map(DodgeRollAnimationPayload::new, DodgeRollAnimationPayload::id).cast();
@@ -40,7 +40,7 @@ public record DodgeRollAnimationPayload(int id) implements CustomPacketPayload {
             Optional.ofNullable(Minecraft.getInstance().level).ifPresent(level -> {
                 Entity entity = level.getEntity(payload.id());
                 if (!(entity instanceof RemotePlayer player)) {
-                    Elysium.LOGGER.info("Not a RemotePlayer!");
+                    ElysiumAPI.LOGGER.info("Not a RemotePlayer!");
                     return;
                 }
                 Animation.DODGE_ROLL.play(player);

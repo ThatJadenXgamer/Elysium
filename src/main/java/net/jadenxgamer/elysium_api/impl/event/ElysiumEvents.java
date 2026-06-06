@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
@@ -10,7 +10,7 @@ import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
-import net.jadenxgamer.elysium_api.scripting.TartarusScriptManager;
+import net.jadenxgamer.elysium_api.tartarus_scripting.scripting.TartarusScriptManager;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -40,7 +40,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-@EventBusSubscriber(modid = Elysium.MOD_ID)
+@EventBusSubscriber(modid = ElysiumAPI.MOD_ID)
 public class ElysiumEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

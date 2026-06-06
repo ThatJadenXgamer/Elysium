@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.client;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
@@ -24,7 +24,7 @@ public class GameRendererMixin {
     )
     private void elysium$setupGUILightmap(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
         if (ModList.get().isLoaded("polytone")) return;
-        Elysium.LIGHTMAP_SETTINGS.setupForGUI(true);
+        ElysiumAPI.LIGHTMAP_SETTINGS.setupForGUI(true);
         lightTexture.turnOnLightLayer();
     }
 
@@ -34,7 +34,7 @@ public class GameRendererMixin {
     )
     private void elysium$resetGUILightmap(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
         if (ModList.get().isLoaded("polytone")) return;
-        Elysium.LIGHTMAP_SETTINGS.setupForGUI(false);
+        ElysiumAPI.LIGHTMAP_SETTINGS.setupForGUI(false);
         lightTexture.turnOnLightLayer();
     }
 }

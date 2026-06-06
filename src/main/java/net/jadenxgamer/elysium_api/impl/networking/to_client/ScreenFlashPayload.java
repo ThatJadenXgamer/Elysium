@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.networking.to_client;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public record ScreenFlashPayload(int fadeIn, int hold, int fadeOut,
                                  int color, boolean firstPersonOnly, boolean force) implements CustomPacketPayload {
 
-    public static final Type<ScreenFlashPayload> TYPE = new Type<>(Elysium.elysiumPath("screen_flash"));
+    public static final Type<ScreenFlashPayload> TYPE = new Type<>(ElysiumAPI.elysiumPath("screen_flash"));
 
     public static final StreamCodec<FriendlyByteBuf, ScreenFlashPayload> CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, ScreenFlashPayload::fadeIn,
@@ -30,7 +30,7 @@ public record ScreenFlashPayload(int fadeIn, int hold, int fadeOut,
     }
 
     public void handleDataOnClient(final IPayloadContext ignored) {
-        Elysium.LOGGER.debug("Received ScreenFlashPayload: {}", this);
+        ElysiumAPI.LOGGER.debug("Received ScreenFlashPayload: {}", this);
         ScreenFlash.triggerScreenFlash(fadeIn, hold, fadeOut, color, firstPersonOnly, force);
     }
 }

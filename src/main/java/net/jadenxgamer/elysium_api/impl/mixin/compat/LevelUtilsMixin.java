@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.compat;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -47,7 +47,7 @@ public abstract class LevelUtilsMixin {
                     }
                     if (ruleCategory == null) return;
                     ((IExtendedNoiseGeneratorSettings) (Object) generatorSettings).setRuleCategory(ruleCategory);
-                    Elysium.LOGGER.info("MosaicBiomeSource successfully patched surface rules from Terrablender for dimension: '{}'", dimensionType.getRegisteredName());
+                    ElysiumAPI.LOGGER.info("MosaicBiomeSource successfully patched surface rules from Terrablender for dimension: '{}'", dimensionType.getRegisteredName());
                 }
             }
         }

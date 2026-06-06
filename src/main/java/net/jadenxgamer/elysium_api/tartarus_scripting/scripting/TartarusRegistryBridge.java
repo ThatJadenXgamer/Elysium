@@ -1,7 +1,8 @@
-package net.jadenxgamer.elysium_api.scripting;
+package net.jadenxgamer.elysium_api.tartarus_scripting.scripting;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -17,9 +18,13 @@ public class TartarusRegistryBridge {
     private static final String BLOCK = "BLOCK";
     private static final String ITEM = "ITEM";
     private static final String MOB_EFFECT = "MOB_EFFECT";
+    private static final String FLUID = "FLUID";
+    private static final String FLUID_TYPE = "FLUID_TYPE";
     private static final String ENTITY_TYPE = "ENTITY_TYPE";
     private static final String BLOCK_ENTITY_TYPE = "BLOCK_ENTITY_TYPE";
-    private static final String BLOCK_TYPE = "BLOCK_TYPE";
+    private static final String SOUND_EVENT = "SOUND_EVENT";
+    private static final String PARTICLE_TYPE = "PARTICLE_TYPE";
+    private static final String POTION = "POTION";
 
     public final Map<ResourceLocation, Supplier<Object>> pendingBlocks = new LinkedHashMap<>();
     public final Map<ResourceLocation, Supplier<Object>> pendingItems = new LinkedHashMap<>();
@@ -43,7 +48,7 @@ public class TartarusRegistryBridge {
         switch (type) {
             case BLOCK -> pendingBlocks.put(location, supplier);
             case ITEM -> pendingItems.put(location, supplier);
-            default -> throw new IllegalArgumentException("Invalid registry type: '" + type + "'. Must be 'BLOCK' or 'ITEM' (screaming case).");
+            default -> throw new IllegalArgumentException("Invalid registry type: '" + type + "'");
         }
         return null;
     }
@@ -65,9 +70,13 @@ public class TartarusRegistryBridge {
             case BLOCK -> BuiltInRegistries.BLOCK.get(location);
             case ITEM -> BuiltInRegistries.ITEM.get(location);
             case MOB_EFFECT -> BuiltInRegistries.MOB_EFFECT.get(location);
+            case FLUID -> BuiltInRegistries.FLUID.get(location);
+            case FLUID_TYPE -> NeoForgeRegistries.FLUID_TYPES.get(location);
             case ENTITY_TYPE -> BuiltInRegistries.ENTITY_TYPE.get(location);
             case BLOCK_ENTITY_TYPE -> BuiltInRegistries.BLOCK_ENTITY_TYPE.get(location);
-            case BLOCK_TYPE -> BuiltInRegistries.BLOCK_TYPE.get(location);
+            case SOUND_EVENT -> BuiltInRegistries.SOUND_EVENT.get(location);
+            case PARTICLE_TYPE -> BuiltInRegistries.PARTICLE_TYPE.get(location);
+            case POTION -> BuiltInRegistries.POTION.get(location);
             default -> null;
         };
     }

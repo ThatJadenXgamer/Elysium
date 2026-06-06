@@ -4,24 +4,24 @@ import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
 import net.jadenxgamer.elysium_api.impl.registry.*;
-import net.jadenxgamer.elysium_api.scripting.TartarusLoader;
-import net.jadenxgamer.elysium_api.scripting.TartarusScriptManager;
+import net.jadenxgamer.elysium_api.tartarus_scripting.TartarusScripting;
+import net.jadenxgamer.elysium_api.tartarus_scripting.impl.pack.TartarusLoader;
+import net.jadenxgamer.elysium_api.tartarus_scripting.scripting.TartarusScriptManager;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
-@Mod(Elysium.MOD_ID)
-public final class Elysium {
+@Mod(ElysiumAPI.MOD_ID)
+public final class ElysiumAPI {
     public static final String MOD_ID = "elysium_api";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
     public static final LightmapSettingsManager LIGHTMAP_SETTINGS = new LightmapSettingsManager();
 
-    public Elysium(IEventBus modEventBus, ModContainer modContainer) {
-        TartarusScriptManager.initializeEngine();
-        TartarusLoader.loadAllPacks();
+    public ElysiumAPI(IEventBus modEventBus, ModContainer modContainer) {
+        TartarusScripting.init();
 
         ElysiumRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);

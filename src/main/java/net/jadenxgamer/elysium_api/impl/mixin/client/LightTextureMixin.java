@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -32,7 +32,7 @@ public class LightTextureMixin {
     private void elysium$updateLightmapMultipliers(float partialTicks, CallbackInfo ci) {
         Player player = Minecraft.getInstance().player;
         if (player != null) {
-            var settings = Elysium.LIGHTMAP_SETTINGS.getSettings(player);
+            var settings = ElysiumAPI.LIGHTMAP_SETTINGS.getSettings(player);
             elysium$skyMultiplier.set(settings.getLeft());
             elysium$blockMultiplier.set(settings.getMiddle());
             elysium$ambientBrightness = settings.getRight();
@@ -71,7 +71,7 @@ public class LightTextureMixin {
     )
     public void elysium$useGuiLightmap(CallbackInfo ci) {
         if (ModList.get().isLoaded("polytone")) return;
-        if (Elysium.LIGHTMAP_SETTINGS.isGui()) {
+        if (ElysiumAPI.LIGHTMAP_SETTINGS.isGui()) {
             RenderSystem.setShaderTexture(2, LightmapSettingsManager.GUI_LIGHTMAP);
             Minecraft.getInstance().getTextureManager().bindForSetup(LightmapSettingsManager.GUI_LIGHTMAP);
             RenderSystem.texParameter(3553, 10241, 9729);

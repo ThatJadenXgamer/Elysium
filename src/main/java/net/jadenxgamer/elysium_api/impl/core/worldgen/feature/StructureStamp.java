@@ -2,14 +2,13 @@ package net.jadenxgamer.elysium_api.impl.core.worldgen.feature;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumBlocks;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.level.LevelReader;
@@ -42,7 +41,7 @@ public class StructureStamp extends Feature<StructureStamp.Config> {
         return config.templates().getRandom(random)
                 .map(selected -> placeTemplate(selected.data(), origin, level, random, config))
                 .orElseGet(() -> {
-                    Elysium.LOGGER.warn("StructureStamp failed to place at '{}' due to a lack of templates. This could happen if the templates weighted list is empty.", origin);
+                    ElysiumAPI.LOGGER.warn("StructureStamp failed to place at '{}' due to a lack of templates. This could happen if the templates weighted list is empty.", origin);
                     return false;
                 });
     }
@@ -64,7 +63,7 @@ public class StructureStamp extends Feature<StructureStamp.Config> {
                 BlockPos anchorLocal = findAnchor(template);
                 if (anchorLocal == null) {
                     placementPos = origin;
-                    Elysium.LOGGER.warn("No Structure Stamp Anchor was found within '{}', fallback to CORNER origin_type.", templateLocation);
+                    ElysiumAPI.LOGGER.warn("No Structure Stamp Anchor was found within '{}', fallback to CORNER origin_type.", templateLocation);
                 } else {
                     pivot = anchorLocal;
                     placementPos = origin.subtract(anchorLocal);

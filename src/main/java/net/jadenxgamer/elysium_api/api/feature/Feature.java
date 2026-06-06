@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.api.feature;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.resources.ResourceLocation;
 
 public class Feature<T> {
@@ -17,7 +17,7 @@ public class Feature<T> {
 
     public void enable() {
         if (!enabled) {
-            Elysium.LOGGER.info("Enabling feature {}...", id);
+            ElysiumAPI.LOGGER.info("Enabling feature {}...", id);
         }
         enabled = true;
     }

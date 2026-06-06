@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.entity;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -31,7 +31,7 @@ public abstract class AbstractClientPlayerMixin {
     private void elysium$getCustomCapeTexture(CallbackInfoReturnable<PlayerSkin> cir) {
         PlayerInfo info = this.getPlayerInfo();
         if (info != null && DEV_CAPE_PLAYERS.contains(info.getProfile().getName())) {
-            ResourceLocation capeTexture = Elysium.elysiumPath("textures/entity/cape/jadenxgamer.png");
+            ResourceLocation capeTexture = ElysiumAPI.elysiumPath("textures/entity/cape/jadenxgamer.png");
             ((PlayerSkinAccessor) (Object) cir.getReturnValue()).elysium$setCapeTexture(capeTexture);
         }
     }
