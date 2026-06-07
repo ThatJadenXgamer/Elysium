@@ -9,15 +9,16 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Mod(Elysium.MOD_ID)
-public final class Elysium {
+@Mod(ElysiumAPI.MOD_ID)
+public final class ElysiumAPI {
     public static final String MOD_ID = "elysium_api";
-    public static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LoggerFactory.getLogger("Elysium-API");
     public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
     public static final LightmapSettingsManager LIGHTMAP_SETTINGS = new LightmapSettingsManager();
 
-    public Elysium(IEventBus modEventBus, ModContainer modContainer) {
+    public ElysiumAPI(IEventBus modEventBus, ModContainer modContainer) {
         ElysiumRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
         ElysiumAttachmentTypes.init(modEventBus);

@@ -6,10 +6,10 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 
-@Mod(value = Elysium.MOD_ID, dist = {Dist.CLIENT})
-public class ElysiumClient {
+@Mod(value = ElysiumAPI.MOD_ID, dist = {Dist.CLIENT})
+public class ElysiumAPIClient {
 
-    public ElysiumClient(IEventBus eventBus, ModContainer container) {
+    public ElysiumAPIClient(IEventBus eventBus, ModContainer container) {
         AnimationLayers.boostrap();
     }
 

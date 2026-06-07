@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.registry;
 
 import com.mojang.serialization.MapCodec;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
@@ -34,11 +34,11 @@ public class ElysiumRegistries {
      * NeoForge/Vanilla Deferred Registries
      */
 
-    public static final DeferredRegister<MapCodec<? extends BiomeSource>> BIOME_SOURCES = DeferredRegister.create(BuiltInRegistries.BIOME_SOURCE, Elysium.MOD_ID);
-    private static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, Elysium.MOD_ID);
-    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(BuiltInRegistries.FEATURE, Elysium.MOD_ID);
-    public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPE = DeferredRegister.create(BuiltInRegistries.STRUCTURE_TYPE, Elysium.MOD_ID);
-    public static final DeferredRegister<StructureProcessorType<?>> STRUCTURE_PROCESSOR = DeferredRegister.create(BuiltInRegistries.STRUCTURE_PROCESSOR, Elysium.MOD_ID);
+    public static final DeferredRegister<MapCodec<? extends BiomeSource>> BIOME_SOURCES = DeferredRegister.create(BuiltInRegistries.BIOME_SOURCE, ElysiumAPI.MOD_ID);
+    private static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, ElysiumAPI.MOD_ID);
+    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(BuiltInRegistries.FEATURE, ElysiumAPI.MOD_ID);
+    public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPE = DeferredRegister.create(BuiltInRegistries.STRUCTURE_TYPE, ElysiumAPI.MOD_ID);
+    public static final DeferredRegister<StructureProcessorType<?>> STRUCTURE_PROCESSOR = DeferredRegister.create(BuiltInRegistries.STRUCTURE_PROCESSOR, ElysiumAPI.MOD_ID);
 
     public static final Supplier<MapCodec<MosaicBiomeSource>> MOSAIC = BIOME_SOURCES.register("mosaic", () -> MosaicBiomeSource.CODEC);
     public static final Supplier<MapCodec<EffectsBiomeModifier>> EFFECTS_MODIFIER = BIOME_MODIFIERS.register("effects_modifier", () -> EffectsBiomeModifier.CODEC);
@@ -51,7 +51,7 @@ public class ElysiumRegistries {
      */
 
     private static <T> ResourceKey<Registry<T>> key(String name) {
-        return ResourceKey.createRegistryKey(Elysium.elysiumPath(name));
+        return ResourceKey.createRegistryKey(ElysiumAPI.elysiumPath(name));
     }
 
     public static void init(IEventBus eventBus) {

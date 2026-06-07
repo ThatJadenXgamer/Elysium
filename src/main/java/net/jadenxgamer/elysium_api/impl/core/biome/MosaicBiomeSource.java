@@ -6,7 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Holder;
@@ -146,8 +146,8 @@ public class MosaicBiomeSource extends BiomeSource {
         this.climateEntries = entriesByClimate;
         this.isInitialized = true;
 
-        Elysium.LOGGER.info("MosaicBiomeSource successfully initialized for dimension: '{}'", dimension.location());
-        Elysium.LOGGER.debug(buildDebugInfo(seed, dimension, possibleBiomes.get()).toString());
+        ElysiumAPI.LOGGER.info("MosaicBiomeSource successfully initialized for dimension: '{}'", dimension.location());
+        ElysiumAPI.LOGGER.debug(buildDebugInfo(seed, dimension, possibleBiomes.get()).toString());
     }
 
     @Override

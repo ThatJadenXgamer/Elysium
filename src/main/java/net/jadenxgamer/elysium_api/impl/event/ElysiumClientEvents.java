@@ -1,10 +1,9 @@
 package net.jadenxgamer.elysium_api.impl.event;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
 import net.jadenxgamer.elysium_api.impl.client.commands.DodgeRollCommand;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumBlocks;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
@@ -26,7 +25,7 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @SuppressWarnings("unused")
-@EventBusSubscriber(modid = Elysium.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ElysiumAPI.MOD_ID, value = Dist.CLIENT)
 public class ElysiumClientEvents {
 
     @SubscribeEvent
@@ -49,7 +48,7 @@ public class ElysiumClientEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void fogRender(ViewportEvent.RenderFog event) {
         if (event.getCamera().getFluidInCamera() == FogType.NONE && event.getMode() == FogRenderer.FogMode.FOG_TERRAIN && (event.getCamera().getEntity().getEyeInFluidType() == NeoForgeMod.EMPTY_TYPE.value())) {
-            var settings = Elysium.FOG_SETTINGS.getSettings(Minecraft.getInstance().player, event.getNearPlaneDistance(), event.getFarPlaneDistance());
+            var settings = ElysiumAPI.FOG_SETTINGS.getSettings(Minecraft.getInstance().player, event.getNearPlaneDistance(), event.getFarPlaneDistance());
             if (settings != null) {
                 event.setCanceled(true);
                 event.setNearPlaneDistance(settings.getLeft());

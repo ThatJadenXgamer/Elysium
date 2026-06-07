@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.api.client.dodge;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.ElysiumFeatures;
 import net.jadenxgamer.elysium_api.impl.client.animation.Animation;
 import net.jadenxgamer.elysium_api.impl.networking.to_server.DodgeRollPayload;
@@ -19,7 +19,7 @@ public class DodgeRoll {
     public static void dodgeRoll() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
-            Elysium.LOGGER.error("Client Player");
+            ElysiumAPI.LOGGER.error("Client Player");
             return;
         }
 

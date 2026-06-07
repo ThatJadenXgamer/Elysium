@@ -18,52 +18,75 @@ public final class ElysiumReflection {
     private static final Map<Class<?>, Constructor<?>[]> CONSTRUCTORS_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * Creates an instance of a {@link Block} subclass using reflection
+     * Creates a builder for dynamically instantiating a {@link Block} subclass using reflection.
      * <p>
-     * This method dynamically instantiates a block from any mod using reflection to find and invoke the appropriate constructor,
-     * This is particularly useful when you need to register blocks from different mods without direct compile-time dependencies.
+     * This method starts a builder pattern that allows you to specify the fully qualified class name
+     * and constructor arguments. Reflection is used to find and invoke the appropriate constructor,
+     * which is particularly useful when you need to register blocks from different mods without direct
+     * compile-time dependencies.
      *
      * <p><b>Usage Example:</b>
      * <pre>{@code
-     * Block lesionBlock = BlockReflection.createBlock(
-     *     "net.jadenxgamer.netherexp.core.block.LesionBlock",
-     *     () -> Items.ROTTEN_FLESH, BlockBehaviour.Properties.of().strength(2.0f)
-     * );
+     * Block lesionBlock = ElysiumReflection.createBlock()
+     *         .className("net.jadenxgamer.netherexp.core.block.LesionBlock")
+     *         .constructorValues(() -> Items.ROTTEN_FLESH, BlockBehaviour.Properties.of().strength(2.0f));
      * }</pre>
      *
-     * @param className the fully qualified class name of the block to make a reflection out of
-     * @param args the constructor arguments to pass into the reflected block's constructor
-     * @return a new instance of the specified block class
      * @param <T> the type of block to create (must extend Block)
+     * @return a new ReflectionBuilder instance for building the block
      */
+    public static <T extends Block> ReflectionBuilder<T> createBlock() {
+        return new ReflectionBuilder<>(Block.class);
+    }
+
+    /**
+     * Creates a builder for dynamically instantiating an {@link Item} subclass using reflection.
+     * <p>
+     * This method starts a builder pattern that allows you to specify the fully qualified class name
+     * and constructor arguments. See {@link #createBlock()} for a usage example and explanation
+     * of the reflection purpose.
+     *
+     * @param <T> the type of item to create (must extend Item)
+     * @return a new ReflectionBuilder instance for building the item
+     */
+    public static <T extends Item> ReflectionBuilder<T> createItem() {
+        return new ReflectionBuilder<>(Item.class);
+    }
+
+    /**
+     * Creates a builder for dynamically instantiating a {@link MobEffect} subclass using reflection.
+     * <p>
+     * This method starts a builder pattern that allows you to specify the fully qualified class name
+     * and constructor arguments. See {@link #createBlock()} for a usage example and explanation
+     * of the reflection purpose.
+     *
+     * @param <T> the type of mob effect to create (must extend MobEffect)
+     * @return a new ReflectionBuilder instance for building the mob effect
+     */
+    public static <T extends MobEffect> ReflectionBuilder<T> createMobEffect() {
+        return new ReflectionBuilder<>(MobEffect.class);
+    }
+
+    /**
+     * @deprecated Use {@link #createBlock()} builder pattern instead.
+     */
+    @Deprecated(since = "1.2.0", forRemoval = true)
     public static <T extends Block> T createBlock(String className, Object... args) {
         return createInstance(Block.class, className, args);
     }
 
     /**
-     * Creates an instance of an {@link Item} subclass using reflection
-     * <p>
-     * See {@link ElysiumReflection#createBlock} for usage example and explanation for reflection's use purpose
-     *
-     * @param className the fully qualified class name of the item to make a reflection out of
-     * @param args the constructor arguments to pass into the reflected item's constructor
-     * @return a new instance of the specified item class
-     * @param <T> the type of item to create (must extend Item)
+     * @deprecated Use {@link #createItem()} builder pattern instead.
      */
+    @Deprecated(since = "1.2.0", forRemoval = true)
     public static <T extends Item> T createItem(String className, Object... args) {
         return createInstance(Item.class, className, args);
     }
 
     /**
-     * Creates an instance of an {@link MobEffect} subclass using reflection
-     * <p>
-     * See {@link ElysiumReflection#createBlock} for usage example and explanation for reflection's use purpose
-     *
-     * @param className the fully qualified class name of the effect to make a reflection out of
-     * @param args the constructor arguments to pass into the reflected effect's constructor
-     * @return a new instance of the specified effect class
-     * @param <T> the type of item to create (must extend MobEffect)
+     * @deprecated Use {@link #createMobEffect()} builder pattern instead.
      */
+    @Deprecated(since = "1.2.0", forRemoval = true)
     public static <T extends MobEffect> T createMobEffect(String className, Object... args) {
         return createInstance(MobEffect.class, className, args);
     }
@@ -223,6 +246,27 @@ public final class ElysiumReflection {
 
         static boolean isWrapper(Class<?> type1, Class<?> type2) {
             return WRAPPER_TO_PRIMITIVE.get(type1) == type2 || PRIMITIVE_TO_WRAPPER.get(type1) == type2;
+        }
+    }
+
+    public static class ReflectionBuilder<T> {
+        private final Class<?> superType;
+        private String targetClassName;
+
+        protected ReflectionBuilder(Class<?> superType) {
+            this.superType = superType;
+        }
+
+        public ReflectionBuilder<T> className(String className) {
+            this.targetClassName = className;
+            return this;
+        }
+
+        public T constructorValues(Object... args) {
+            if (targetClassName == null) {
+                throw new IllegalStateException("className must be defined before calling constructorValues!");
+            }
+            return (T) createInstance(superType, targetClassName, args);
         }
     }
 }

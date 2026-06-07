@@ -6,7 +6,7 @@ import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.recipe.vanilla.IJeiBrewingRecipe;
 import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.brewing_recipe.ElysiumBrewingRecipe;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.client.Minecraft;
@@ -23,7 +23,7 @@ public class ElysiumJeiPlugin implements IModPlugin {
 
     @Override
     public ResourceLocation getPluginUid() {
-        return Elysium.elysiumPath("brewing_recipes");
+        return ElysiumAPI.elysiumPath("brewing_recipes");
     }
 
     @Override

@@ -16,6 +16,8 @@ authors="${mod_authors}"
 
 description='''${mod_description}'''
 
+logoFile = "elysium_api.png"
+
 [[mixins]]
 config = "${mod_id}.mixins.json"
 

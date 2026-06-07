@@ -8,7 +8,7 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 
@@ -17,18 +17,18 @@ public interface Animation {
     Animation DODGE_ROLL = animation("dodge_roll", AnimationLayers.MOVEMENT);
 
     private static Animation animation(String id, ResourceLocation layerId) {
-        ResourceLocation animationId = Elysium.elysiumPath(id);
+        ResourceLocation animationId = ElysiumAPI.elysiumPath(id);
         return player -> {
             //noinspection unchecked
             ModifierLayer<IAnimation> layer = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(player).get(layerId);
             if (layer == null) {
-                Elysium.LOGGER.error("ModifierLayer {} is null!", layerId);
+                ElysiumAPI.LOGGER.error("ModifierLayer {} is null!", layerId);
                 return;
             }
 
             KeyframeAnimation animation = (KeyframeAnimation) PlayerAnimationRegistry.getAnimation(animationId);
             if (animation == null) {
-                Elysium.LOGGER.error("KeyframeAnimation {} is null!", animationId);
+                ElysiumAPI.LOGGER.error("KeyframeAnimation {} is null!", animationId);
                 return;
             }
 

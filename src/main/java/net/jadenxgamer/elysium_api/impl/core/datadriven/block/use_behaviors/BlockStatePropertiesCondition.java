@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors;
 
 import com.mojang.serialization.Codec;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
@@ -92,7 +92,7 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
                 }
             }
         } catch (NumberFormatException e) {
-            Elysium.LOGGER.warn("Failed to parse numeric condition '{}'", trimmed);
+            ElysiumAPI.LOGGER.warn("Failed to parse numeric condition '{}'", trimmed);
         }
         return null;
     }
@@ -165,7 +165,7 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
                 return currentValue.equals(parsedValue.get());
             }
         } catch (Exception e) {
-            Elysium.LOGGER.warn("Failed to parse value '{}' for property '{}'", conditionValue, property.getName());
+            ElysiumAPI.LOGGER.warn("Failed to parse value '{}' for property '{}'", conditionValue, property.getName());
         }
 
         return currentValue.toString().equals(conditionValue);

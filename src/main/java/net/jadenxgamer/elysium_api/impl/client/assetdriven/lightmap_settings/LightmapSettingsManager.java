@@ -3,8 +3,7 @@ package net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.jadenxgamer.elysium_api.Elysium;
-import net.jadenxgamer.elysium_api.impl.client.assetdriven.FogLightSettingsType;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -32,7 +31,7 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
     private static final List<LightmapSettings> LIGHTMAP_SETTINGS = new ArrayList<>();
     private static final Set<ResourceLocation> ENABLED_EVENT_FLAGS = new HashSet<>();
 
-    public static final ResourceLocation GUI_LIGHTMAP = Elysium.elysiumPath("textures/misc/gui.png");
+    public static final ResourceLocation GUI_LIGHTMAP = ElysiumAPI.elysiumPath("textures/misc/gui.png");
     private boolean usingGuiLightmap = false;
 
     public LightmapSettingsManager() {
@@ -48,7 +47,7 @@ public class LightmapSettingsManager extends SimpleJsonResourceReloadListener {
                 LightmapSettings settings = LightmapSettings.parseSetting(json);
                 LIGHTMAP_SETTINGS.add(settings);
             } catch (Exception e) {
-                Elysium.LOGGER.warn("Couldn't load LightmapSettings: {}", e.getMessage());
+                ElysiumAPI.LOGGER.warn("Couldn't load LightmapSettings: {}", e.getMessage());
             }
         }
         LIGHTMAP_SETTINGS.sort(Comparator.comparingInt(LightmapSettings::priority).reversed());

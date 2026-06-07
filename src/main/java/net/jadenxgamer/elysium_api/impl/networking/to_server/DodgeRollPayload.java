@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.networking.to_server;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.ElysiumFeatures;
 import net.jadenxgamer.elysium_api.impl.networking.to_client.DodgeRollAnimationPayload;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class DodgeRollPayload implements CustomPacketPayload {
 
-    public static final Type<DodgeRollPayload> TYPE = new Type<>(Elysium.elysiumPath("dodge_roll_server"));
+    public static final Type<DodgeRollPayload> TYPE = new Type<>(ElysiumAPI.elysiumPath("dodge_roll_server"));
 
     public static final DodgeRollPayload INSTANCE = new DodgeRollPayload();
 

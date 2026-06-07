@@ -1,6 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.registry;
 
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -10,7 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ElysiumAttributes {
 
-    public static final DeferredRegister<Attribute> ATTRIBUTES =DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, Elysium.MOD_ID);
+    public static final DeferredRegister<Attribute> ATTRIBUTES =DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, ElysiumAPI.MOD_ID);
 
     public static final Holder<Attribute> DODGE_POWER = ATTRIBUTES.register(
             "dodge_power", () -> new RangedAttribute(

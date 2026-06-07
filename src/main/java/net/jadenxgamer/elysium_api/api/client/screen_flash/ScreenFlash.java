@@ -1,7 +1,7 @@
 package net.jadenxgamer.elysium_api.api.client.screen_flash;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.networking.to_client.ScreenFlashPayload;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ScreenFlash {
 
-    private static final ResourceLocation TEXTURE = Elysium.elysiumPath("textures/misc/screen_flash.png");
+    private static final ResourceLocation TEXTURE = ElysiumAPI.elysiumPath("textures/misc/screen_flash.png");
     private static int fadeInDuration = 0;
     private static int holdDuration = 0;
     private static int fadeOutDuration = 0;

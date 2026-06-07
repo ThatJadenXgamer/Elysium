@@ -3,7 +3,7 @@ package net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.jadenxgamer.elysium_api.Elysium;
+import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -42,7 +42,7 @@ public class FogSettingsManager extends SimpleJsonResourceReloadListener {
                 FogSettings settings = FogSettings.parseSetting(json);
                 FOG_SETTINGS.add(settings);
             } catch (Exception e) {
-                Elysium.LOGGER.warn("Couldn't load FogSettings: {}", e.getMessage());
+                ElysiumAPI.LOGGER.warn("Couldn't load FogSettings: {}", e.getMessage());
             }
         }
         FOG_SETTINGS.sort(Comparator.comparingInt(FogSettings::priority).reversed());
