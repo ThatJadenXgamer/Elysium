@@ -39,7 +39,7 @@ public class MosaicBiomeSource extends BiomeSource {
             Codec.INT.optionalFieldOf("warp_iterations", 1).forGetter(s -> s.warpIterations),
             Codec.INT.optionalFieldOf("noise_octaves", 3).forGetter(s -> s.noiseOctaves),
             TagKey.codec(Registries.BIOME).optionalFieldOf("auto_populate_entries_from_tag").forGetter(s -> s.autoPopulateEntriesFromTag),
-            TagKey.codec(Registries.BIOME).optionalFieldOf("auto_populate_exclusion_tag").forGetter(s -> s.autoPopulateExclusionTag)
+            TagKey.codec(Registries.BIOME).optionalFieldOf("biome_exclusion_tag").forGetter(s -> s.BiomeExclusionTag)
     ).apply(instance, MosaicBiomeSource::new));
 
     private final int gridCellSize;
@@ -47,7 +47,7 @@ public class MosaicBiomeSource extends BiomeSource {
     private final float jitterStrength;
     private final boolean avoidDiagonalNeighbors;
     private final Optional<TagKey<Biome>> autoPopulateEntriesFromTag;
-    private final Optional<TagKey<Biome>> autoPopulateExclusionTag;
+    private final Optional<TagKey<Biome>> BiomeExclusionTag;
 
     private final double distortionStrength;
     private final double distortionScale;
@@ -77,13 +77,13 @@ public class MosaicBiomeSource extends BiomeSource {
     public MosaicBiomeSource(int gridCellSize, int climateCount, float jitterStrength, boolean avoidDiagonalNeighbors,
                              double distortionStrength, double distortionScale, int warpIterations, int noiseOctaves,
                              Optional<TagKey<Biome>> autoPopulateEntriesFromTag,
-                             Optional<TagKey<Biome>> autoPopulateExclusionTag) {
+                             Optional<TagKey<Biome>> BiomeExclusionTag) {
         this.gridCellSize = gridCellSize;
         this.climateCount = climateCount;
         this.jitterStrength = jitterStrength;
         this.avoidDiagonalNeighbors = avoidDiagonalNeighbors;
         this.autoPopulateEntriesFromTag = autoPopulateEntriesFromTag;
-        this.autoPopulateExclusionTag = autoPopulateExclusionTag;
+        this.BiomeExclusionTag = BiomeExclusionTag;
 
         this.distortionStrength = distortionStrength;
         this.distortionScale = distortionScale;
@@ -94,9 +94,7 @@ public class MosaicBiomeSource extends BiomeSource {
         if (this.climateCount > 64) throw new IllegalStateException("climateCount beyond 64 is not supported due to bitmask avoidance");
     }
 
-    //////////
     // CORE //
-    //////////
 
     @Override
     protected MapCodec<? extends BiomeSource> codec() {
@@ -128,6 +126,25 @@ public class MosaicBiomeSource extends BiomeSource {
                     if (entriesByClimate[climateP] == null) entriesByClimate[climateP] = new WeightedBiomeList();
                     entriesByClimate[climateP].add(entry.biome(), entry.weight());
                     entry.biome().unwrapKey().ifPresent(assignedBiomeKeys::add);
+                }));
+
+        BiomeExclusionTag.ifPresent(exclusionTag -> RegistryAccessHelper.getServer()
+                .flatMap(access -> access.registry(Registries.BIOME))
+                .ifPresent(biomeRegistry -> {
+                    Set<ResourceKey<Biome>> excludedKeys = new HashSet<>();
+                    for (Holder<Biome> holder : biomeRegistry.getTagOrEmpty(exclusionTag)) holder.unwrapKey().ifPresent(excludedKeys::add);
+
+                    assignedBiomeKeys.removeAll(excludedKeys);
+                    for (int i = 0; i < entriesByClimate.length; i++) {
+                        WeightedBiomeList list = entriesByClimate[i];
+                        if (list != null) {
+                            list.entries.removeIf(entry -> entry.biome().unwrapKey().map(excludedKeys::contains).orElse(false));
+                            list.totalWeight = list.entries.stream().mapToInt(BiomeEntry::weight).sum();
+                            if (list.entries.isEmpty()) {
+                                entriesByClimate[i] = null;
+                            }
+                        }
+                    }
                 }));
 
         tagProvidedEntries(assignedBiomeKeys, entriesByClimate);
@@ -184,9 +201,7 @@ public class MosaicBiomeSource extends BiomeSource {
         return selectBiomeFromClimateEntry(bestClimate, bestGridX, bestGridZ);
     }
 
-    ///////////
     // NOISE //
-    ///////////
 
     //TODO: Add more noise warping types, right now Mosaic only supports fractional Brownian motion.
     private void initNoise() {
@@ -234,9 +249,7 @@ public class MosaicBiomeSource extends BiomeSource {
         return new double[]{wx, wz};
     }
 
-    ///////////////////////////////////
     // CLIMATE SELECTION & AVOIDANCE //
-    ///////////////////////////////////
 
     private int resolveClimateForGridCell(int gridX, int gridZ) {
         long key = packGridCoordinates(gridX, gridZ);
@@ -340,9 +353,7 @@ public class MosaicBiomeSource extends BiomeSource {
         return available[index];
     }
 
-    ///////////////////////////////
     // CALCULATIONS & SELECTIONS //
-    ///////////////////////////////
 
     private double computeJitterOffset(int gridX, int gridZ, int axis) {
         long hash = this.worldSeed + gridX * 31337L + gridZ * 313373L + axis * 17L;
@@ -368,9 +379,7 @@ public class MosaicBiomeSource extends BiomeSource {
         return list.entries.getLast().biome;
     }
 
-    ///////////
     // DEBUG //
-    ///////////
 
     private StringBuilder buildDebugInfo(long seed, ResourceKey<LevelStem> dimension, Set<Holder<Biome>> possibleBiomes) {
         StringBuilder debug = new StringBuilder();
@@ -388,9 +397,7 @@ public class MosaicBiomeSource extends BiomeSource {
         return debug;
     }
 
-    /////////////
     // HELPERS //
-    /////////////
 
     private void tagProvidedEntries(Set<ResourceKey<Biome>> assignedBiomeKeys, WeightedBiomeList[] entriesByClimate) {
         if (autoPopulateEntriesFromTag.isEmpty()) return;
@@ -398,7 +405,7 @@ public class MosaicBiomeSource extends BiomeSource {
                 .flatMap(access -> access.registry(Registries.BIOME))
                 .ifPresent(biomeRegistry -> biomeRegistry.getTagOrEmpty(autoPopulateEntriesFromTag.get())
                         .forEach(holder -> holder.unwrapKey().ifPresent(key -> {
-                            if (autoPopulateExclusionTag.isPresent() && holder.is(autoPopulateExclusionTag.get())) return;
+                            if (BiomeExclusionTag.isPresent() && holder.is(BiomeExclusionTag.get())) return;
                             if (!assignedBiomeKeys.contains(key)) {
                                 int climate = Math.abs(key.location().toString().hashCode()) % climateCount;
                                 WeightedBiomeList list = entriesByClimate[climate];
