@@ -1,5 +1,6 @@
 package net.jadenxgamer.elysium_api.tartarus_scripting.scripting;
 
+import net.jadenxgamer.elysium_api.tartarus_scripting.callers.*;
 import net.jadenxgamer.elysium_api.tartarus_scripting.impl.plugin.TartarusPluginLoader;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeJavaClass;
@@ -25,6 +26,7 @@ public class TartarusScriptManager {
             cx.setClassShutter(ALLOWED_CLASSES::contains);
             globalScope = cx.initSafeStandardObjects();
             deleteJavaPackages(globalScope);
+            attachStandardFunctions(globalScope);
         } finally {
             Context.exit();
         }
@@ -40,7 +42,7 @@ public class TartarusScriptManager {
         ALLOWED_CLASSES.add(clazz.getName());
         if (clazz.getCanonicalName() != null) ALLOWED_CLASSES.add(clazz.getCanonicalName());
 
-        Context cx = Context.enter();
+        Context.enter();
         try {
             ScriptableObject.putProperty(globalScope, jsName, new NativeJavaClass(globalScope, clazz));
         } finally {
@@ -55,7 +57,7 @@ public class TartarusScriptManager {
         ALLOWED_CLASSES.add(objClass.getName());
         if (objClass.getCanonicalName() != null) ALLOWED_CLASSES.add(objClass.getCanonicalName());
 
-        Context cx = Context.enter();
+        Context.enter();
         try {
             ScriptableObject.putProperty(globalScope, name, Context.javaToJS(obj, globalScope));
         } finally {
@@ -63,11 +65,26 @@ public class TartarusScriptManager {
         }
     }
 
+    /**
+     * Removes access to all dangerous Java objects to prevent malicious scripts
+     */
     private static void deleteJavaPackages(Scriptable scope) {
         String[] dangerous = { "Java", "Packages", "java", "javax", "org", "com", "edu", "net" };
         for (String prop : dangerous) {
             ScriptableObject.deleteProperty(scope, prop);
         }
+    }
+
+    /**
+     * Attaches all standard script-loading functions to the global scope.
+     * These functions are then available in every pack and every loaded script.
+     */
+    private static void attachStandardFunctions(Scriptable scope) {
+        ScriptableObject.putProperty(scope, "importModule", new ImportModuleFunction());
+        ScriptableObject.putProperty(scope, "loadScript", new LoadScriptFunction());
+        ScriptableObject.putProperty(scope, "includeScript", new IncludeScriptFunction());
+        ScriptableObject.putProperty(scope, "loadFromPack", new LoadFromPackFunction());
+        ScriptableObject.putProperty(scope, "includeFromPack", new IncludeFromPackFunction());
     }
 
     public static Scriptable getGlobalScope() {

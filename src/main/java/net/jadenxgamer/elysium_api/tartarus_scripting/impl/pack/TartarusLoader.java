@@ -3,8 +3,8 @@ package net.jadenxgamer.elysium_api.tartarus_scripting.impl.pack;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.toml.TomlParser;
 import net.jadenxgamer.elysium_api.tartarus_scripting.scripting.TartarusScriptManager;
-import net.jadenxgamer.elysium_api.tartarus_scripting.util.ScriptCallerHelper;
 import net.jadenxgamer.elysium_api.tartarus_scripting.scripting.ScriptSource;
+import net.jadenxgamer.elysium_api.tartarus_scripting.util.CurrentScriptSource;
 import net.minecraft.SharedConstants;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
@@ -267,11 +267,12 @@ public final class TartarusLoader {
         try {
             Scriptable globalScope = TartarusScriptManager.getGlobalScope();
             Scriptable packScope = createChildScope(cx, globalScope);
-            ScriptCallerHelper.attachStandardFunctions(packScope, source);
+            CurrentScriptSource.set(source);
             cx.evaluateReader(packScope, mainScriptReader, packName + "/" + MAIN_SCRIPT, SCRIPT_LINE_NUMBER, null);
         } catch (IOException e) {
             throw new RuntimeException("Failed to evaluate pack: " + packName, e);
         } finally {
+            CurrentScriptSource.clear();
             Context.exit();
         }
     }
