@@ -22,7 +22,7 @@ public class GameRendererMixin {
     @Inject(method = "render",
             at = @At(value = "NEW", target = "(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)Lnet/minecraft/client/gui/GuiGraphics;")
     )
-    private void elysium$setupGUILightmap(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
+    private void elysium_api$setupGUILightmap(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
         if (ModList.get().isLoaded("polytone")) return;
         ElysiumAPI.LIGHTMAP_SETTINGS.setupForGUI(true);
         lightTexture.turnOnLightLayer();
@@ -32,7 +32,7 @@ public class GameRendererMixin {
             method = "render",
             at = @At(value = "TAIL")
     )
-    private void elysium$resetGUILightmap(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
+    private void elysium_api$resetGUILightmap(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
         if (ModList.get().isLoaded("polytone")) return;
         ElysiumAPI.LIGHTMAP_SETTINGS.setupForGUI(false);
         lightTexture.turnOnLightLayer();

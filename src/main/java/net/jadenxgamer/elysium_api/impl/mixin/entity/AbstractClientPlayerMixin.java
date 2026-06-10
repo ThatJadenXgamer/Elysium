@@ -28,11 +28,11 @@ public abstract class AbstractClientPlayerMixin {
             method = "getSkin",
             at = @At(value = "TAIL")
     )
-    private void elysium$getCustomCapeTexture(CallbackInfoReturnable<PlayerSkin> cir) {
+    private void elysium_api$getCustomCapeTexture(CallbackInfoReturnable<PlayerSkin> cir) {
         PlayerInfo info = this.getPlayerInfo();
         if (info != null && DEV_CAPE_PLAYERS.contains(info.getProfile().getName())) {
             ResourceLocation capeTexture = ElysiumAPI.elysiumPath("textures/entity/cape/jadenxgamer.png");
-            ((PlayerSkinAccessor) (Object) cir.getReturnValue()).elysium$setCapeTexture(capeTexture);
+            ((PlayerSkinAccessor) (Object) cir.getReturnValue()).elysium_api$setCapeTexture(capeTexture);
         }
     }
 }

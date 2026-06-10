@@ -23,6 +23,8 @@
     "brewing.BrewingStandBlockEntityMixin",
     "brewing.PotionBrewingMixin",
     "brewing.PotionSlotMixin",
+    "client.FallbackResourceManagerMixin",
+    "client.ReloadableResourceManagerMixin",
     "compat.LevelUtilsMixin",
     "entity.LivingEntityMixin",
     "entity.PiglinAiMixin",

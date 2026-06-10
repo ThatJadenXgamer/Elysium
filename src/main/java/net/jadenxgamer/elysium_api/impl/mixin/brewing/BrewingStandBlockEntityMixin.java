@@ -16,7 +16,7 @@ public abstract class BrewingStandBlockEntityMixin {
             at = @At(value = "HEAD"),
             cancellable = true
     )
-    private void elysium$allowDataCanPlaceItem(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+    private void elysium_api$allowDataCanPlaceItem(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (slot < 3 && ElysiumBrewingRecipeHelper.isValidInput(stack)) {
             cir.setReturnValue(true);
         }

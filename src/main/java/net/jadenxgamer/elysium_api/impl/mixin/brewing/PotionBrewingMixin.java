@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class PotionBrewingMixin {
 
     @ModifyReturnValue(method = "isIngredient", at = @At("RETURN"))
-    private static boolean elysium$isIngredient(boolean original, ItemStack stack) {
+    private static boolean elysium_api$isIngredient(boolean original, ItemStack stack) {
         if (ElysiumBrewingRecipeHelper.isIngredient(stack)) {
             return true;
         }
@@ -19,7 +19,7 @@ public abstract class PotionBrewingMixin {
     }
 
     @ModifyReturnValue(method = "hasMix", at = @At("RETURN"))
-    private static boolean elysium$hasMix(boolean original, ItemStack input, ItemStack ingredient) {
+    private static boolean elysium_api$hasMix(boolean original, ItemStack input, ItemStack ingredient) {
         if (ElysiumBrewingRecipeHelper.hasMix(input, ingredient)) {
             return true;
         }
@@ -27,7 +27,7 @@ public abstract class PotionBrewingMixin {
     }
 
     @ModifyReturnValue(method = "mix", at = @At("RETURN"))
-    private static ItemStack elysium$mix(ItemStack original, ItemStack ingredient, ItemStack input) {
+    private static ItemStack elysium_api$mix(ItemStack original, ItemStack ingredient, ItemStack input) {
         ItemStack result = ElysiumBrewingRecipeHelper.mix(input, ingredient);
         if (!result.isEmpty()) {
             return result;

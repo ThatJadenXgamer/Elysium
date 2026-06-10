@@ -17,7 +17,7 @@ public class PotionSlotMixin {
             at = @At("RETURN"),
             cancellable = true
     )
-    private static void elysium$allowDataMayPlaceItem(PotionBrewing brewing, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+    private static void elysium_api$allowDataMayPlaceItem(PotionBrewing brewing, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (ElysiumBrewingRecipeHelper.isValidInput(stack)) {
             cir.setReturnValue(true);
         }

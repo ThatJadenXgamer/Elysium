@@ -18,7 +18,7 @@ public abstract class BlockBehaviorMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void elysium$soundTransformer(BlockState state, CallbackInfoReturnable<SoundType> cir) {
+    private void elysium_api$soundTransformer(BlockState state, CallbackInfoReturnable<SoundType> cir) {
         RegistryAccessHelper.getServer()
                 .flatMap(access -> access.registryOrThrow(ElysiumRegistries.Keys.BLOCK_SOUND_TRANSFORMERS).stream()
                         .filter(s -> s.blocks().contains(state.getBlockHolder()))

@@ -29,7 +29,7 @@ public abstract class LevelUtilsMixin {
             method = "initializeBiomes",
             at = @At(value = "HEAD")
     )
-    private static void elysium$initializeBiomesFix(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed, CallbackInfo ci) {
+    private static void elysium_api$initializeBiomesFix(RegistryAccess registryAccess, Holder<DimensionType> dimensionType, ResourceKey<LevelStem> levelResourceKey, ChunkGenerator chunkGenerator, long seed, CallbackInfo ci) {
         /*
          * Dear Terrablender developers, why in the flying fuck are your SurfaceRules tied to the MultiNoiseBiomeSource??? 🥀 🥀 🥀
          * Please look into having surface rules globally apply to a dimension even if they aren't MultiNoise, your API isn't exclusively being used for biome distribution,

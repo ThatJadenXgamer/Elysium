@@ -33,6 +33,6 @@ public class ElysiumSurfaceRulesManager {
         else if (dimension.equals(LevelStem.NETHER)) newRules = ElysiumSurfaceRulesManager.getForMergingRules(ElysiumSurfaceRulesManager.NETHER_SURFACE_RULES, originalRules);
         else if (dimension.equals(LevelStem.END)) newRules = ElysiumSurfaceRulesManager.getForMergingRules(ElysiumSurfaceRulesManager.END_SURFACE_RULES, originalRules);
 
-        if (newRules != null) ((NoiseGeneratorSettingsAccessor) (Object) noiseGenerator.settings.value()).elysium$setSurfaceRule(newRules);
+        if (newRules != null) ((NoiseGeneratorSettingsAccessor) (Object) noiseGenerator.settings.value()).elysium_api$setSurfaceRule(newRules);
     }
 }

@@ -22,7 +22,7 @@ public interface IItemExtensionMixin {
             at = @At(value = "HEAD"),
             cancellable = true
     )
-    private void elysium$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+    private void elysium_api$remainderTransformer(ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
         RegistryAccessHelper.getServer()
                 .flatMap(access -> access.registryOrThrow(ElysiumRegistries.Keys.REMAINDER_TRANSFORMERS).stream()
                         .filter(s -> s.items().contains(self().builtInRegistryHolder()))
@@ -41,7 +41,7 @@ public interface IItemExtensionMixin {
             at = @At(value = "HEAD"),
             cancellable = true
     )
-    private void elysium$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+    private void elysium_api$hasRemainderTransformer(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         RegistryAccessHelper.getServer()
                 .flatMap(access -> access.registryOrThrow(ElysiumRegistries.Keys.REMAINDER_TRANSFORMERS).stream()
                         .filter(s -> s.items().contains(self().builtInRegistryHolder()))
