@@ -2,6 +2,8 @@ package net.jadenxgamer.elysium_api.impl.registry;
 
 import com.mojang.serialization.MapCodec;
 import net.jadenxgamer.elysium_api.ElysiumAPI;
+import net.jadenxgamer.elysium_api.api.surface_rules.condition.BiomeTagConditionSource;
+import net.jadenxgamer.elysium_api.api.surface_rules.condition.BlockMatchConditionSource;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
@@ -16,6 +18,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
@@ -39,14 +42,18 @@ public class ElysiumRegistries {
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(BuiltInRegistries.FEATURE, ElysiumAPI.MOD_ID);
     public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPE = DeferredRegister.create(BuiltInRegistries.STRUCTURE_TYPE, ElysiumAPI.MOD_ID);
     public static final DeferredRegister<StructureProcessorType<?>> STRUCTURE_PROCESSOR = DeferredRegister.create(BuiltInRegistries.STRUCTURE_PROCESSOR, ElysiumAPI.MOD_ID);
+    public static final DeferredRegister<MapCodec<? extends SurfaceRules.ConditionSource>> MATERIAL_CONDITIONS = DeferredRegister.create(BuiltInRegistries.MATERIAL_CONDITION, ElysiumAPI.MOD_ID);
 
     public static final Supplier<MapCodec<MosaicBiomeSource>> MOSAIC = BIOME_SOURCES.register("mosaic", () -> MosaicBiomeSource.CODEC);
     public static final Supplier<MapCodec<EffectsBiomeModifier>> EFFECTS_MODIFIER = BIOME_MODIFIERS.register("effects_modifier", () -> EffectsBiomeModifier.CODEC);
     public static final Supplier<Feature<StructureStamp.Config>> STRUCTURE_STAMP = FEATURES.register("structure_stamp", () -> new StructureStamp(StructureStamp.Config.CODEC));
     public static final Supplier<StructureType<MultilayerJigsawStructure>> MULTILAYERED_JIGSAW = STRUCTURE_TYPE.register("multilayered_jigsaw", () -> () -> MultilayerJigsawStructure.CODEC);
     public static final Supplier<StructureProcessorType<ProtectNonReplaceableProcessor>> PROTECT_NON_REPLACEABLE = STRUCTURE_PROCESSOR.register("protect_non_replaceable", () -> () -> ProtectNonReplaceableProcessor.CODEC);
+    public static final Supplier<MapCodec<? extends SurfaceRules.ConditionSource>> BIOME_TAG  = MATERIAL_CONDITIONS.register("biome_tag", BiomeTagConditionSource.CODEC::codec);
+    public static final Supplier<MapCodec<? extends SurfaceRules.ConditionSource>> BLOCK_MATCH  = MATERIAL_CONDITIONS.register("block_match", BlockMatchConditionSource.CODEC::codec);
 
     /**
+     *
      * Elysium Registries (currently nothing)
      */
 
@@ -60,6 +67,7 @@ public class ElysiumRegistries {
         FEATURES.register(eventBus);
         STRUCTURE_TYPE.register(eventBus);
         STRUCTURE_PROCESSOR.register(eventBus);
+        MATERIAL_CONDITIONS.register(eventBus);
     }
 
     public static void registryInit(NewRegistryEvent event) {
