@@ -18,9 +18,8 @@ public class ElysiumSurfaceRulesManager {
     public static SurfaceRules.RuleSource getForMergingRules(List<SurfaceRules.RuleSource> dimensionRules, SurfaceRules.RuleSource originalRules) {
         if (dimensionRules.isEmpty()) return null;
 
-        List<SurfaceRules.RuleSource> combinedRules = new ArrayList<>();
+        List<SurfaceRules.RuleSource> combinedRules = new ArrayList<>(dimensionRules);
         combinedRules.add(originalRules);
-        combinedRules.addAll(dimensionRules);
         return SurfaceRules.sequence(combinedRules.toArray(SurfaceRules.RuleSource[]::new));
     }
 
