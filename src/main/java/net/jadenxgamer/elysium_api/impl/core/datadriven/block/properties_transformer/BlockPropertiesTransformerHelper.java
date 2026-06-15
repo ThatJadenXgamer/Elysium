@@ -1,19 +1,18 @@
 package net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer;
 
+import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.jadenxgamer.elysium_api.impl.util.ConditionalBoolean;
 import net.jadenxgamer.elysium_api.impl.util.ConditionalInt;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -34,15 +33,15 @@ public final class BlockPropertiesTransformerHelper {
 
     @Nullable
     public static BlockPropertiesTransformer getTransformer(ResourceLocation blockId) {
-        if (FMLLoader.getDist().isClient() && ServerLifecycleHooks.getCurrentServer() == null) return null;
+        if (!RegistryAccessHelper.isServerAvailable()) return null;
         return CACHE.computeIfAbsent(blockId, id -> Optional.ofNullable(loadAndMergeTransformers(id))).orElse(null);
     }
 
     private static BlockPropertiesTransformer loadAndMergeTransformers(ResourceLocation blockId) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) return null;
+        Optional<RegistryAccess> registryAccess = RegistryAccessHelper.getServer();
+        if (registryAccess.isEmpty()) return null;
 
-        Registry<BlockPropertiesTransformer> registry = server.registryAccess().registryOrThrow(ElysiumRegistries.Keys.BLOCK_PROPERTIES_TRANSFORMERS);
+        Registry<BlockPropertiesTransformer> registry = registryAccess.get().registryOrThrow(ElysiumRegistries.Keys.BLOCK_PROPERTIES_TRANSFORMERS);
         Optional<Holder.Reference<Block>> blockHolder = BuiltInRegistries.BLOCK.getHolder(ResourceKey.create(Registries.BLOCK, blockId));
         if (blockHolder.isEmpty()) return null;
 
