@@ -25,7 +25,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "getDestroySpeed",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideDestroySpeed(CallbackInfoReturnable<Float> cir) {
@@ -37,7 +37,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "canBeReplaced()Z",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideCanBeReplaced(CallbackInfoReturnable<Boolean> cir) {
@@ -49,7 +49,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "getLightEmission",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideLightEmission(CallbackInfoReturnable<Integer> cir) {
@@ -61,7 +61,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "canOcclude",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideCanOcclude(CallbackInfoReturnable<Boolean> cir) {
@@ -73,7 +73,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "isAir",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIsAir(CallbackInfoReturnable<Boolean> cir) {
@@ -85,7 +85,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "ignitedByLava",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIgnitedByLava(CallbackInfoReturnable<Boolean> cir) {
@@ -97,7 +97,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "getPistonPushReaction",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overridePushReaction(CallbackInfoReturnable<PushReaction> cir) {
@@ -109,7 +109,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "shouldSpawnTerrainParticles",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideSpawnTerrainParticles(CallbackInfoReturnable<Boolean> cir) {
@@ -121,7 +121,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "requiresCorrectToolForDrops",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideRequiresCorrectTool(CallbackInfoReturnable<Boolean> cir) {
@@ -133,7 +133,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "isRandomlyTicking",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideRandomTicking(CallbackInfoReturnable<Boolean> cir) {
@@ -145,7 +145,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "isValidSpawn",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIsValidSpawn(BlockGetter level, BlockPos pos, EntityType<?> entityType, CallbackInfoReturnable<Boolean> cir) {
@@ -157,7 +157,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "isRedstoneConductor",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIsRedstoneConductor(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
@@ -169,7 +169,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "isSuffocating",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIsSuffocating(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
@@ -181,7 +181,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "isViewBlocking",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIsViewBlocking(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
@@ -193,7 +193,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "hasPostProcess",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideHasPostProcess(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
@@ -205,7 +205,7 @@ public abstract class BlockStateBaseMixin {
 
     @Inject(
             method = "emissiveRendering",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideEmissiveRendering(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {

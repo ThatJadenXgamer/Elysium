@@ -20,7 +20,7 @@ public abstract class ItemStackMixin {
 
     @Inject(
             method = "getMaxDamage",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideMaxDamage(CallbackInfoReturnable<Integer> cir) {
@@ -32,7 +32,7 @@ public abstract class ItemStackMixin {
 
     @Inject(
             method = "isDamageableItem",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideIsDamageableItem(CallbackInfoReturnable<Boolean> cir) {
@@ -44,7 +44,7 @@ public abstract class ItemStackMixin {
 
     @Inject(
             method = "getRarity",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideRarity(CallbackInfoReturnable<Rarity> cir) {
@@ -56,7 +56,7 @@ public abstract class ItemStackMixin {
 
     @Inject(
             method = "getMaxStackSize",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideMaxStackSize(CallbackInfoReturnable<Integer> cir) {
@@ -68,7 +68,7 @@ public abstract class ItemStackMixin {
 
     @Inject(
             method = "canBeHurtBy",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideFireResistant(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {

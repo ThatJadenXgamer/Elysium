@@ -17,7 +17,7 @@ public abstract class BlockMixin {
 
     @Inject(
             method = "getFriction",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideFriction(CallbackInfoReturnable<Float> cir) {
@@ -29,7 +29,7 @@ public abstract class BlockMixin {
 
     @Inject(
             method = "getSpeedFactor",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideSpeedFactor(CallbackInfoReturnable<Float> cir) {
@@ -41,7 +41,7 @@ public abstract class BlockMixin {
 
     @Inject(
             method = "getJumpFactor",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideJumpFactor(CallbackInfoReturnable<Float> cir) {
@@ -53,7 +53,7 @@ public abstract class BlockMixin {
 
     @Inject(
             method = "getExplosionResistance",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideExplosionResistance(CallbackInfoReturnable<Float> cir) {

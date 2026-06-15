@@ -17,7 +17,7 @@ public abstract class ItemMixin {
 
     @Inject(
             method = "isRepairable",
-            at = @At("HEAD"),
+            at = @At(value = "HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideCanRepair(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {

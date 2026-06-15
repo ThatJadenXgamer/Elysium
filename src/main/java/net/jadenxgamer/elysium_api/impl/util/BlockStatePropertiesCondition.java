@@ -49,11 +49,11 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         if (first == '!') {
             String target = trimmed.substring(1).trim();
             if (target.length() > 1 && target.charAt(0) == '(' && target.charAt(target.length() - 1) == ')')
-                return new CompiledCondition(Operator.NOT, splitOnPipe(target.substring(1, target.length() - 1)));
+                return new CompiledCondition(Operator.NOT, splitOnOr(target.substring(1, target.length() - 1)));
 
             return new CompiledCondition(Operator.NOT, target);
         }
-        if (trimmed.indexOf('|') != -1) return new CompiledCondition(Operator.OR, splitOnPipe(trimmed));
+        if (trimmed.contains("||")) return new CompiledCondition(Operator.OR, splitOnOr(trimmed));
         if (trimmed.length() >= 2) {
             CompiledCondition numeric = tryParseNumeric(trimmed);
             if (numeric != null) return numeric;
@@ -79,7 +79,7 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         }
     }
 
-    private String[] splitOnPipe(String input) { return input.split("\\|", -1); }
+    private String[] splitOnOr(String input) { return input.split("\\|\\|", -1); }
 
     private boolean checkCondition(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
         return switch (condition.operator) {
