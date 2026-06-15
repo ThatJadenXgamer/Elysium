@@ -20,13 +20,13 @@ public class ClientIConditionContext implements ICondition.IContext {
 
     @Override
     public <T> Map<ResourceLocation, Collection<Holder<T>>> getAllTags(ResourceKey<? extends Registry<T>> registry) {
-        ElysiumAPI.LOGGER.debug("Tag access attempted in client condition context - tags are unsupported for conditional-loaded assets");
+        ElysiumAPI.LOGGER.debug("Tag access attempted in client condition context - tags are unsupported for conditionalProperties-loaded assets");
         return Collections.emptyMap();
     }
 
     @Override
     public <T> Collection<Holder<T>> getTag(TagKey<T> key) {
-        ElysiumAPI.LOGGER.debug("Tag access attempted for {} - tags are unsupported for conditional-loaded assets", key.location());
+        ElysiumAPI.LOGGER.debug("Tag access attempted for {} - tags are unsupported for conditionalProperties-loaded assets", key.location());
         return Set.of();
     }
 }

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 @Mod(ElysiumAPI.MOD_ID)
 public final class ElysiumAPI {
     public static final String MOD_ID = "elysium_api";
-    public static final Logger LOGGER = LoggerFactory.getLogger("Elysium-API");
+    public static final Logger LOGGER = LoggerFactory.getLogger("ElysiumAPI");
     public static final FogSettingsManager FOG_SETTINGS = new FogSettingsManager();
     public static final LightmapSettingsManager LIGHTMAP_SETTINGS = new LightmapSettingsManager();
 

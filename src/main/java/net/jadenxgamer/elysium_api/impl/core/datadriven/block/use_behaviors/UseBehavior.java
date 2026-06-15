@@ -2,6 +2,7 @@ package net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.jadenxgamer.elysium_api.impl.util.BlockStatePropertiesCondition;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.BuiltInRegistries;

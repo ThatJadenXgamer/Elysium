@@ -6,6 +6,7 @@ import net.jadenxgamer.elysium_api.api.surface_rules.condition.BiomeTagCondition
 import net.jadenxgamer.elysium_api.api.surface_rules.condition.BlockMatchConditionSource;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransformer;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer.BlockPropertiesTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.brewing_recipe.ElysiumBrewingRecipe;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
@@ -80,6 +81,7 @@ public class ElysiumRegistries {
         event.dataPackRegistry(Keys.REMAINDER_TRANSFORMERS, RemainderTransformer.CODEC);
         event.dataPackRegistry(Keys.BREWING_RECIPES, ElysiumBrewingRecipe.CODEC, ElysiumBrewingRecipe.CODEC);
         event.dataPackRegistry(Keys.MOSAIC_BIOME_ENTRY, MosaicBiomeEntry.CODEC);
+        event.dataPackRegistry(Keys.BLOCK_PROPERTIES_TRANSFORMERS, BlockPropertiesTransformer.CODEC, BlockPropertiesTransformer.CODEC);
     }
 
     public static final class Keys {
@@ -91,5 +93,6 @@ public class ElysiumRegistries {
         public static final ResourceKey<Registry<RemainderTransformer>> REMAINDER_TRANSFORMERS = key("item/remainder_transformers");
         public static final ResourceKey<Registry<ElysiumBrewingRecipe>> BREWING_RECIPES = key("brewing_recipes");
         public static final ResourceKey<Registry<MosaicBiomeEntry>> MOSAIC_BIOME_ENTRY = key("mosaic_biome_entry");
+        public static final ResourceKey<Registry<BlockPropertiesTransformer>> BLOCK_PROPERTIES_TRANSFORMERS = key("block/properties_transformer");
     }
 }

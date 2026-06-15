@@ -55,6 +55,7 @@ base {
     archivesName = mod_id
 }
 
+
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
@@ -147,6 +148,8 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
+
 
 java {
     withSourcesJar()

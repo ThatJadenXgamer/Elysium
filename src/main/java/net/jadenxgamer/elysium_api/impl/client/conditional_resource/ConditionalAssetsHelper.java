@@ -82,6 +82,6 @@ public final class ConditionalAssetsHelper {
     public static void invalidateCache() {
         CONDITION_CACHE.clear();
         CONDITION_FILE_PRESENCE.clear();
-        if (LOGGER.isDebugEnabled()) LOGGER.debug("Conditional-Loaded Assets cache cleared");
+        LOGGER.debug("Conditional-Loaded Assets cache cleared");
     }
 }

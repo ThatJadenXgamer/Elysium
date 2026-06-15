@@ -4,6 +4,7 @@ import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
 import net.jadenxgamer.elysium_api.impl.core.biome.MosaicBiomeSource;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer.BlockPropertiesTransformerHelper;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehaviorImpl;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
@@ -38,6 +39,7 @@ public class ElysiumEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+        BlockPropertiesTransformerHelper.invalidateCache();
         RegistryAccess registryAccess = event.getServer().registryAccess();
 
         Registry<LevelStem> levelStems = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
