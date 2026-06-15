@@ -9,7 +9,7 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.block.BlockSoundTransfor
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer.BlockPropertiesTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseBehavior;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.brewing_recipe.ElysiumBrewingRecipe;
-import net.jadenxgamer.elysium_api.impl.core.datadriven.item.RemainderTransformer;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.item.properties_transformer.ItemPropertiesTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
 import net.jadenxgamer.elysium_api.impl.core.misc.neoforge.EffectsBiomeModifier;
 import net.jadenxgamer.elysium_api.impl.core.worldgen.feature.StructureStamp;
@@ -78,10 +78,10 @@ public class ElysiumRegistries {
     public static void datapackInit(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(Keys.USE_BEHAVIORS, UseBehavior.CODEC);
         event.dataPackRegistry(Keys.BLOCK_SOUND_TRANSFORMERS, BlockSoundTransformer.CODEC, BlockSoundTransformer.CODEC);
-        event.dataPackRegistry(Keys.REMAINDER_TRANSFORMERS, RemainderTransformer.CODEC);
         event.dataPackRegistry(Keys.BREWING_RECIPES, ElysiumBrewingRecipe.CODEC, ElysiumBrewingRecipe.CODEC);
         event.dataPackRegistry(Keys.MOSAIC_BIOME_ENTRY, MosaicBiomeEntry.CODEC);
         event.dataPackRegistry(Keys.BLOCK_PROPERTIES_TRANSFORMERS, BlockPropertiesTransformer.CODEC, BlockPropertiesTransformer.CODEC);
+        event.dataPackRegistry(Keys.ITEM_PROPERTIES_TRANSFORMERS, ItemPropertiesTransformer.CODEC, ItemPropertiesTransformer.CODEC);
     }
 
     public static final class Keys {
@@ -90,9 +90,9 @@ public class ElysiumRegistries {
         // Data-Driven Registries
         public static final ResourceKey<Registry<UseBehavior>> USE_BEHAVIORS = key("block/use_behaviors");
         public static final ResourceKey<Registry<BlockSoundTransformer>> BLOCK_SOUND_TRANSFORMERS = key("block/sound_transformers");
-        public static final ResourceKey<Registry<RemainderTransformer>> REMAINDER_TRANSFORMERS = key("item/remainder_transformers");
         public static final ResourceKey<Registry<ElysiumBrewingRecipe>> BREWING_RECIPES = key("brewing_recipes");
         public static final ResourceKey<Registry<MosaicBiomeEntry>> MOSAIC_BIOME_ENTRY = key("mosaic_biome_entry");
         public static final ResourceKey<Registry<BlockPropertiesTransformer>> BLOCK_PROPERTIES_TRANSFORMERS = key("block/properties_transformer");
+        public static final ResourceKey<Registry<ItemPropertiesTransformer>> ITEM_PROPERTIES_TRANSFORMERS = key("item/properties_transformer");
     }
 }

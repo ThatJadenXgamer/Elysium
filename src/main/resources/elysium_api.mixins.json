@@ -31,6 +31,8 @@
     "entity.LivingEntityMixin",
     "entity.PiglinAiMixin",
     "item.IItemExtensionMixin",
+    "item.ItemMixin",
+    "item.ItemStackMixin",
     "misc.DecoratedPotPatternsMixin"
   ],
   "injectors": {

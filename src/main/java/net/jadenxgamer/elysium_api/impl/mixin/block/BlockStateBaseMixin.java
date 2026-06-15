@@ -29,8 +29,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideDestroySpeed(CallbackInfoReturnable<Float> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().destroySpeed().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().destroySpeed().get());
         }
@@ -42,8 +41,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideCanBeReplaced(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().canBeReplaced().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().canBeReplaced().get());
         }
@@ -55,8 +53,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideLightEmission(CallbackInfoReturnable<Integer> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().lightEmission().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().lightEmission().get().getValue(asState()));
         }
@@ -68,8 +65,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideCanOcclude(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().canOcclude().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().canOcclude().get());
         }
@@ -81,8 +77,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideIsAir(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().isAir().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().isAir().get());
         }
@@ -94,8 +89,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideIgnitedByLava(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().ignitedByLava().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().ignitedByLava().get());
         }
@@ -107,8 +101,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overridePushReaction(CallbackInfoReturnable<PushReaction> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().pushReaction().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().pushReaction().get().toPushReaction());
         }
@@ -120,8 +113,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideSpawnTerrainParticles(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().spawnTerrainParticles().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().spawnTerrainParticles().get());
         }
@@ -133,8 +125,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideRequiresCorrectTool(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().requiresCorrectToolForDrops().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().requiresCorrectToolForDrops().get());
         }
@@ -146,8 +137,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideRandomTicking(CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.baseProperties().randomTicking().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().randomTicking().get());
         }
@@ -159,8 +149,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideIsValidSpawn(BlockGetter level, BlockPos pos, EntityType<?> entityType, CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().isValidSpawn().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().isValidSpawn().get().getValue(asState()));
         }
@@ -172,8 +161,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideIsRedstoneConductor(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().isRedstoneConductor().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().isRedstoneConductor().get().getValue(asState()));
         }
@@ -185,8 +173,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideIsSuffocating(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().isSuffocating().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().isSuffocating().get().getValue(asState()));
         }
@@ -198,8 +185,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideIsViewBlocking(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().isViewBlocking().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().isViewBlocking().get().getValue(asState()));
         }
@@ -211,8 +197,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideHasPostProcess(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().hasPostProcess().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().hasPostProcess().get().getValue(asState()));
         }
@@ -224,8 +209,7 @@ public abstract class BlockStateBaseMixin {
             cancellable = true
     )
     private void elysium_api$overrideEmissiveRendering(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        Block block = getBlock();
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(block);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(getBlock());
         if (transformer != null && transformer.conditionalProperties().emissiveRendering().isPresent()) {
             cir.setReturnValue(transformer.conditionalProperties().emissiveRendering().get().getValue(asState()));
         }

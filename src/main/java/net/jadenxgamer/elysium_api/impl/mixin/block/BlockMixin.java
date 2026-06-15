@@ -4,6 +4,7 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transfo
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer.BlockPropertiesTransformerHelper;
 import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -11,14 +12,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Block.class)
 public abstract class BlockMixin {
 
+    @Unique
+    private final Block elysium$self = ((Block) (Object) this);
+
     @Inject(
             method = "getFriction",
             at = @At("HEAD"),
             cancellable = true
     )
     private void elysium_api$overrideFriction(CallbackInfoReturnable<Float> cir) {
-        Block self = (Block) (Object) this;
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(self);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(elysium$self);
         if (transformer != null && transformer.baseProperties().friction().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().friction().get());
         }
@@ -30,8 +33,7 @@ public abstract class BlockMixin {
             cancellable = true
     )
     private void elysium_api$overrideSpeedFactor(CallbackInfoReturnable<Float> cir) {
-        Block self = (Block) (Object) this;
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(self);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(elysium$self);
         if (transformer != null && transformer.baseProperties().speedFactor().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().speedFactor().get());
         }
@@ -43,8 +45,7 @@ public abstract class BlockMixin {
             cancellable = true
     )
     private void elysium_api$overrideJumpFactor(CallbackInfoReturnable<Float> cir) {
-        Block self = (Block) (Object) this;
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(self);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(elysium$self);
         if (transformer != null && transformer.baseProperties().jumpFactor().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().jumpFactor().get());
         }
@@ -56,8 +57,7 @@ public abstract class BlockMixin {
             cancellable = true
     )
     private void elysium_api$overrideExplosionResistance(CallbackInfoReturnable<Float> cir) {
-        Block self = (Block) (Object) this;
-        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(self);
+        BlockPropertiesTransformer transformer = BlockPropertiesTransformerHelper.getTransformer(elysium$self);
         if (transformer != null && transformer.baseProperties().explosionResistance().isPresent()) {
             cir.setReturnValue(transformer.baseProperties().explosionResistance().get());
         }
