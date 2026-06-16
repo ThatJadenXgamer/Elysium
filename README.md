@@ -10,12 +10,12 @@
 
 ![About](https://cdn.modrinth.com/data/cached_images/6964251251f2a081e4dccbb2262d486f09f54d75.png)
 
-Elysium API is a mod designed for Mod Developers and Modpack Creators by providing various tools and features for the more esoteric, overlooked or hardcoded parts of Minecraft; in other words, areas where vanilla behavior is often difficult or impossible to change without invasive workarounds. A few of the things it provides are:
+Elysium-API is a library mod for Minecraft NeoForge 1.21.1. It provides a robust collection of utilities, built-in features, and data-driven systems designed to simplify and expand the modification capabilities for both mod developers and modpack creators.
 
+Elysium's target is to make the game easier to modify by providing tools for the more esoteric, overlooked or hardcoded parts of Minecraft; in other words, areas where vanilla behavior is often difficult or impossible to change without invasive workarounds. A few of the things it provides are:
 * Various useful Java APIs
 * Utility Classes and Methods
 * Data-driven and Resource-driven systems
 * And more!
-
+  
 ![linebreak](https://cdn.modrinth.com/data/cached_images/6a7b4189d580191e8b7254ac5fb37e054f654d9f.png)
-
