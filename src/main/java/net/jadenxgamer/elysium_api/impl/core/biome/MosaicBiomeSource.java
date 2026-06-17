@@ -20,7 +20,6 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -59,20 +58,14 @@ public class MosaicBiomeSource extends BiomeSource {
 
     private volatile boolean isInitialized = false;
     private long worldSeed;
+    private long validClimatesMask = 0L;
 
     private WeightedBiomeList[] climateEntries;
 
     private PerlinNoise[][] warpNoisesX;
     private PerlinNoise[][] warpNoisesZ;
-    private volatile boolean noiseInitialized = false;
 
-    private static final ThreadLocal<Map<Long, Integer>> CLIMATE_RESOLUTION_CACHE =
-            ThreadLocal.withInitial(() -> new LinkedHashMap<>(64, 0.75f, true) {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<Long, Integer> eldest) {
-                    return size() > 256;
-                }
-            });
+    private static final ThreadLocal<ClimateCache> CLIMATE_RESOLUTION_CACHE = ThreadLocal.withInitial(ClimateCache::new);
 
     public MosaicBiomeSource(int gridCellSize, int climateCount, float jitterStrength, boolean avoidDiagonalNeighbors,
                              double distortionStrength, double distortionScale, int warpIterations, int noiseOctaves,
@@ -106,14 +99,25 @@ public class MosaicBiomeSource extends BiomeSource {
         return Stream.empty(); // handled in initialize()
     }
 
-    /**
-     * Lazy-Initialization of entriesByClimate, possibleBiomes and worldSeed since we need RegistryAccess to be present for this.
-     * @see net.jadenxgamer.elysium_api.impl.event.ElysiumEvents#onServerAboutToStart(ServerAboutToStartEvent)
-     */
     public void initialize(long seed, ResourceKey<LevelStem> dimension) {
         if (isInitialized) return;
         this.worldSeed = seed;
 
+        // Initialize Noise
+        RandomSource baseRand = RandomSource.create(worldSeed);
+        warpNoisesX = new PerlinNoise[warpIterations][noiseOctaves];
+        warpNoisesZ = new PerlinNoise[warpIterations][noiseOctaves];
+
+        for (int iteration = 0; iteration < warpIterations; iteration++) {
+            for (int octave = 0; octave < noiseOctaves; octave++) {
+                long octaveSeed = baseRand.nextLong() ^ (iteration * 73421L) ^ (octave * 19381L);
+                RandomSource octaveRandom = RandomSource.create(octaveSeed);
+                warpNoisesX[iteration][octave] = PerlinNoise.create(octaveRandom, 1, DoubleList.of(1.0));
+                warpNoisesZ[iteration][octave] = PerlinNoise.create(octaveRandom, 1, DoubleList.of(1.0));
+            }
+        }
+
+        // Initialize Biome Entries
         WeightedBiomeList[] entriesByClimate = new WeightedBiomeList[climateCount];
         Set<ResourceKey<Biome>> assignedBiomeKeys = new HashSet<>();
 
@@ -136,13 +140,19 @@ public class MosaicBiomeSource extends BiomeSource {
         this.possibleBiomes = Suppliers.memoize(() -> providePossibleBiomes.stream().distinct().collect(ImmutableSet.toImmutableSet()));
 
         boolean hasAnyValidEntry = false;
+        long globalMask = 0L;
+
         for (int i = 0; i < climateCount; i++) {
-            if (entriesByClimate[i] != null && !entriesByClimate[i].isEmpty()) hasAnyValidEntry = true;
-            else entriesByClimate[i] = null;
+            if (entriesByClimate[i] != null && !entriesByClimate[i].isEmpty()) {
+                hasAnyValidEntry = true;
+                globalMask |= (1L << i);
+            } else entriesByClimate[i] = null;
         }
+
         if (!hasAnyValidEntry) throw new IllegalStateException("MosaicBiomeSource for dimension '" + dimension.location() + "' has no entries to populate any of the climate points");
 
         this.climateEntries = entriesByClimate;
+        this.validClimatesMask = globalMask;
         this.isInitialized = true;
 
         ElysiumAPI.LOGGER.info("MosaicBiomeSource successfully initialized for dimension: '{}'", dimension.location());
@@ -151,9 +161,14 @@ public class MosaicBiomeSource extends BiomeSource {
 
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.@NotNull Sampler sampler) {
-        double[] warped = warpPoint(x, z);
-        double wx = warped[0];
-        double wz = warped[1];
+        double wx = x;
+        double wz = z;
+        for (int iteration = 0; iteration < warpIterations; iteration++) {
+            double dx = fractalNoise(warpNoisesX[iteration], wx, wz, distortionScale) * distortionStrength;
+            double dz = fractalNoise(warpNoisesZ[iteration], wx, wz, distortionScale) * distortionStrength;
+            wx += dx;
+            wz += dz;
+        }
         int gridX = Mth.floor(wx / gridCellSize);
         int gridZ = Mth.floor(wz / gridCellSize);
 
@@ -185,27 +200,6 @@ public class MosaicBiomeSource extends BiomeSource {
 
     // NOISE //
 
-    //TODO: Add more noise warping types, right now Mosaic only supports fractional Brownian motion.
-    private void initNoise() {
-        if (noiseInitialized) return;
-        synchronized (this) {
-            if (noiseInitialized) return;
-            RandomSource baseRand = RandomSource.create(worldSeed);
-            warpNoisesX = new PerlinNoise[warpIterations][noiseOctaves];
-            warpNoisesZ = new PerlinNoise[warpIterations][noiseOctaves];
-
-            for (int iter = 0; iter < warpIterations; iter++) {
-                for (int oct = 0; oct < noiseOctaves; oct++) {
-                    long seed = baseRand.nextLong() ^ (iter * 73421L) ^ (oct * 19381L);
-                    RandomSource octaveRand = RandomSource.create(seed);
-                    warpNoisesX[iter][oct] = PerlinNoise.create(octaveRand, 1, DoubleList.of(1.0));
-                    warpNoisesZ[iter][oct] = PerlinNoise.create(octaveRand, 1, DoubleList.of(1.0));
-                }
-            }
-            noiseInitialized = true;
-        }
-    }
-
     private double fractalNoise(PerlinNoise[] noises, double x, double z, double scale) {
         double value = 0.0;
         double amplitude = 1.0;
@@ -218,26 +212,16 @@ public class MosaicBiomeSource extends BiomeSource {
         return value;
     }
 
-    private double[] warpPoint(double x, double z) {
-        initNoise();
-        double wx = x;
-        double wz = z;
-        for (int iter = 0; iter < warpIterations; iter++) {
-            double dx = fractalNoise(warpNoisesX[iter], wx, wz, distortionScale) * distortionStrength;
-            double dz = fractalNoise(warpNoisesZ[iter], wx, wz, distortionScale) * distortionStrength;
-            wx += dx;
-            wz += dz;
-        }
-        return new double[]{wx, wz};
-    }
-
     // CLIMATE SELECTION & AVOIDANCE //
 
     private int resolveClimateForGridCell(int gridX, int gridZ) {
-        long key = packGridCoordinates(gridX, gridZ);
-        Map<Long, Integer> cache = CLIMATE_RESOLUTION_CACHE.get();
-        Integer cached = cache.get(key);
-        if (cached != null) return cached;
+        long cellKey = ((long) gridX << 32) | (gridZ & 0xFFFFFFFFL);
+        long instanceSalt = System.identityHashCode(this);
+        long key = cellKey ^ this.worldSeed ^ (instanceSalt << 32);
+
+        ClimateCache cache = CLIMATE_RESOLUTION_CACHE.get();
+        int cached = cache.get(key);
+        if (cached != -1) return cached;
 
         int result = computeClimateWithAvoidance(gridX, gridZ);
         cache.put(key, result);
@@ -250,89 +234,63 @@ public class MosaicBiomeSource extends BiomeSource {
 
         if (xMod == 0 && zMod == 0) {
             // Even-even: no neighbors to avoid
-            return selectClimateWithAvoidance(gridX, gridZ, new int[0]);
+            return selectClimateWithAvoidance(gridX, gridZ, 0L, 0L);
         } else if (xMod == 1 && zMod == 0) {
             // Horizontal edge cell: avoid left and right
-            int left = resolveClimateForGridCell(gridX - 1, gridZ);
-            int right = resolveClimateForGridCell(gridX + 1, gridZ);
-            return selectClimateWithAvoidance(gridX, gridZ, new int[]{left, right});
+            long mask = toMask(resolveClimateForGridCell(gridX - 1, gridZ)) |
+                    toMask(resolveClimateForGridCell(gridX + 1, gridZ));
+            return selectClimateWithAvoidance(gridX, gridZ, mask, mask);
         } else if (xMod == 0) {
             // Vertical edge cell: avoid top and bottom
-            int top = resolveClimateForGridCell(gridX, gridZ - 1);
-            int bottom = resolveClimateForGridCell(gridX, gridZ + 1);
-            return selectClimateWithAvoidance(gridX, gridZ, new int[]{top, bottom});
+            long mask = toMask(resolveClimateForGridCell(gridX, gridZ - 1)) |
+                    toMask(resolveClimateForGridCell(gridX, gridZ + 1));
+            return selectClimateWithAvoidance(gridX, gridZ, mask, mask);
         } else {
             // Odd-odd (cardinal and diagonal cell)
-            int left = resolveClimateForGridCell(gridX - 1, gridZ);
-            int right = resolveClimateForGridCell(gridX + 1, gridZ);
-            int top = resolveClimateForGridCell(gridX, gridZ - 1);
-            int bottom = resolveClimateForGridCell(gridX, gridZ + 1);
+            long cardinalMask = toMask(resolveClimateForGridCell(gridX - 1, gridZ)) |
+                    toMask(resolveClimateForGridCell(gridX + 1, gridZ)) |
+                    toMask(resolveClimateForGridCell(gridX, gridZ - 1)) |
+                    toMask(resolveClimateForGridCell(gridX, gridZ + 1));
 
             if (avoidDiagonalNeighbors) {
-                int topLeft = resolveClimateForGridCell(gridX - 1, gridZ - 1);
-                int topRight = resolveClimateForGridCell(gridX + 1, gridZ - 1);
-                int bottomLeft = resolveClimateForGridCell(gridX - 1, gridZ + 1);
-                int bottomRight = resolveClimateForGridCell(gridX + 1, gridZ + 1);
-                int[] avoids = {left, right, top, bottom, topLeft, topRight, bottomLeft, bottomRight};
-                return selectClimateWithAvoidance(gridX, gridZ, avoids);
-            } else {
-                return selectClimateWithAvoidance(gridX, gridZ, new int[]{left, right, top, bottom});
-            }
+                long diagonalMask = toMask(resolveClimateForGridCell(gridX - 1, gridZ - 1)) |
+                        toMask(resolveClimateForGridCell(gridX + 1, gridZ - 1)) |
+                        toMask(resolveClimateForGridCell(gridX - 1, gridZ + 1)) |
+                        toMask(resolveClimateForGridCell(gridX + 1, gridZ + 1));
+
+                long forbiddenMask = cardinalMask | diagonalMask;
+                return selectClimateWithAvoidance(gridX, gridZ, forbiddenMask, cardinalMask);
+            } else return selectClimateWithAvoidance(gridX, gridZ, cardinalMask, cardinalMask);
         }
     }
 
-    private static long packGridCoordinates(int gridX, int gridZ) {
-        return ((long) gridX << 32) | (gridZ & 0xFFFFFFFFL);
+    private long toMask(int climate) {
+        return (climate >= 0 && climate < climateCount) ? (1L << climate) : 0L;
     }
 
-    /**
-     * Chooses a climate index for the given grid cell while trying to avoid specified indices.
-     * Fallback behavior:
-     * 1. Avoid all provided indices.
-     * 2. If no climate is left, avoid only the first 4 indices (cardinal directions) if available.
-     * 3. If still none, avoid nothing (select any climate that has biome entries).
-     */
-    private int selectClimateWithAvoidance(int gridX, int gridZ, int[] avoids) {
+    private int selectClimateWithAvoidance(int gridX, int gridZ, long forbiddenMask, long cardinalMask) {
         long hash = this.worldSeed + gridX * 1234567L + gridZ * 7654321L;
         hash = (hash ^ (hash >> 16)) * 0x85ebca6bL;
-        long forbiddenMask = 0L;
-        for (int a : avoids) if (a >= 0 && a < this.climateCount) forbiddenMask |= (1L << a); // is it even standard to format code this way? ehhhhh whatever, I like it compact
 
         // Try avoiding all given indices
-        int[] available = buildAvailableClimateIndices(forbiddenMask);
-        if (available.length > 0) return pickClimateFromAvailable(hash, available);
+        long availableMask = ~forbiddenMask & this.validClimatesMask;
+        if (availableMask != 0L) return pickClimateFromMask(hash, availableMask);
 
-        // Fallback: avoid only the first 4 indices (cardinal directions)
-        if (avoids.length >= 4) {
-            long cardinalMask = 0L;
-            for (int i = 0; i < 4; i++) {
-                int a = avoids[i];
-                if (a >= 0 && a < this.climateCount) cardinalMask |= (1L << a);
-            }
-            available = buildAvailableClimateIndices(cardinalMask);
-            if (available.length > 0) return pickClimateFromAvailable(hash, available);
-        }
+        // Fallback: avoid only cardinal directions
+        long cardinalAvailableMask = ~cardinalMask & this.validClimatesMask;
+        if (cardinalAvailableMask != 0L) return pickClimateFromMask(hash, cardinalAvailableMask);
 
         // Final Fallback: avoid nothing
-        available = buildAvailableClimateIndices(0L);
-        return pickClimateFromAvailable(hash, available);
+        return pickClimateFromMask(hash, this.validClimatesMask);
     }
 
-    private int[] buildAvailableClimateIndices(long forbiddenMask) {
-        int[] temp = new int[this.climateCount];
-        int count = 0;
-        for (int i = 0; i < this.climateCount; i++) {
-            boolean isForbidden = (forbiddenMask & (1L << i)) != 0;
-            if (!isForbidden && climateEntries[i] != null) {
-                temp[count++] = i;
-            }
-        }
-        return Arrays.copyOf(temp, count);
-    }
+    private int pickClimateFromMask(long hash, long mask) {
+        int count = Long.bitCount(mask);
+        int target = (int) ((hash & Long.MAX_VALUE) % count);
 
-    private int pickClimateFromAvailable(long hash, int[] available) {
-        int index = (int) ((hash & Long.MAX_VALUE) % available.length);
-        return available[index];
+        long tempMask = mask;
+        for (int i = 0; i < target; i++) tempMask &= tempMask - 1;
+        return Long.numberOfTrailingZeros(tempMask);
     }
 
     // CALCULATIONS & SELECTIONS //
@@ -416,4 +374,35 @@ public class MosaicBiomeSource extends BiomeSource {
     }
 
     private record BiomeEntry(Holder<Biome> biome, int weight) {}
+
+    // CACHE //
+
+    private static class ClimateCache {
+        private static final int CAPACITY = 4096;
+        private static final int MASK = CAPACITY - 1;
+        private final long[] keys = new long[CAPACITY];
+        private final int[] values = new int[CAPACITY];
+
+        public ClimateCache() {
+            Arrays.fill(keys, Long.MIN_VALUE);
+        }
+
+        public int get(long key) {
+            long h = key ^ (key >>> 32);
+            h ^= (h >>> 16);
+            int idx = (int) (h & MASK);
+
+            if (keys[idx] == key) return values[idx];
+            return -1;
+        }
+
+        public void put(long key, int value) {
+            long h = key ^ (key >>> 32);
+            h ^= (h >>> 16);
+            int idx = (int) (h & MASK);
+
+            keys[idx] = key;
+            values[idx] = value;
+        }
+    }
 }
