@@ -11,6 +11,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -72,7 +74,8 @@ public class StructureStamp extends Feature<StructureStamp.Config> {
             default -> placementPos = origin; // CORNER
         }
 
-        placementPos = placementPos.offset(0, config.originOffset(), 0);
+        int offset = config.originOffset().sample(random);
+        placementPos = placementPos.offset(0, offset, 0);
 
         StructurePlaceSettings settings = new StructurePlaceSettings()
                 .setRotation(rotation)
@@ -97,8 +100,10 @@ public class StructureStamp extends Feature<StructureStamp.Config> {
         return null;
     }
 
-    public record Config(WeightedRandomList<WeightedEntry.Wrapper<ResourceLocation>> templates, Optional<HolderSet<Block>> canPlaceOn, Holder<StructureProcessorList> processors,
-                         Optional<Rotation> rotation, LiquidSettings liquidSettings, OriginType originType, int originOffset) implements FeatureConfiguration {
+    public record Config(
+            WeightedRandomList<WeightedEntry.Wrapper<ResourceLocation>> templates, Optional<HolderSet<Block>> canPlaceOn, Holder<StructureProcessorList> processors,
+            Optional<Rotation> rotation, LiquidSettings liquidSettings, OriginType originType, IntProvider originOffset
+    ) implements FeatureConfiguration {
 
         public static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 WeightedRandomList.codec(WeightedEntry.Wrapper.codec(ResourceLocation.CODEC)).fieldOf("templates").forGetter(Config::templates),
@@ -107,7 +112,7 @@ public class StructureStamp extends Feature<StructureStamp.Config> {
                 Rotation.CODEC.optionalFieldOf("rotation").forGetter(Config::rotation),
                 LiquidSettings.CODEC.fieldOf("liquid_settings").orElse(LiquidSettings.APPLY_WATERLOGGING).forGetter(Config::liquidSettings),
                 OriginType.CODEC.optionalFieldOf("origin_type", OriginType.CORNER).forGetter(Config::originType),
-                Codec.INT.optionalFieldOf("origin_offset", 0).forGetter(Config::originOffset)
+                IntProvider.CODEC.optionalFieldOf("origin_offset", ConstantInt.of(0)).forGetter(Config::originOffset)
         ).apply(instance, Config::new));
     }
 
