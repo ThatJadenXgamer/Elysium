@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LightTexture.class)
-public class LightTextureMixin {
+public abstract class LightTextureMixin {
 
     @Unique
     private static final Vector3f elysium_api$skyMultiplier = new Vector3f(1.0f, 1.0f, 1.0f);

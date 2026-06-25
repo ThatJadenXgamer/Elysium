@@ -62,6 +62,7 @@ public class ElysiumClientEvents {
         if (event.hasPermissions() && event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.insertAfter(Items.DEBUG_STICK.getDefaultInstance(), ElysiumItems.PANORAMA_CAMERA.get().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             event.insertAfter(Items.JIGSAW.getDefaultInstance(), ElysiumItems.STRUCTURE_STAMP_ANCHOR.get().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.insertAfter(Items.BARRIER.getDefaultInstance(), ElysiumItems.MOB_BARRIER.get().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         }
     }
 

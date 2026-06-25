@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 @Mixin(ReloadableResourceManager.class)
-public class ReloadableResourceManagerMixin {
+public abstract class ReloadableResourceManagerMixin {
 
     @Inject(method = "createReload", at = @At("HEAD"))
     private void onReloadStart(Executor backgroundExecutor, Executor gameExecutor, CompletableFuture<Unit> waitingFor, List<PackResources> resourcePacks, CallbackInfoReturnable<ReloadInstance> cir) {

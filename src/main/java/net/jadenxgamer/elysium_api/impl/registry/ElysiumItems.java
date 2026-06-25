@@ -22,6 +22,9 @@ public class ElysiumItems {
     public static final Supplier<Item> STRUCTURE_STAMP_ANCHOR = ITEMS.register("structure_stamp_anchor", () ->
             new GameMasterBlockItem(ElysiumBlocks.STRUCTURE_STAMP_ANCHOR.get(), new Item.Properties().rarity(Rarity.EPIC)));
 
+    public static final Supplier<Item> MOB_BARRIER = ITEMS.register("mob_barrier", () ->
+            new GameMasterBlockItem(ElysiumBlocks.MOB_BARRIER.get(), new Item.Properties().rarity(Rarity.EPIC)));
+
     public static void init(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
