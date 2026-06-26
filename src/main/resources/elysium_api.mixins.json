@@ -33,7 +33,9 @@
     "item.IItemExtensionMixin",
     "item.ItemMixin",
     "item.ItemStackMixin",
-    "misc.DecoratedPotPatternsMixin"
+    "misc.DecoratedPotPatternsMixin",
+    "misc.JigsawReplacementProcessorMixin",
+    "misc.StructureTemplateMixin"
   ],
   "injectors": {
     "defaultRequire": 1

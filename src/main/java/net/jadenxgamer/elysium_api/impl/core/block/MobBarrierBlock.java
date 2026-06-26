@@ -44,7 +44,7 @@ public class MobBarrierBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return context.isHoldingItem(ElysiumItems.MOB_BARRIER.get()) ? Shapes.block() : Shapes.empty();
+        return context.isHoldingItem(ElysiumBlocks.MOB_BARRIER.get().asItem()) ? Shapes.block() : Shapes.empty();
     }
 
     @Override
