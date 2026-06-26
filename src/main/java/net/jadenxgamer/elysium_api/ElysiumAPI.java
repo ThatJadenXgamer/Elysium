@@ -1,9 +1,7 @@
 package net.jadenxgamer.elysium_api;
 
-import com.mojang.logging.LogUtils;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.fog_settings.FogSettingsManager;
 import net.jadenxgamer.elysium_api.impl.client.assetdriven.lightmap_settings.LightmapSettingsManager;
-import net.jadenxgamer.elysium_api.impl.config.ElysiumConfig;
 import net.jadenxgamer.elysium_api.impl.config.ElysiumConfigImpl;
 import net.jadenxgamer.elysium_api.impl.registry.*;
 import net.minecraft.resources.ResourceLocation;

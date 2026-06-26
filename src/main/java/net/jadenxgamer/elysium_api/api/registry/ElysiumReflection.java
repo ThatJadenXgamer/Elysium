@@ -1,4 +1,4 @@
-package net.jadenxgamer.elysium_api.api.reflection;
+package net.jadenxgamer.elysium_api.api.registry;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.Item;
