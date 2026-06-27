@@ -1,5 +1,6 @@
 package net.jadenxgamer.elysium_api.impl.mixin.block;
 
+import net.jadenxgamer.elysium_api.api.extensions.IElysiumBlockExtension;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer.BlockPropertiesTransformer;
 import net.jadenxgamer.elysium_api.impl.core.datadriven.block.properties_transformer.BlockPropertiesTransformerHelper;
 import net.minecraft.world.level.block.Block;
@@ -10,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Block.class)
-public abstract class BlockMixin {
+public abstract class BlockMixin implements IElysiumBlockExtension {
 
     @Unique
     private final Block elysium$self = ((Block) (Object) this);
