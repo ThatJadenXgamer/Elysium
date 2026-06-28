@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
 import java.util.Optional;
 
 public record UseBehavior(HolderSet<Block> blocks, Optional<BlockStatePropertiesCondition> blockstateCondition, HolderSet<Item> itemCondition, int chanceToFail, Behavior behavior) {
@@ -27,7 +28,8 @@ public record UseBehavior(HolderSet<Block> blocks, Optional<BlockStateProperties
     public record Behavior(UseBehaviorTypeEnum type, Optional<BlockState> block,
                            Optional<ResourceLocation> item, int itemCount, Optional<ResourceLocation> feature,
                            PosEnum pos, int posOffset, AfterUseItemEnum afterUseItem, boolean canReplace, boolean breakParticles,
-                           Optional<Sounds> sounds, Optional<Particles> particles) {
+                           Optional<Sounds> sounds, Optional<Particles> particles,
+                           Optional<List<String>> copyProperties) {
         public static final Codec<Behavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 UseBehaviorTypeEnum.CODEC.optionalFieldOf("type", UseBehaviorTypeEnum.PLACE).forGetter(Behavior::type),
                 BlockState.CODEC.optionalFieldOf("blockstate").forGetter(Behavior::block),
@@ -40,7 +42,8 @@ public record UseBehavior(HolderSet<Block> blocks, Optional<BlockStateProperties
                 Codec.BOOL.optionalFieldOf("can_replace_solids", false).forGetter(Behavior::canReplace),
                 Codec.BOOL.optionalFieldOf("break_particles", false).forGetter(Behavior::breakParticles),
                 Sounds.CODEC.optionalFieldOf("sounds").forGetter(Behavior::sounds),
-                Particles.CODEC.optionalFieldOf("particles").forGetter(Behavior::particles)
+                Particles.CODEC.optionalFieldOf("particles").forGetter(Behavior::particles),
+                Codec.list(Codec.STRING).optionalFieldOf("copy_properties").forGetter(Behavior::copyProperties)
         ).apply(instance, Behavior::new));
     }
 

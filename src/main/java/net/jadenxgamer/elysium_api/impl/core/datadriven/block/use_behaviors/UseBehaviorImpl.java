@@ -22,9 +22,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UseBehaviorImpl {
@@ -67,8 +69,8 @@ public class UseBehaviorImpl {
         }
 
         switch (registry.behavior().type()) {
-            case PLACE -> placeBlock(level, pos, registry.behavior().block().get(), event); // Places a Block
-            case PLACE_ITSELF -> placeBlock(level, pos, state, event); // Places a Block of itself
+            case PLACE -> placeBlock(level, pos, state, registry.behavior().block().get(), registry.behavior(), event); // Places a Block
+            case PLACE_ITSELF -> placeBlock(level, pos, state, state, registry.behavior(), event); // Places a Block of itself
             case DROP -> dropStack(level, pos, event.getFace(), registry.behavior().item().get(), registry.behavior().itemCount()); // Drops a Stack
             case DROP_ITSELF -> dropStack(level, pos, event.getFace(), BuiltInRegistries.BLOCK.getKey(state.getBlock()), registry.behavior().itemCount()); // Drops a Stack of itself
             case FEATURE -> placeFeature(level, pos, registry.behavior().feature().get()); // Places a PlacedFeature
@@ -80,11 +82,24 @@ public class UseBehaviorImpl {
         event.setCanceled(true);
     }
 
-    private static void placeBlock(Level level, BlockPos pos, BlockState state, PlayerInteractEvent.RightClickBlock event) {
-        if (state != null && ((BlockAccessor) state.getBlock()).elysium_api$canSurvive(state, level, pos)) {
-            level.setBlock(pos, state, Block.UPDATE_ALL);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void placeBlock(Level level, BlockPos pos, BlockState originalState, BlockState newState, UseBehavior.Behavior behavior, PlayerInteractEvent.RightClickBlock event) {
+        if (newState == null) return;
+        BlockState finalState = newState;
+        Optional<List<String>> copyProperties = behavior.copyProperties();
+        if (copyProperties.isPresent()) {
+            List<String> propertyNames = copyProperties.get();
+            for (Property property : originalState.getProperties()) {
+                if (propertyNames.contains(property.getName()) && newState.hasProperty(property)) {
+                    finalState = finalState.setValue(property, originalState.getValue(property));
+                }
+            }
+        }
+        if (((BlockAccessor) finalState.getBlock()).elysium_api$canSurvive(finalState, level, pos)) {
+            level.setBlock(pos, finalState, Block.UPDATE_ALL);
         }
     }
+
 
     private static void dropStack(Level level, BlockPos pos, Direction direction, ResourceLocation location, int count) {
         Item item = LookupRegistryHelper.getItem(location);
