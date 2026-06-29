@@ -45,7 +45,13 @@ public class UseBehaviorImpl {
                                 && s.itemCondition().contains(stack.getItemHolder()))
                         .findFirst());
 
-        if (level.isClientSide() || useBehavior.isEmpty()) return;
+        if (useBehavior.isEmpty()) return;
+
+        if (level.isClientSide()) {
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
         UseBehavior registry = useBehavior.get();
         BlockPos pos = getPosFromCodec(registry.behavior().pos(), registry.behavior().posOffset(), event);
 
