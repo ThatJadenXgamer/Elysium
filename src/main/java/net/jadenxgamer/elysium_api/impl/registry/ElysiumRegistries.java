@@ -13,6 +13,7 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.item.properties_transfor
 import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
 import net.jadenxgamer.elysium_api.impl.core.misc.neoforge.EffectsBiomeModifier;
 import net.jadenxgamer.elysium_api.impl.core.worldgen.feature.StructureStamp;
+import net.jadenxgamer.elysium_api.impl.core.worldgen.structure.GiantJigsawStructure;
 import net.jadenxgamer.elysium_api.impl.core.worldgen.structure.MultilayerJigsawStructure;
 import net.jadenxgamer.elysium_api.impl.core.worldgen.structure.processor.ProtectNonReplaceableProcessor;
 import net.minecraft.core.Registry;
@@ -49,12 +50,12 @@ public class ElysiumRegistries {
     public static final Supplier<MapCodec<EffectsBiomeModifier>> EFFECTS_MODIFIER = BIOME_MODIFIERS.register("effects_modifier", () -> EffectsBiomeModifier.CODEC);
     public static final Supplier<Feature<StructureStamp.Config>> STRUCTURE_STAMP = FEATURES.register("structure_stamp", () -> new StructureStamp(StructureStamp.Config.CODEC));
     public static final Supplier<StructureType<MultilayerJigsawStructure>> MULTILAYERED_JIGSAW = STRUCTURE_TYPE.register("multilayered_jigsaw", () -> () -> MultilayerJigsawStructure.CODEC);
+    public static final Supplier<StructureType<GiantJigsawStructure>> GIANT_JIGSAW = STRUCTURE_TYPE.register("giant_jigsaw", () -> () -> GiantJigsawStructure.CODEC);
     public static final Supplier<StructureProcessorType<ProtectNonReplaceableProcessor>> PROTECT_NON_REPLACEABLE = STRUCTURE_PROCESSOR.register("protect_non_replaceable", () -> () -> ProtectNonReplaceableProcessor.CODEC);
     public static final Supplier<MapCodec<? extends SurfaceRules.ConditionSource>> BIOME_TAG  = MATERIAL_CONDITIONS.register("biome_tag", BiomeTagConditionSource.CODEC::codec);
     public static final Supplier<MapCodec<? extends SurfaceRules.ConditionSource>> BLOCK_MATCH  = MATERIAL_CONDITIONS.register("block_match", BlockMatchConditionSource.CODEC::codec);
 
     /**
-     *
      * Elysium Registries (currently nothing)
      */
 

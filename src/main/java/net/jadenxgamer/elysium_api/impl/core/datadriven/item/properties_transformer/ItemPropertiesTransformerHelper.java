@@ -7,10 +7,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 
@@ -21,32 +17,30 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ItemPropertiesTransformerHelper {
-    private static final ConcurrentHashMap<ResourceLocation, Optional<ItemPropertiesTransformer>> CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Item, Optional<ItemPropertiesTransformer>> CACHE = new ConcurrentHashMap<>();
 
     @Nullable
     public static ItemPropertiesTransformer getTransformer(Item item) {
-        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
-        return getTransformer(itemId);
-    }
-
-    @Nullable
-    public static ItemPropertiesTransformer getTransformer(ResourceLocation itemId) {
         if (!RegistryAccessHelper.isServerAvailable()) return null;
-        return CACHE.computeIfAbsent(itemId, id -> Optional.ofNullable(loadAndMergeTransformers(id))).orElse(null);
+        Optional<ItemPropertiesTransformer> cached = CACHE.get(item);
+        if (cached != null) return cached.orElse(null);
+
+        Optional<ItemPropertiesTransformer> computed = Optional.ofNullable(loadAndMergeTransformers(item));
+        CACHE.put(item, computed);
+        return computed.orElse(null);
     }
 
-    private static ItemPropertiesTransformer loadAndMergeTransformers(ResourceLocation itemId) {
+    private static ItemPropertiesTransformer loadAndMergeTransformers(Item item) {
         Optional<RegistryAccess> registryAccess = RegistryAccessHelper.getServer();
         if (registryAccess.isEmpty()) return null;
 
         Registry<ItemPropertiesTransformer> registry = registryAccess.get().registryOrThrow(ElysiumRegistries.Keys.ITEM_PROPERTIES_TRANSFORMERS);
-        Optional<Holder.Reference<Item>> itemHolder = BuiltInRegistries.ITEM.getHolder(ResourceKey.create(Registries.ITEM, itemId));
-        if (itemHolder.isEmpty()) return null;
+        Holder<Item> itemHolder = item.builtInRegistryHolder();
 
         List<ItemPropertiesTransformer> applicable = new ArrayList<>();
         for (Holder<ItemPropertiesTransformer> holder : registry.holders().toList()) {
             ItemPropertiesTransformer transformer = holder.value();
-            if (transformer.items().contains(itemHolder.get())) applicable.add(transformer);
+            if (transformer.items().contains(itemHolder)) applicable.add(transformer);
         }
 
         if (applicable.isEmpty()) return null;

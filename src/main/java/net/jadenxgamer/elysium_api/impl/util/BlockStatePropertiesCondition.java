@@ -2,18 +2,66 @@ package net.jadenxgamer.elysium_api.impl.util;
 
 import com.mojang.serialization.Codec;
 import net.jadenxgamer.elysium_api.ElysiumAPI;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public record BlockStatePropertiesCondition(Map<String, String> properties) {
+public final class BlockStatePropertiesCondition {
     public static final Codec<BlockStatePropertiesCondition> CODEC = Codec.unboundedMap(Codec.STRING, Codec.STRING)
             .xmap(BlockStatePropertiesCondition::new, BlockStatePropertiesCondition::properties);
 
-    private static final Map<String, CompiledCondition> CONDITION_CACHE = new ConcurrentHashMap<>();
+    private final Map<String, String> properties;
+    private final List<PrecompiledRule> rules;
+
+    private final ConcurrentHashMap<Block, List<ResolvedRule>> blockCache = new ConcurrentHashMap<>();
+
+    public BlockStatePropertiesCondition(Map<String, String> properties) {
+        this.properties = properties;
+        this.rules = new ArrayList<>(properties.size());
+
+        for (Map.Entry<String, String> entry : properties.entrySet())
+            this.rules.add(new PrecompiledRule(entry.getKey(), compileCondition(entry.getValue())));
+    }
+
+    public Map<String, String> properties() {
+        return this.properties;
+    }
+
+    public boolean matches(BlockState state) {
+        Block block = state.getBlock();
+        List<ResolvedRule> resolved = blockCache.get(block);
+
+        if (resolved == null) {
+            resolved = resolveForBlock(block);
+            blockCache.put(block, resolved);
+        }
+        for (ResolvedRule rule : resolved) {
+            if (rule.property == null) return false;
+
+            Comparable<?> currentValue = state.getValue(rule.property);
+            if (!checkCondition(rule.property, currentValue, rule.condition)) return false;
+        }
+
+        return true;
+    }
+
+    private List<ResolvedRule> resolveForBlock(Block block) {
+        List<ResolvedRule> resolvedRules = new ArrayList<>(rules.size());
+        for (PrecompiledRule rule : rules) {
+            Property<?> property = block.getStateDefinition().getProperty(rule.propertyName);
+            resolvedRules.add(new ResolvedRule(property, rule.condition));
+        }
+        return resolvedRules;
+    }
+
+    private record PrecompiledRule(String propertyName, CompiledCondition condition) {}
+    private record ResolvedRule(Property<?> property, CompiledCondition condition) {}
 
     private enum Operator {
         EXACT_MATCH, NOT, OR, GREATER_THAN, LESS_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL
@@ -31,18 +79,8 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         }
     }
 
-    public boolean matches(BlockState state) {
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            Property<?> property = state.getBlock().getStateDefinition().getProperty(entry.getKey());
-            if (property == null) return false;
-            Comparable<?> currentValue = state.getValue(property);
-            CompiledCondition condition = CONDITION_CACHE.computeIfAbsent(entry.getValue(), this::compileCondition);
-            if (!checkCondition(property, currentValue, condition)) return false;
-        }
-        return true;
-    }
 
-    private CompiledCondition compileCondition(String conditionValue) {
+    private static CompiledCondition compileCondition(String conditionValue) {
         String trimmed = conditionValue.trim();
         if (trimmed.isEmpty()) return new CompiledCondition(Operator.EXACT_MATCH, "");
         char first = trimmed.charAt(0);
@@ -61,7 +99,7 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         return new CompiledCondition(Operator.EXACT_MATCH, trimmed);
     }
 
-    private CompiledCondition tryParseNumeric(String s) {
+    private static CompiledCondition tryParseNumeric(String s) {
         Operator op = null;
         int startIdx = -1;
         if (s.startsWith(">=")) { op = Operator.GREATER_THAN_OR_EQUAL; startIdx = 2; }
@@ -79,9 +117,9 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         }
     }
 
-    private String[] splitOnOr(String input) { return input.split("\\|\\|", -1); }
+    private static String[] splitOnOr(String input) { return input.split("\\|\\|", -1); }
 
-    private boolean checkCondition(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
+    private static boolean checkCondition(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
         return switch (condition.operator) {
             case NOT -> handleNot(property, currentValue, condition);
             case OR -> handleOr(property, currentValue, condition);
@@ -90,7 +128,7 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         };
     }
 
-    private boolean handleNot(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
+    private static boolean handleNot(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
         String[] values = condition.values;
         if (values.length > 1) {
             for (String value : values) if (compareValues(property, currentValue, value)) return false;
@@ -99,12 +137,12 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         return !compareValues(property, currentValue, values[0]);
     }
 
-    private boolean handleOr(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
+    private static boolean handleOr(Property<?> property, Comparable<?> currentValue, CompiledCondition condition) {
         for (String value : condition.values) if (compareValues(property, currentValue, value)) return true;
         return false;
     }
 
-    private boolean handleNumeric(Comparable<?> currentValue, CompiledCondition condition) {
+    private static boolean handleNumeric(Comparable<?> currentValue, CompiledCondition condition) {
         if (!(currentValue instanceof Number currentNum)) return false;
         double current = currentNum.doubleValue();
         double target = condition.numericValue;
@@ -117,7 +155,7 @@ public record BlockStatePropertiesCondition(Map<String, String> properties) {
         };
     }
 
-    private boolean compareValues(Property<?> property, Comparable<?> currentValue, String conditionValue) {
+    private static boolean compareValues(Property<?> property, Comparable<?> currentValue, String conditionValue) {
         Optional<?> parsed = property.getValue(conditionValue);
         return parsed.map(currentValue::equals).orElseGet(() -> currentValue.toString().equals(conditionValue));
     }

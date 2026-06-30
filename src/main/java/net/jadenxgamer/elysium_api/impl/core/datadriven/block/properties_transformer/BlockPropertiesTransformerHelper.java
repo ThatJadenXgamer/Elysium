@@ -23,32 +23,30 @@ import java.util.concurrent.ConcurrentHashMap;
 import static net.jadenxgamer.elysium_api.ElysiumAPI.LOGGER;
 
 public final class BlockPropertiesTransformerHelper {
-    private static final ConcurrentHashMap<ResourceLocation, Optional<BlockPropertiesTransformer>> CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Block, Optional<BlockPropertiesTransformer>> CACHE = new ConcurrentHashMap<>();
 
     @Nullable
     public static BlockPropertiesTransformer getTransformer(Block block) {
-        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
-        return getTransformer(blockId);
-    }
-
-    @Nullable
-    public static BlockPropertiesTransformer getTransformer(ResourceLocation blockId) {
         if (!RegistryAccessHelper.isServerAvailable()) return null;
-        return CACHE.computeIfAbsent(blockId, id -> Optional.ofNullable(loadAndMergeTransformers(id))).orElse(null);
+        Optional<BlockPropertiesTransformer> cached = CACHE.get(block);
+        if (cached != null) return cached.orElse(null);
+
+        Optional<BlockPropertiesTransformer> computed = Optional.ofNullable(loadAndMergeTransformers(block));
+        CACHE.put(block, computed);
+        return computed.orElse(null);
     }
 
-    private static BlockPropertiesTransformer loadAndMergeTransformers(ResourceLocation blockId) {
+    private static BlockPropertiesTransformer loadAndMergeTransformers(Block block) {
         Optional<RegistryAccess> registryAccess = RegistryAccessHelper.getServer();
         if (registryAccess.isEmpty()) return null;
 
         Registry<BlockPropertiesTransformer> registry = registryAccess.get().registryOrThrow(ElysiumRegistries.Keys.BLOCK_PROPERTIES_TRANSFORMERS);
-        Optional<Holder.Reference<Block>> blockHolder = BuiltInRegistries.BLOCK.getHolder(ResourceKey.create(Registries.BLOCK, blockId));
-        if (blockHolder.isEmpty()) return null;
+        Holder<Block> blockHolder = block.builtInRegistryHolder();
 
         List<BlockPropertiesTransformer> applicable = new ArrayList<>();
         for (Holder<BlockPropertiesTransformer> holder : registry.holders().toList()) {
             BlockPropertiesTransformer transformer = holder.value();
-            if (transformer.blocks().contains(blockHolder.get())) applicable.add(transformer);
+            if (transformer.blocks().contains(blockHolder)) applicable.add(transformer);
         }
 
         if (applicable.isEmpty()) return null;
