@@ -69,7 +69,7 @@ public class ElysiumEvents {
     }
 
     public static void modifyDefaultAttributes(EntityAttributeModificationEvent event) {
-        event.add(EntityType.PLAYER, ElysiumAttributes.DODGE_POWER);
+
     }
 
     @SubscribeEvent

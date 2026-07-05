@@ -37,10 +37,3 @@ type="required"
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
-
-[[dependencies.${mod_id}]]
-modId = "playeranimator"
-type = "required"
-versionRange = "[${player_anim_version},)"
-ordering = "NONE"
-side = "CLIENT"
