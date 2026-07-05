@@ -12,16 +12,7 @@ public class ElysiumAttributes {
 
     public static final DeferredRegister<Attribute> ATTRIBUTES =DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, ElysiumAPI.MOD_ID);
 
-    public static final Holder<Attribute> DODGE_POWER = ATTRIBUTES.register(
-            "dodge_power", () -> new RangedAttribute(
-                    "attributes.elysium.dodge_power",
-                    1.3d,
-                    0,
-                    10
-            ).setSyncable(true));
-
     public static void init(IEventBus eventBus) {
         ATTRIBUTES.register(eventBus);
     }
-
 }

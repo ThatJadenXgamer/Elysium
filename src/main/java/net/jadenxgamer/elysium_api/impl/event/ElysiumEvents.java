@@ -9,7 +9,6 @@ import net.jadenxgamer.elysium_api.impl.core.datadriven.block.use_behaviors.UseB
 import net.jadenxgamer.elysium_api.impl.core.datadriven.item.properties_transformer.ItemPropertiesTransformerHelper;
 import net.jadenxgamer.elysium_api.impl.core.surface_rules.ElysiumSurfaceRulesManager;
 import net.jadenxgamer.elysium_api.impl.networking.ElysiumPayloads;
-import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttachmentTypes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumAttributes;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Registry;
@@ -61,7 +60,7 @@ public class ElysiumEvents {
 
     @SubscribeEvent
     public static void tickPlayerPre(PlayerTickEvent.Pre event) {
-        event.getEntity().setData(ElysiumAttachmentTypes.COOLDOWN_TICK, event.getEntity().getData(ElysiumAttachmentTypes.COOLDOWN_TICK) + 1);
+
     }
 
     @SubscribeEvent

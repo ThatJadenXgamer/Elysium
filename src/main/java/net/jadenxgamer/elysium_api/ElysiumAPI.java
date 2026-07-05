@@ -24,7 +24,6 @@ public final class ElysiumAPI {
 
         ElysiumRegistries.init(modEventBus);
         ElysiumAttributes.init(modEventBus);
-        ElysiumAttachmentTypes.init(modEventBus);
         ElysiumBlocks.init(modEventBus);
         ElysiumItems.init(modEventBus);
     }

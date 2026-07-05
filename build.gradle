@@ -105,13 +105,6 @@ configurations {
 }
 
 dependencies {
-
-    jarJar(implementation("dev.kosmx.player-anim:player-animation-lib-forge")) {
-        version {
-            prefer player_anim_version
-        }
-    }
-
     compileOnly "curse.maven:terrablender-940057:6054947"
     compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
     //runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")

@@ -3,7 +3,6 @@ package net.jadenxgamer.elysium_api.impl.event;
 import com.mojang.brigadier.CommandDispatcher;
 import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.api.client.screen_flash.ScreenFlash;
-import net.jadenxgamer.elysium_api.impl.client.commands.DodgeRollCommand;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumBlocks;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumItems;
 import net.minecraft.client.Minecraft;
@@ -42,8 +41,6 @@ public class ElysiumClientEvents {
     @SubscribeEvent
     public static void onClientCommandsRegister(RegisterClientCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-
-        DodgeRollCommand.register(dispatcher);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
