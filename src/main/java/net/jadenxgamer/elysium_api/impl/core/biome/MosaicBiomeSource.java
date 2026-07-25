@@ -8,6 +8,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.jadenxgamer.elysium_api.ElysiumAPI;
 import net.jadenxgamer.elysium_api.api.util.RegistryAccessHelper;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.EntryType;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.MosaicBiomeEntry;
+import net.jadenxgamer.elysium_api.impl.core.datadriven.mosaic.SubBiomeBehavior;
 import net.jadenxgamer.elysium_api.impl.registry.ElysiumRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -119,6 +122,8 @@ public class MosaicBiomeSource extends BiomeSource {
 
         // Initialize Biome Entries
         WeightedBiomeList[] entriesByClimate = new WeightedBiomeList[climateCount];
+        Map<ResourceKey<Biome>, BiomeEntry> defaultEntryMap = new HashMap<>();
+        List<MosaicBiomeEntry> subBiomeEntries = new ArrayList<>();
         Set<ResourceKey<Biome>> assignedBiomeKeys = new HashSet<>();
 
         RegistryAccessHelper.getServer()
@@ -128,15 +133,23 @@ public class MosaicBiomeSource extends BiomeSource {
                     if (biomeExclusionTag.isPresent() && entry.biome().is(biomeExclusionTag.get())) return;
                     int climateP = entry.climatePoint();
                     if (climateP < 0 || climateP >= climateCount) return;
-                    if (entriesByClimate[climateP] == null) entriesByClimate[climateP] = new WeightedBiomeList();
-                    entriesByClimate[climateP].add(entry.biome(), entry.weight());
-                    entry.biome().unwrapKey().ifPresent(assignedBiomeKeys::add);
-                }));
 
-        tagProvidedEntries(assignedBiomeKeys, entriesByClimate);
+                    if (entry.type() == EntryType.DEFAULT)
+                        processDefaultEntry(entry, climateP, entriesByClimate, defaultEntryMap, assignedBiomeKeys);
+                    else if (entry.type() == EntryType.SUB_BIOME) subBiomeEntries.add(entry);
+                }));
+        tagProvidedEntries(assignedBiomeKeys, entriesByClimate, defaultEntryMap);
+        for (MosaicBiomeEntry subEntry : subBiomeEntries) processSubBiomeEntry(subEntry, defaultEntryMap);
 
         Set<Holder<Biome>> providePossibleBiomes = new HashSet<>();
-        for (WeightedBiomeList list : entriesByClimate) if (list != null) for (BiomeEntry entry : list.entries) providePossibleBiomes.add(entry.biome);
+        for (WeightedBiomeList biomeList : entriesByClimate) {
+            if (biomeList == null) continue;
+            for (BiomeEntry entry : biomeList.entries) {
+                providePossibleBiomes.add(entry.biome);
+                if (entry.replacements != null) for (SubBiomeReplacement replacement : entry.replacements)
+                    providePossibleBiomes.add(replacement.replacementBiome);
+            }
+        }
         this.possibleBiomes = Suppliers.memoize(() -> providePossibleBiomes.stream().distinct().collect(ImmutableSet.toImmutableSet()));
 
         boolean hasAnyValidEntry = false;
@@ -157,6 +170,34 @@ public class MosaicBiomeSource extends BiomeSource {
 
         ElysiumAPI.LOGGER.info("MosaicBiomeSource successfully initialized for dimension: '{}'", dimension.location());
         ElysiumAPI.LOGGER.debug(buildDebugInfo(seed, dimension, possibleBiomes.get()).toString());
+    }
+
+    private void processDefaultEntry(MosaicBiomeEntry entry, int climatePoint, WeightedBiomeList[] entriesByClimate,
+                                     Map<ResourceKey<Biome>, BiomeEntry> defaultEntryMap,
+                                     Set<ResourceKey<Biome>> assignedBiomeKeys) {
+        ResourceKey<Biome> biomeKey = entry.biome().unwrapKey().orElseThrow(() -> new IllegalStateException("Biome has no key"));
+        if (entriesByClimate[climatePoint] == null) entriesByClimate[climatePoint] = new WeightedBiomeList();
+        BiomeEntry biomeEntry = new BiomeEntry(entry.biome(), entry.weight(), entry.keepWeight(), climatePoint, null);
+        entriesByClimate[climatePoint].add(biomeEntry);
+        defaultEntryMap.put(biomeKey, biomeEntry);
+        assignedBiomeKeys.add(biomeKey);
+    }
+
+    private void processSubBiomeEntry(MosaicBiomeEntry entry, Map<ResourceKey<Biome>, BiomeEntry> defaultEntryMap) {
+        if (biomeExclusionTag.isPresent() && entry.biome().is(biomeExclusionTag.get())) return;
+
+        MosaicBiomeEntry.SubBiomeType subType = entry.subBiomeSettings().orElseThrow(() -> new IllegalStateException("Sub-biome entry missing sub_biome_type"));
+        if (subType.behavior() == SubBiomeBehavior.REPLACE) { // currently only the "replace" behavior is supported. the rest get ignored
+            ResourceKey<Biome> targetKey = ResourceKey.create(Registries.BIOME, subType.replaceBiome());
+            BiomeEntry targetEntry = defaultEntryMap.get(targetKey);
+            if (targetEntry == null) {
+                ElysiumAPI.LOGGER.error("Target biome: {} not found for sub-biome replacement: {}", subType.replaceBiome(), entry.biome().unwrapKey().map(ResourceKey::location).orElse(null));
+                return;
+            }
+            if (targetEntry.climate != entry.climatePoint()) return;
+            if (targetEntry.replacements == null) targetEntry.replacements = new ArrayList<>();
+            targetEntry.replacements.add(new SubBiomeReplacement(entry.biome(), entry.weight()));
+        } else ElysiumAPI.LOGGER.warn("Only \"REPLACE\" sub-biome behavior is supported at the moment.");
     }
 
     @Override
@@ -195,7 +236,8 @@ public class MosaicBiomeSource extends BiomeSource {
             }
         }
 
-        return selectBiomeFromClimateEntry(bestClimate, bestGridX, bestGridZ);
+        BiomeEntry selectedEntry = selectBiomeFromClimateEntry(bestClimate, bestGridX, bestGridZ);
+        return applySubBiomeReplacement(selectedEntry, bestGridX, bestGridZ);
     }
 
     // NOISE //
@@ -304,7 +346,7 @@ public class MosaicBiomeSource extends BiomeSource {
         return (value - 0.5) * jitterRange;
     }
 
-    private Holder<Biome> selectBiomeFromClimateEntry(int climate, int gridX, int gridZ) {
+    private BiomeEntry selectBiomeFromClimateEntry(int climate, int gridX, int gridZ) {
         WeightedBiomeList list = climateEntries[climate];
         long hash = this.worldSeed + gridX * 98765L + gridZ * 54321L;
         hash = (hash ^ (hash >> 16)) * 0x85ebca6bL;
@@ -313,10 +355,30 @@ public class MosaicBiomeSource extends BiomeSource {
 
         for (BiomeEntry entry : list.entries) {
             roll -= entry.weight;
-            if (roll < 0) return entry.biome;
+            if (roll < 0) return entry;
         }
 
-        return list.entries.getLast().biome;
+        return list.entries.getLast();
+    }
+
+    private Holder<Biome> applySubBiomeReplacement(BiomeEntry selectedEntry, int gridX, int gridZ) {
+        if (selectedEntry.replacements == null || selectedEntry.replacements.isEmpty()) return selectedEntry.biome;
+
+        int keepWeight = selectedEntry.keepWeight;
+        int totalWeight = keepWeight;
+        for (SubBiomeReplacement replacement : selectedEntry.replacements) totalWeight += replacement.weight;
+
+        long hash = this.worldSeed + gridX * 1234567L + gridZ * 7654321L + selectedEntry.biome.unwrapKey().get().location().hashCode() * 17L;
+        hash = (hash ^ (hash >> 16)) * 0x85ebca6bL;
+        int roll = (int) ((hash & Long.MAX_VALUE) % totalWeight);
+
+        if (roll < keepWeight) return selectedEntry.biome;
+        roll -= keepWeight;
+        for (SubBiomeReplacement repl : selectedEntry.replacements) {
+            roll -= repl.weight;
+            if (roll < 0) return repl.replacementBiome;
+        }
+        return selectedEntry.biome;
     }
 
     // DEBUG //
@@ -339,7 +401,9 @@ public class MosaicBiomeSource extends BiomeSource {
 
     // HELPERS //
 
-    private void tagProvidedEntries(Set<ResourceKey<Biome>> assignedBiomeKeys, WeightedBiomeList[] entriesByClimate) {
+    private void tagProvidedEntries(Set<ResourceKey<Biome>> assignedBiomeKeys,
+                                    WeightedBiomeList[] entriesByClimate,
+                                    Map<ResourceKey<Biome>, BiomeEntry> defaultEntryMap) {
         if (autoPopulateEntriesFromTag.isEmpty()) return;
         RegistryAccessHelper.getServer()
                 .flatMap(access -> access.registry(Registries.BIOME))
@@ -352,8 +416,10 @@ public class MosaicBiomeSource extends BiomeSource {
                                 int weight = (list == null) ? 1 : Math.max(1, list.totalWeight / list.entries.size());
 
                                 if (list == null) entriesByClimate[climate] = list = new WeightedBiomeList();
-                                list.add(holder, weight);
+                                BiomeEntry newEntry = new BiomeEntry(holder, weight, 50, climate, null);
+                                list.add(newEntry);
                                 assignedBiomeKeys.add(key);
+                                defaultEntryMap.put(key, newEntry);
                             }
                         }))
                 );
@@ -363,9 +429,9 @@ public class MosaicBiomeSource extends BiomeSource {
         final List<BiomeEntry> entries = new ArrayList<>();
         int totalWeight = 0;
 
-        void add(Holder<Biome> biome, int weight) {
-            entries.add(new BiomeEntry(biome, weight));
-            totalWeight += weight;
+        void add(BiomeEntry entry) {
+            entries.add(entry);
+            totalWeight += entry.weight;
         }
 
         boolean isEmpty() {
@@ -373,7 +439,23 @@ public class MosaicBiomeSource extends BiomeSource {
         }
     }
 
-    private record BiomeEntry(Holder<Biome> biome, int weight) {}
+    private static class BiomeEntry {
+        final Holder<Biome> biome;
+        final int weight;
+        final int keepWeight;
+        final int climate;
+        List<SubBiomeReplacement> replacements;
+
+        BiomeEntry(Holder<Biome> biome, int weight, int keepWeight, int climate, List<SubBiomeReplacement> replacements) {
+            this.biome = biome;
+            this.weight = weight;
+            this.keepWeight = keepWeight;
+            this.climate = climate;
+            this.replacements = replacements;
+        }
+    }
+
+    private record SubBiomeReplacement(Holder<Biome> replacementBiome, int weight) {}
 
     // CACHE //
 
