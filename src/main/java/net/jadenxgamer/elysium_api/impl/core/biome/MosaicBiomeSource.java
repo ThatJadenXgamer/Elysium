@@ -368,9 +368,16 @@ public class MosaicBiomeSource extends BiomeSource {
         int totalWeight = keepWeight;
         for (SubBiomeReplacement replacement : selectedEntry.replacements) totalWeight += replacement.weight;
 
-        long hash = this.worldSeed + gridX * 1234567L + gridZ * 7654321L + selectedEntry.biome.unwrapKey().get().location().hashCode() * 17L;
-        hash = (hash ^ (hash >> 16)) * 0x85ebca6bL;
-        int roll = (int) ((hash & Long.MAX_VALUE) % totalWeight);
+        long cellSeed = this.worldSeed;
+        cellSeed = cellSeed * 6364136223846793005L + 1442695040888963407L;
+        cellSeed += (long) gridX * 374761393L;
+        cellSeed = cellSeed * 6364136223846793005L + 1442695040888963407L;
+        cellSeed += (long) gridZ * 668265263L;
+
+        int biomeHash = selectedEntry.biome.unwrapKey().map(key -> key.location().hashCode()).orElse(0);
+        cellSeed ^= biomeHash;
+        RandomSource random = RandomSource.create(cellSeed);
+        int roll = random.nextInt(totalWeight);
 
         if (roll < keepWeight) return selectedEntry.biome;
         roll -= keepWeight;
@@ -378,6 +385,7 @@ public class MosaicBiomeSource extends BiomeSource {
             roll -= repl.weight;
             if (roll < 0) return repl.replacementBiome;
         }
+
         return selectedEntry.biome;
     }
 

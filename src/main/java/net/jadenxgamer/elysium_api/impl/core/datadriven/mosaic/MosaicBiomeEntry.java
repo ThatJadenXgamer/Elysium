@@ -19,7 +19,7 @@ public record MosaicBiomeEntry(
             Codec.INT.fieldOf("climate_point").forGetter(MosaicBiomeEntry::climatePoint),
             Biome.CODEC.fieldOf("biome").forGetter(MosaicBiomeEntry::biome),
             Codec.INT.fieldOf("weight").forGetter(MosaicBiomeEntry::weight),
-            Codec.INT.optionalFieldOf("keep_weight", 50).forGetter(MosaicBiomeEntry::keepWeight),
+            Codec.INT.optionalFieldOf("keep_weight", 80).forGetter(MosaicBiomeEntry::keepWeight),
             SubBiomeType.CODEC.optionalFieldOf("sub_biome_settings").forGetter(MosaicBiomeEntry::subBiomeSettings)
     ).apply(instance, MosaicBiomeEntry::new));
 
