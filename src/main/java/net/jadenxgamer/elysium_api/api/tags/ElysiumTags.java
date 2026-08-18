@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 
 public class ElysiumTags {
@@ -35,6 +36,14 @@ public class ElysiumTags {
 
         private static TagKey<DamageType> createDamageTypeTag(String name) {
             return TagKey.create(Registries.DAMAGE_TYPE, ElysiumAPI.elysiumPath(name));
+        }
+    }
+
+    public static class Enchantments {
+        public static final TagKey<Enchantment> DISABLED = createEnchantmentTag("disabled"); // Completely disables the enchantment from appearing anywhere
+
+        private static TagKey<Enchantment> createEnchantmentTag(String name) {
+            return TagKey.create(Registries.ENCHANTMENT, ElysiumAPI.elysiumPath(name));
         }
     }
 }
