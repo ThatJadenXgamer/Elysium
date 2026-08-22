@@ -134,9 +134,12 @@ public class MosaicBiomeSource extends BiomeSource {
                     int climateP = entry.climatePoint();
                     if (climateP < 0 || climateP >= climateCount) return;
 
-                    if (entry.type() == EntryType.DEFAULT)
+                    if (entry.type() == EntryType.DEFAULT) {
                         processDefaultEntry(entry, climateP, entriesByClimate, defaultEntryMap, assignedBiomeKeys);
-                    else if (entry.type() == EntryType.SUB_BIOME) subBiomeEntries.add(entry);
+                    } else if (entry.type() == EntryType.SUB_BIOME) {
+                        subBiomeEntries.add(entry);
+                        entry.biome().unwrapKey().ifPresent(assignedBiomeKeys::add);
+                    }
                 }));
         tagProvidedEntries(assignedBiomeKeys, entriesByClimate, defaultEntryMap);
         for (MosaicBiomeEntry subEntry : subBiomeEntries) processSubBiomeEntry(subEntry, defaultEntryMap);
@@ -381,9 +384,9 @@ public class MosaicBiomeSource extends BiomeSource {
 
         if (roll < keepWeight) return selectedEntry.biome;
         roll -= keepWeight;
-        for (SubBiomeReplacement repl : selectedEntry.replacements) {
-            roll -= repl.weight;
-            if (roll < 0) return repl.replacementBiome;
+        for (SubBiomeReplacement replacement : selectedEntry.replacements) {
+            roll -= replacement.weight;
+            if (roll < 0) return replacement.replacementBiome;
         }
 
         return selectedEntry.biome;
